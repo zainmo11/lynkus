@@ -1,7 +1,15 @@
-import React from "react";
+import { Outlet } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Sidebar from "../components/Sidebar";
 
 function Layout() {
-  return <div>layout</div>;
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-8 lg:grid-cols-8 max-w-screen-2xl min-h-screen mx-auto">
+      <Navbar />
+      <Outlet />
+      <Sidebar />
+    </div>
+  );
 }
 
 export default Layout;
