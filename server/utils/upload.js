@@ -4,7 +4,7 @@ const path = require('path');
 // Create a storage engine for user images
 const userStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/users/'); // Set the destination to 'uploads/users'
+        cb(null, '../uploads/users/'); // Set the destination to '../uploads/users'
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + '-' + file.originalname); // Unique filename
@@ -14,7 +14,7 @@ const userStorage = multer.diskStorage({
 // Create a storage engine for post images
 const postStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/posts/'); // Set the destination to 'uploads/posts'
+        cb(null, '../uploads/posts/'); // Set the destination to '../uploads/posts'
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + '-' + file.originalname); // Unique filename
