@@ -80,19 +80,19 @@ if (process.env.NODE_ENV !== "production") {
 // Swagger Setup
 const swaggerOptions = {
     swaggerDefinition: {
-        openapi: "3.0.0", // Specify the OpenAPI version
+        openapi: "3.0.0",
         info: {
-            title: "API Documentation", // Title of the API
-            version: "1.0.0", // Version of the API
-            description: "API documentation for my application.", // Description of the API
+            title: "API Documentation",
+            version: "1.0.0",
+            description: "API documentation for Social Media App",
         },
         servers: [
             {
-                url: `http://localhost:${process.env.PORT || 7000}`, // URL of the API
+                url: `http://localhost:${process.env.PORT || 7000}`,
             },
         ],
     },
-    apis: ["./routes/*.js"], // Path to the API docs (specify your routes directory)
+    apis: ["./routes/*.js"],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
