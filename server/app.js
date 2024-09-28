@@ -10,6 +10,8 @@ const rateLimit = require("express-rate-limit");
 const xss = require("xss-clean");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
+const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 
 const routes = require("./routes");
 const DBConnection = require("./DB");
@@ -74,6 +76,27 @@ if (process.env.NODE_ENV !== "production") {
     app.use(morgan("dev"));
     console.log(`Running in ${process.env.NODE_ENV} mode`);
 }
+
+// Swagger Setup
+const swaggerOptions = {
+    swaggerDefinition: {
+        openapi: "3.0.0", // Specify the OpenAPI version
+        info: {
+            title: "API Documentation", // Title of the API
+            version: "1.0.0", // Version of the API
+            description: "API documentation for my application.", // Description of the API
+        },
+        servers: [
+            {
+                url: `http://localhost:${process.env.PORT || 7000}`, // URL of the API
+            },
+        ],
+    },
+    apis: ["./routes/*.js"], // Path to the API docs (specify your routes directory)
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Routes
 app.use("/api", routes);
