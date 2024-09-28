@@ -19,7 +19,7 @@ node_modules/
 bower_components/
 
 # Environment variables
-.env
+server/.env
 .env.local
 .env.*.local
 
