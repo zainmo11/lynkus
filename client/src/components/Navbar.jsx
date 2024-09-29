@@ -1,3 +1,4 @@
+import logo from "../assets/logo.png";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -17,14 +18,14 @@ function Navbar() {
 
   return (
     <div className="w-full fixed bottom-0 md:static md:col-span-1 md:h-screen lg:col-span-2">
-      <nav className="bg-light-background dark:bg-dark-background w-full h-full z-20 rounded-tr-3xl rounded-tl-3xl md:rounded-none md:border-r border-gray-200 dark:border-gray-600">
+      <nav className="bg-light-background dark:bg-dark-background w-full h-full z-20 rounded-tr-3xl rounded-tl-3xl md:rounded-none md:border-r border-gray-600 ring-1 ring-dark-secondaryBackground md:ring-0 backdrop-blur-3xl md:backdrop-blur-none shadow-2xl shadow-blue-100 md:shadow-none">
         <div className="w-full h-full flex flex-col items-center justify-between mx-auto p-4">
           <Link
             to={"/"}
             className="w-full hidden md:flex items-center md:justify-center lg:justify-start md:mt-8 lg:ml-24"
           >
             <img
-              src="logo.png"
+              src={logo}
               className="md:h-14 lg:h-24 rounded-full object-cover"
               alt="Logo"
             />
@@ -85,7 +86,6 @@ function Navbar() {
             <button
               type="button"
               className="mx-auto p-2 text-white bg-red-700 hover:bg-blue-800 rounded-full dark:bg-red-700 dark:hover:bg-blue-700"
-              onClick={() => dispatch(toggleDarkMode())}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
