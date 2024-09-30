@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import Head from "./Head";
+import Head from "../components/Head";
 import { useSelector } from "react-redux";
 
 function Sidebar() {
