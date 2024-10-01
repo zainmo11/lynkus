@@ -26,6 +26,12 @@ export default {
           secondaryText: "#7FFFD4",
           accent: "#00CED1",
         },
+        // Button theme colors
+        button: {
+          default: "#008080",
+          hover: "#00CED1",
+          error: "#EC221F",
+        },
       },
       fontFamily: {
         roboto: ["Roboto", "sans-serif"],

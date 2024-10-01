@@ -6,9 +6,9 @@ function HomePage() {
   const posts = useSelector((state) => state.post.posts);
 
   return (
-    <div className="w-full max-h-screen bg-light-background dark:bg-dark-background col-span-8 md:col-span-7 lg:col-span-4 overflow-y-auto">
+    <div className="w-full max-h-screen bg-light-background dark:bg-dark-background md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar">
       <CreatePost />
-      <ul className="w-full  divide-y divide-gray-600 border-t border-gray-600">
+      <ul className="w-full divide-y divide-light-secondaryText dark:divide-dark-secondaryText border-t border-light-secondaryText dark:border-dark-secondaryText">
         {posts.map((x, i) => {
           return (
             <li
@@ -24,6 +24,7 @@ function HomePage() {
                 likes={x.likes}
                 commemts={x.comments}
                 showPost={x.showPost}
+                postLiked={x.postLiked}
                 index={i}
               />
             </li>

@@ -8,8 +8,12 @@ function Head({ username, name, profileImg }) {
         alt="Logo"
       />
       <div className="flex flex-col">
-        <p className="text-black font-semibold dark:text-white">{username}</p>
-        <p className="text-gray-500 font-medium dark:text-gray-400">{name}</p>
+        <p className="text-light-primaryText font-semibold dark:text-dark-primaryText">
+          {username}
+        </p>
+        <p className="text-light-secondaryText font-medium dark:text-dark-secondaryText">
+          {name}
+        </p>
       </div>
     </div>
   );

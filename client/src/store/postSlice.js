@@ -12,6 +12,7 @@ const initialState = {
       likes: 176,
       comments: 65,
       showPost: true,
+      postLiked: false,
     },
     {
       username: "User Two",
@@ -22,6 +23,7 @@ const initialState = {
       likes: 305,
       comments: 157,
       showPost: true,
+      postLiked: false,
     },
     {
       username: "User Three",
@@ -32,6 +34,7 @@ const initialState = {
       likes: 120,
       comments: 42,
       showPost: true,
+      postLiked: false,
     },
     {
       username: "User Four",
@@ -42,6 +45,7 @@ const initialState = {
       likes: 276,
       comments: 108,
       showPost: true,
+      postLiked: false,
     },
   ],
 };
@@ -54,9 +58,13 @@ export const postSlice = createSlice({
       state.posts[action.payload].showPost =
         !state.posts[action.payload].showPost;
     },
+    likePost: (state, action) => {
+      state.posts[action.payload].postLiked =
+        !state.posts[action.payload].postLiked;
+    },
   },
 });
 
-export const { togglePost } = postSlice.actions;
+export const { togglePost, likePost } = postSlice.actions;
 
 export default postSlice.reducer;
