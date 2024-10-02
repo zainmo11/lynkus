@@ -4,6 +4,18 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body,
+#root,
+.app {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  font-family: "Roboto", sans-serif;
+  @apply bg-light-background dark:bg-dark-background;
+}
+
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }

@@ -1,7 +1,6 @@
-import Head from "../components/Head";
-import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { LinkIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+import FollowCard from "../components/FollowCard";
 
 function Sidebar() {
   const users = useSelector((state) => state.user.users);
@@ -11,26 +10,12 @@ function Sidebar() {
       <div className="h-full row-span-1 pt-6 px-4">
         <div className="relative hidden md:block">
           <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-            <svg
-              className="w-4 h-4 text-light-secondaryText dark:text-dark-secondaryText"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 20 20"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-              />
-            </svg>
+            <MagnifyingGlassIcon className="size-5  fill-light-secondaryText dark:fill-dark-secondaryText" />
           </div>
           <input
             type="text"
             id="search-navbar"
-            className="block w-full p-2 ps-10 text-sm text-light-primaryText border border-gray-300 rounded-lg bg-light-secondaryBackground focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-secondaryBackground dark:border-gray-600 dark:placeholder-dark-secondaryText dark:text-dark-primaryText dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="block w-full p-2 ps-10 text-sm text-light-primaryText border-0 border-gray-300 rounded-lg bg-light-secondaryBackground  focus:ring-light-secondaryText dark:bg-dark-secondaryBackground dark:placeholder-dark-secondaryText dark:text-dark-primaryText dark:focus:ring-dark-secondaryText"
             placeholder="Search..."
           />
         </div>
@@ -43,22 +28,12 @@ function Sidebar() {
         <div className="w-full flex flex-col justify-center items-center gap-8">
           {users.map((x, i) => {
             return (
-              <div key={i} className="w-full flex justify-between items-center">
-                <Head
-                  username={x.username}
-                  name={x.name}
-                  profileImg={x.profileImg}
-                />
-                <Link
-                  to={"/profile"}
-                  className="bg-button-default hover:bg-button-hover pl-4 pr-5 py-2 flex justify-center items-center gap-2 rounded-xl"
-                >
-                  <LinkIcon className="size-4 text-dark-primaryText" />
-                  <p className="text-dark-primaryText text-base font-semibold">
-                    Link
-                  </p>
-                </Link>
-              </div>
+              <FollowCard
+                key={i}
+                username={x.username}
+                name={x.name}
+                profileImg={x.profileImg}
+              />
             );
           })}
         </div>
