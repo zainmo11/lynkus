@@ -92,7 +92,7 @@ const swaggerOptions = {
             },
         ],
     },
-    apis: ["./routes/*.js"],
+    apis: ["./Resources/**/*.js"],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
