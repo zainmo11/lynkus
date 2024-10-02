@@ -1,13 +1,15 @@
 const multer = require('multer');
 const path = require('path');
-
+const {v4: uuid4}=require("uuid")
 // Create a storage engine for user images
+
 const userStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, '../uploads/users/'); // Set the destination to '../uploads/users'
+        const uploadPath = path.join(__dirname, '../uploads/users'); // Absolute path
+        cb(null, uploadPath);
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname); // Unique filename
+        cb(null, `user-${uuid4()}-${Date.now()}-${file.originalname}`);
     },
 });
 
@@ -17,7 +19,7 @@ const postStorage = multer.diskStorage({
         cb(null, '../uploads/posts/'); // Set the destination to '../uploads/posts'
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname); // Unique filename
+        cb(null, `${Date.now()  }-${  file.originalname}`); // Unique filename
     },
 });
 
