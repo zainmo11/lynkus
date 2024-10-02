@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const commentController = require('./controller');
 const { validateComment } = require('./middleware');
+const {validateAuthentication} = require('../posts/middleware');
 
 /**
  * @swagger
@@ -113,12 +114,10 @@ const { validateComment } = require('./middleware');
  */
 
 // Comment routes
-router.post('/', validateComment, commentController.createComment);
+router.post('/', validateAuthentication, validateComment, commentController.createComment);
 router.get('/:postId', commentController.getCommentsByPost);
-router.put('/:id', commentController.updateComment);
-router.delete('/:id', commentController.deleteComment);
+router.put('/:id', validateAuthentication, validateComment, commentController.updateComment);
+router.delete('/:id', validateAuthentication, commentController.deleteComment);
 
 module.exports = router;
 
-// to-do
-// add authentication to the routes

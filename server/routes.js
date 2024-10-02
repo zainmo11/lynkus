@@ -12,8 +12,9 @@ const hashtags = require('./Resources/hashtags/routes');
 const bookmarks = require('./Resources/bookmarks/routes');
 const auth = require('./Resources/auth/routes');
 
-router.use('/users', users);
+
 router.use('/auth', auth);
+router.use('/users', users);
 router.use('/posts', posts);
 router.use('/notifications', notifications);
 router.use('/comments', comments);

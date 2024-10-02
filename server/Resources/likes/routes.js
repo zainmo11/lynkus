@@ -2,7 +2,7 @@ const express = require('express');
 const likeController = require('./controller');
 const router = express.Router();
 const {validateLike} = require('./middleware');
-
+const {validateAuthentication} = require('../posts/middleware');
 /**
  * @swagger
  * /likes:
@@ -84,10 +84,9 @@ const {validateLike} = require('./middleware');
  */
 
 // Like routes
-router.post('/',  validateLike, likeController.likePost);
+router.post('/', validateAuthentication, validateLike, likeController.likePost);
 router.get('/:postId', likeController.getLikes);
-router.delete('/',  validateLike, likeController.unlikePost);
-
+router.delete('/', validateAuthentication, validateLike, likeController.unlikePost);
 module.exports = router;
 
 
