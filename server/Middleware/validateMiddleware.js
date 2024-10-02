@@ -1,4 +1,4 @@
-const validationResult=require('express-validator')
+const {validationResult}=require('express-validator')
 
 const validatorMiddleware=(req, res, next)=>{
     // validation middleware here

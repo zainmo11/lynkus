@@ -12,7 +12,8 @@ const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const swaggerJsDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
-
+// eslint-disable-next-line import/no-extraneous-dependencies
+const cookieParser = require('cookie-parser');
 const routes = require("./routes");
 const DBConnection = require("./DB");
 const globalError = require("./Middleware/errorMiddleware");
@@ -71,6 +72,8 @@ app.use(
     })
 );
 
+app.use(cookieParser())
+
 // Development Logging
 if (process.env.NODE_ENV !== "production") {
     app.use(morgan("dev"));
@@ -80,7 +83,7 @@ if (process.env.NODE_ENV !== "production") {
 // Swagger Setup
 const swaggerOptions = {
     swaggerDefinition: {
-        openapi: "3.0.0",
+        openvpn: "3.0.0",
         info: {
             title: "API Documentation",
             version: "1.0.0",
@@ -92,6 +95,7 @@ const swaggerOptions = {
             },
         ],
     },
+
     apis: ["./Resources/**/*.js"],
 };
 
@@ -103,7 +107,7 @@ app.use("/api", routes);
 
 // Handle unrecognized routes
 app.all("*", (req, res, next) => {
-    next(ApiError("Route not found", 404));
+    next(new ApiError("Route not found", 404));
 });
 
 // Global Error Handler

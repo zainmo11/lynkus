@@ -1,5 +1,6 @@
 // this is the route
 const express = require('express');
+
 const router = express.Router();
 const { authorizePost, validatePost} = require('./middleware');
 const postController = require('./controller');
