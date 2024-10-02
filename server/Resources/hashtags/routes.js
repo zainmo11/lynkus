@@ -5,9 +5,9 @@ const { validateHashtag } = require('./middleware');
 
 /**
  * @swagger
- * /hashtags:
+ * /hashtags/from-post:
  *   post:
- *     summary: Create a new hashtag
+ *     summary: Create hashtags from a post body
  *     tags: [Hashtags]
  *     requestBody:
  *       required: true
@@ -16,17 +16,17 @@ const { validateHashtag } = require('./middleware');
  *           schema:
  *             type: object
  *             properties:
- *               text:
+ *               body:
  *                 type: string
- *                 description: The text of the hashtag.
+ *                 description: The body of the post containing hashtags.
  *               postId:
  *                 type: string
- *                 description: The ID of the post the hashtag is associated with.
+ *                 description: The ID of the post the hashtags are associated with.
  *     responses:
  *       201:
- *         description: Hashtag created successfully.
+ *         description: Hashtags created successfully.
  *       400:
- *         description: Bad request. Missing required fields.
+ *         description: No hashtags found in the post body.
  *       404:
  *         description: Post not found.
  *       500:
@@ -77,13 +77,50 @@ const { validateHashtag } = require('./middleware');
  *         description: Internal server error.
  */
 
+/**
+ * @swagger
+ * /hashtags/trending:
+ *   get:
+ *     summary: Get trending hashtags
+ *     tags: [Hashtags]
+ *     responses:
+ *       200:
+ *         description: List of trending hashtags.
+ *       500:
+ *         description: Internal server error.
+ */
+
+/**
+ * @swagger
+ * /hashtags/{hashtag}/posts:
+ *   get:
+ *     summary: Get posts associated with a specific hashtag
+ *     tags: [Hashtags]
+ *     parameters:
+ *       - in: path
+ *         name: hashtag
+ *         required: true
+ *         description: The hashtag to retrieve posts for.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of posts associated with the hashtag.
+ *       404:
+ *         description: Hashtag not found.
+ *       500:
+ *         description: Internal server error.
+ */
+
 // Hashtag routes
-router.post('/', validateHashtag, hashtagController.createHashtag);
+router.post('/', validateHashtag, hashtagController.createHashtagsFromPost);
 router.get('/:postId', hashtagController.getHashtagsByPost);
+router.get('/trending', hashtagController.getTrendingHashtags);
+router.get('/:hashtag/posts', hashtagController.getPostsByHashtag);
+router.get('/trending/posts', hashtagController.getPostsByTrendingHashtags);
 router.delete('/:id', hashtagController.deleteHashtag);
 
 module.exports = router;
-
 
 
 // to do
