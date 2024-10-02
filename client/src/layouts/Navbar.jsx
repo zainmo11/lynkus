@@ -20,6 +20,7 @@ import {
   UserIcon as UserSolid,
   EnvelopeIcon as EnvelopeSolid,
 } from "@heroicons/react/24/solid";
+import { DefaultButton, ErrorButton } from "../components/Buttons";
 
 function Navbar() {
   const location = useLocation();
@@ -49,40 +50,7 @@ function Navbar() {
               alt="Logo"
             />
           </Link>
-          <div className="hidden w-full mb-4 lg:flex flex-col gap-4 order-2">
-            <button
-              type="button"
-              className="w-3/4 mx-auto font-medium rounded-lg text-sm px-4 py-2 text-center text-dark-primaryText bg-button-default hover:bg-button-hover"
-              onClick={() => dispatch(toggleDarkMode())}
-            >
-              {darkMode ? "Light Mode" : "Dark Mode"}
-            </button>
-            <button
-              type="button"
-              className="w-3/4 mx-auto font-medium rounded-lg text-sm px-4 py-2 text-center text-dark-primaryText bg-button-error hover:bg-red-800"
-            >
-              Sign Out
-            </button>
-          </div>
-          <div className="w-full hidden md:flex mb-8 lg:hidden flex-col gap-8 order-2">
-            <button
-              type="button"
-              className="mx-auto p-2 text-dark-primaryText bg-button-default hover:bg-button-hover rounded-full"
-              onClick={() => dispatch(toggleDarkMode())}
-            >
-              {darkMode ? (
-                <SunIcon className="size-6" />
-              ) : (
-                <MoonIcon className="size-6" />
-              )}
-            </button>
-            <button
-              type="button"
-              className="mx-auto p-2 text-dark-primaryText bg-button-error hover:bg-red-800 rounded-full"
-            >
-              <ArrowLeftStartOnRectangleIcon className="size-6" />
-            </button>
-          </div>
+
           <ul className="w-full md:min-h-96 h-full flex md:flex-col items-center justify-between md:justify-start md:mt-20 lg:ml-24 md:gap-14 lg:gap-5 order-1 font-medium">
             <li className="w-full lg:flex items-center">
               <Link to={"/"} className="flex justify-center items-center gap-2">
@@ -168,6 +136,38 @@ function Navbar() {
               </Link>
             </li>
           </ul>
+          <div className="hidden mb-4 lg:flex flex-col gap-4 order-2 w-3/4">
+            {/* <DefaultButton label={"Dark Mode"} /> */}
+            <DefaultButton
+              label={darkMode ? "Light Mode" : "Dark Mode"}
+              Icon={darkMode ? SunIcon : MoonIcon}
+              onClick={() => dispatch(toggleDarkMode())}
+            />
+            <ErrorButton
+              label="Sign Out"
+              Icon={ArrowLeftStartOnRectangleIcon}
+              onClick={() => {}}
+            />
+          </div>
+          <div className="w-full hidden md:flex mb-8 lg:hidden flex-col gap-8 order-2">
+            <button
+              type="button"
+              className="mx-auto p-2 text-dark-primaryText bg-button-default hover:bg-button-hover rounded-full"
+              onClick={() => dispatch(toggleDarkMode())}
+            >
+              {darkMode ? (
+                <SunIcon className="size-6" />
+              ) : (
+                <MoonIcon className="size-6" />
+              )}
+            </button>
+            <button
+              type="button"
+              className="mx-auto p-2 text-dark-primaryText bg-button-error hover:bg-red-800 rounded-full"
+            >
+              <ArrowLeftStartOnRectangleIcon className="size-6" />
+            </button>
+          </div>
         </div>
       </nav>
     </div>

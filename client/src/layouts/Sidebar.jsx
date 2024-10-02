@@ -1,8 +1,6 @@
-import Head from "../components/Head";
-import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { LinkIcon } from "@heroicons/react/24/outline";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+import FollowCard from "../components/FollowCard";
 
 function Sidebar() {
   const users = useSelector((state) => state.user.users);
@@ -30,22 +28,12 @@ function Sidebar() {
         <div className="w-full flex flex-col justify-center items-center gap-8">
           {users.map((x, i) => {
             return (
-              <div key={i} className="w-full flex justify-between items-center">
-                <Head
-                  username={x.username}
-                  name={x.name}
-                  profileImg={x.profileImg}
-                />
-                <Link
-                  to={"/profile"}
-                  className="bg-button-default hover:bg-button-hover pl-4 pr-5 py-2 flex justify-center items-center gap-2 rounded-xl"
-                >
-                  <LinkIcon className="size-4 text-dark-primaryText" />
-                  <p className="text-dark-primaryText text-base font-semibold">
-                    Link
-                  </p>
-                </Link>
-              </div>
+              <FollowCard
+                key={i}
+                username={x.username}
+                name={x.name}
+                profileImg={x.profileImg}
+              />
             );
           })}
         </div>
