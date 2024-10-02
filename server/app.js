@@ -95,7 +95,8 @@ const swaggerOptions = {
             },
         ],
     },
-    apis: ['./Resources/**/*.js'],
+
+    apis: ["./Resources/**/*.js"],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
