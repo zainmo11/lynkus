@@ -1,25 +1,24 @@
 import logo from "../assets/logo.png";
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleDarkMode } from "../store/darkModeSlice";
 import {
   SunIcon,
   MoonIcon,
   ArrowLeftStartOnRectangleIcon,
   PhotoIcon,
 } from "@heroicons/react/24/outline";
+import { toggleTheme } from "../store/themeSlice";
 
 function CreatePost() {
-  const darkMode = useSelector((state) => state.darkMode.darkMode);
+  const theme = useSelector((state) => state.theme.theme);
+  const darkMode = theme === "dark";
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [darkMode]);
+  const changeTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    dispatch(toggleTheme());
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
+  };
 
   return (
     <>
@@ -29,7 +28,7 @@ function CreatePost() {
           <button
             type="button"
             className="mx-auto p-2 text-dark-primaryText bg-button-default hover:bg-button-hover rounded-full"
-            onClick={() => dispatch(toggleDarkMode())}
+            onClick={() => changeTheme()}
           >
             {darkMode ? (
               <SunIcon className="size-6" />

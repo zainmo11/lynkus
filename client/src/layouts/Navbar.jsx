@@ -1,8 +1,6 @@
 import logo from "../assets/logo.png";
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
-import { toggleDarkMode } from "../store/darkModeSlice";
 import {
   HomeIcon,
   MagnifyingGlassIcon,
@@ -21,20 +19,21 @@ import {
   EnvelopeIcon as EnvelopeSolid,
 } from "@heroicons/react/24/solid";
 import { DefaultButton, ErrorButton } from "../components/Buttons";
+import { toggleTheme } from "../store/themeSlice";
 
 function Navbar() {
   const location = useLocation();
   const { pathname } = location;
-  const darkMode = useSelector((state) => state.darkMode.darkMode);
+  const theme = useSelector((state) => state.theme.theme);
+  const darkMode = theme === "dark";
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [darkMode]);
+  const changeTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    dispatch(toggleTheme());
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
+  };
 
   return (
     <div className="w-full fixed bottom-0 md:static md:col-span-1 md:h-screen lg:col-span-2">
@@ -141,7 +140,7 @@ function Navbar() {
             <DefaultButton
               label={darkMode ? "Light Mode" : "Dark Mode"}
               Icon={darkMode ? SunIcon : MoonIcon}
-              onClick={() => dispatch(toggleDarkMode())}
+              onClick={() => changeTheme()}
             />
             <ErrorButton
               label="Sign Out"
@@ -153,7 +152,7 @@ function Navbar() {
             <button
               type="button"
               className="mx-auto p-2 text-dark-primaryText bg-button-default hover:bg-button-hover rounded-full"
-              onClick={() => dispatch(toggleDarkMode())}
+              onClick={() => changeTheme()}
             >
               {darkMode ? (
                 <SunIcon className="size-6" />
