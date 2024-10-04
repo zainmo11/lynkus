@@ -1,8 +1,12 @@
-import { flowbite } from "flowbite-react/tailwind";
+import flowbitePlugin from "flowbite/plugin";
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/flowbite/**/*.js",
+  ],
   theme: {
     extend: {
       colors: {
@@ -22,11 +26,18 @@ export default {
           secondaryText: "#7FFFD4",
           accent: "#00CED1",
         },
+        // Button theme colors
+        button: {
+          default: "#008080",
+          hover: "#00CED1",
+          error: "#EC221F",
+        },
       },
       fontFamily: {
         roboto: ["Roboto", "sans-serif"],
       },
     },
   },
-  plugins: [],
+  plugins: [flowbitePlugin],
+  darkMode: "class",
 };
