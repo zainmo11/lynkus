@@ -1,1 +1,21 @@
-// this is the model
+
+const mongoose = require('mongoose');
+
+const followsSchema = new mongoose.Schema({
+ 
+  user: { type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User', 
+    required: true
+ },
+
+ following: { type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User', 
+    required: true
+ }
+}
+  , { timestamps: true }
+
+);
+
+module.exports = mongoose.model('Follows', followsSchema);
+
