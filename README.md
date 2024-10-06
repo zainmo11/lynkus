@@ -1,3 +1,5 @@
+https://lynkus-3.onrender.com/api-docs/
+
 ## Note:
 
 create .env file in the root directory and add the following:
