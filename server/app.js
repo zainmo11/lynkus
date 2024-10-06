@@ -105,8 +105,8 @@ const swaggerOptions = {
         servers: [
             {
                 url: process.env.NODE_ENV === 'production'
-                    ? 'https://lynkus-3.onrender.com'
-                    : `http://localhost:${process.env.PORT || 7000}`,
+                    ? 'https://lynkus-3.onrender.com/api'
+                    : `http://localhost:${process.env.PORT || 7000}/api`,
             },
         ],
         components: {
