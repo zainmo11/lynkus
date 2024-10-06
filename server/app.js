@@ -25,7 +25,15 @@ DBConnection();
 const app = express();
 
 // Middleware
-app.use(cors());
+// Configure CORS options
+const corsOptions = {
+    origin: 'http://localhost:7000', // Allow requests from localhost:3000
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
+    credentials: true, // Allow credentials (if needed)
+};
+
+// Use CORS middleware
+app.use(cors(corsOptions));
 app.use(express.json({ limit: "20kb" })); // Limit request payload size
 app.use(express.static(path.join(__dirname, "uploads"))); // Serve static files
 app.use(compression()); // Compress responses
@@ -71,6 +79,11 @@ app.use(
         sameSite: "strict" // Restrict cookies to the same site
     })
 );
+
+// Define your API endpoints
+app.get('/users', (req, res) => {
+    res.send('User route');
+});
 
 app.use(cookieParser())
 
@@ -321,6 +334,76 @@ const swaggerOptions = {
                     },
                     required: ['user', 'post'],
                 },
+                Follows: {
+                    type: 'object',
+                    properties: {
+                        user: {
+                            type: 'string',
+                            description: 'ID of the user who is following another user',
+                            example: '613a1f4fcb1b8a5f7c89360a',
+                        },
+                        following: {
+                            type: 'string',
+                            description: 'ID of the user being followed',
+                            example: '613a1f4fcb1b8a5f7c89360b',
+                        },
+                        createdAt: {
+                            type: 'string',
+                            format: 'date-time',
+                            description: 'Follow creation timestamp',
+                            example: '2023-10-01T12:34:56.789Z',
+                        },
+                    },
+                    required: ['user', 'following'],
+                },
+                Notifications: {
+                    type: 'object',
+                    properties: {
+                        id: {
+                            type: 'string',
+                            description: 'Notification ID',
+                            example: '613a1f4fcb1b8a5f7c893610',
+                        },
+                        to: {
+                            type: 'string',
+                            description: 'ID of the user receiving the notification',
+                            example: '613a1f4fcb1b8a5f7c89360a',
+                        },
+                        from: {
+                            type: 'string',
+                            description: 'ID of the user who triggered the notification',
+                            example: '613a1f4fcb1b8a5f7c89360b',
+                        },
+                        post: {
+                            type: 'string',
+                            description: 'ID of the post associated with the notification (if applicable)',
+                            example: '613a1f4fcb1b8a5f7c89360b',
+                        },
+                        type: {
+                            type: 'string',
+                            enum: ['FOLLOW', 'LIKE', 'COMMENT', 'POST'],
+                            description: 'Type of the notification',
+                            example: 'LIKE',
+                        },
+                        content: {
+                            type: 'string',
+                            description: 'Content of the notification',
+                            example: 'John Doe liked your post.',
+                        },
+                        read: {
+                            type: 'boolean',
+                            description: 'Indicates if the notification has been read',
+                            example: false,
+                        },
+                        createdAt: {
+                            type: 'string',
+                            format: 'date-time',
+                            description: 'Notification creation timestamp',
+                            example: '2023-10-01T12:34:56.789Z',
+                        },
+                    },
+                    required: ['to', 'from', 'type', 'content'],
+                },
             },
         },
         tags: [
@@ -347,10 +430,6 @@ const swaggerOptions = {
             {
                 name: 'Likes',
                 description: 'Like operations',
-            },
-            {
-                name: 'Follows',
-                description: 'Follow operations',
             },
             {
                 name: 'Hashtags',
