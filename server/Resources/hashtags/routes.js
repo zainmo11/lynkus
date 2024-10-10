@@ -3,6 +3,7 @@ const router = express.Router();
 const hashtagController = require('./controller');
 const { validateHashtag } = require('./middleware');
 const {validateAuthentication} = require('../posts/middleware');
+const {authenticate}= require('../auth/authController')
 /**
  * @swagger
  * /hashtags/from-post:
@@ -113,12 +114,12 @@ const {validateAuthentication} = require('../posts/middleware');
  */
 
 // Hashtag routes
-router.post('/', validateAuthentication, validateHashtag, hashtagController.createHashtagsFromPost);
+router.post('/',authenticate, validateAuthentication, validateHashtag, hashtagController.createHashtagsFromPost);
 router.get('/:postId', hashtagController.getHashtagsByPost);
 router.get('/trending', hashtagController.getTrendingHashtags);
 router.get('/:hashtag/posts', hashtagController.getPostsByHashtag);
 router.get('/trending/posts', hashtagController.getPostsByTrendingHashtags);
-router.delete('/:id', validateAuthentication, hashtagController.deleteHashtag);
+router.delete('/:id',authenticate, validateAuthentication, hashtagController.deleteHashtag);
 
 module.exports = router;
 

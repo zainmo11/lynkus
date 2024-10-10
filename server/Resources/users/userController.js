@@ -91,7 +91,7 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
 
 //     res.status(201).json({ message: 'User created successfully' ,data: user });
 // });
-//for admin
+
 // exports.getUsers = asyncHandler(async (req, res, next) => {
     
 //     if (!req.user.isAdmin) {
@@ -182,29 +182,70 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
 
 
 exports.getUserProfile = asyncHandler(async (req, res, next) => {
-
-
     const { id } = req.params;
 
-if (!mongoose.Types.ObjectId.isValid(id)) {
+    // const page = req.query.page* 1 || 1; 
+    // const limit = req.query.limit* 1 || 10; 
+    // const skip = (page - 1) * limit; 
+
+    // Check if id is  mongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      
+        const user = await User.findOne({ name: id })
+            // .populate({
+            //     path: 'posts',
+            //     options: {
+            //         limit: limit,  
+            //         skip: skip,    
+            //     }
+            // });
+
+        if (!user) {
+            return next(new ApiError("UserProfile Not Found", 404));
+        }
+        // const totalCount = await Post.countDocuments({ authorId: user._id });
+        // const totalPages = Math.ceil(totalCount / limit);
     
-    const user = await User.findOne({ name: id })
-    //dont forget to add it .populate("posts");
+
+        return res.status(200).json({
+            // pagination: {
+
+            //     results:user.posts.length,
+            //     page: page,
+            //     totalPages,
+            // },
+            data: user,
+           
+        });
+    }
+
+    // If id is  ObjectId, find the user by id and paginate posts
+    const user = await User.findById(id)
+        // .populate({
+        //     path: 'posts',
+        //     options: {
+        //         limit: limit,  
+        //         skip: skip,    
+        //     }
+        // });
+
     if (!user) {
         return next(new ApiError("UserProfile Not Found", 404));
     }
-    return res.status(200).json({ data: user });
-}
+    // const totalCount = await Post.countDocuments({ authorId: id });
+    // const totalPages = Math.ceil(totalCount / limit);
 
-const user = await User.findById(id);
-  //dont forget to add it .populate("posts");
-
-if (!user) {
-    return next(new ApiError("UserProfile Not Found", 404));
-}
-res.status(200).json({ data: user });
-
+    res.status(200).json({
+       
+        // pagination: {
+        //     results:user.posts.length,
+        //     page: page,
+        //     totalPages,
+        // },
+         data: user,
+    });
 });
+
 
 exports.updateUser = asyncHandler(async (req, res, next) => {
     

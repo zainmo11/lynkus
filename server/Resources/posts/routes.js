@@ -5,7 +5,7 @@ const router = express.Router();
 const { authorizePost, validatePost} = require('./middleware');
 const postController = require('./controller');
 const { validateAuthentication } = require('./middleware');
-
+const {authenticate}= require('../auth/authController')
 /**
  * @swagger
  * /posts:
@@ -178,10 +178,10 @@ const { validateAuthentication } = require('./middleware');
 
 
 // Post routes
-router.post('/', validateAuthentication, validatePost, postController.createPost);
+router.post('/',authenticate, validateAuthentication, validatePost, postController.createPost);
 router.get('/:id', postController.getPost);
-router.put('/:id', validateAuthentication, authorizePost, validatePost, postController.updatePost);
-router.delete('/:id', validateAuthentication, authorizePost, postController.deletePost);
+router.put('/:id',authenticate, validateAuthentication, authorizePost, validatePost, postController.updatePost);
+router.delete('/:id',authenticate, validateAuthentication, authorizePost, postController.deletePost);
 router.get('/', postController.getAllPosts);
 router.get('/user/:userId', postController.getPostsByUser);
 router.get('/likes/:userId', postController.getPostsLikedByUser);
