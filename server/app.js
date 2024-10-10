@@ -35,7 +35,7 @@ const corsOptions = {
 // Use CORS middleware
 app.use(cors(corsOptions));
 app.use(express.json({ limit: "20kb" })); // Limit request payload size
-app.use(express.static(path.join(__dirname, "uploads"))); // Serve static files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(compression()); // Compress responses
 app.use(hpp()); // Protect against HTTP parameter pollution
 app.use(mongoSanitize()); // Prevent NoSQL injection
@@ -79,11 +79,6 @@ app.use(
         sameSite: "strict" // Restrict cookies to the same site
     })
 );
-
-// Define your API endpoints
-app.get('/users', (req, res) => {
-    res.send('User route');
-});
 
 app.use(cookieParser())
 
