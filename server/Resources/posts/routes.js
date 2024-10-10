@@ -17,24 +17,25 @@ const {authenticate}= require('../auth/authController')
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
- *               title:
+ *               body:
  *                 type: string
- *                 description: The title of the post.
- *               content:
+ *                 description: The body content of the post.
+ *               authorId:
  *                 type: string
- *                 description: The content of the post.
- *               userId:
+ *                 description: The ID of the post's author.
+ *               image:
  *                 type: string
- *                 description: The ID of the user creating the post.
+ *                 format: binary
+ *                 description: Optional image file for the post.
  *     responses:
  *       201:
  *         description: Post created successfully.
  *       400:
- *         description: Invalid request.
+ *         description: Invalid request - missing body or authorId.
  *       500:
  *         description: Internal server error.
  */
@@ -49,14 +50,16 @@ const {authenticate}= require('../auth/authController')
  *       - in: path
  *         name: id
  *         required: true
- *         description: The ID of the post to retrieve.
  *         schema:
  *           type: string
+ *         description: The ID of the post to retrieve.
  *     responses:
  *       200:
  *         description: Post retrieved successfully.
  *       404:
  *         description: Post not found.
+ *       400:
+ *         description: Invalid Post ID.
  *       500:
  *         description: Internal server error.
  */
@@ -65,35 +68,39 @@ const {authenticate}= require('../auth/authController')
  * @swagger
  * /posts/{id}:
  *   put:
- *     summary: Update a post
+ *     summary: Update a post by ID
  *     tags: [Posts]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: The ID of the post to update.
  *         schema:
  *           type: string
+ *         description: The ID of the post to update.
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
- *               title:
+ *               body:
  *                 type: string
- *                 description: The title of the post.
- *               content:
+ *                 description: The body content of the post.
+ *               authorId:
  *                 type: string
- *                 description: The content of the post.
+ *                 description: The ID of the post's author.
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: Optional image file to update.
  *     responses:
  *       200:
  *         description: Post updated successfully.
- *       400:
- *         description: Invalid request.
  *       404:
  *         description: Post not found.
+ *       400:
+ *         description: Invalid Post ID.
  *       500:
  *         description: Internal server error.
  */
@@ -102,20 +109,22 @@ const {authenticate}= require('../auth/authController')
  * @swagger
  * /posts/{id}:
  *   delete:
- *     summary: Delete a post
+ *     summary: Delete a post by ID
  *     tags: [Posts]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: The ID of the post to delete.
  *         schema:
  *           type: string
+ *         description: The ID of the post to delete.
  *     responses:
  *       200:
  *         description: Post deleted successfully.
  *       404:
  *         description: Post not found.
+ *       400:
+ *         description: Invalid Post ID.
  *       500:
  *         description: Internal server error.
  */
@@ -137,20 +146,22 @@ const {authenticate}= require('../auth/authController')
  * @swagger
  * /posts/user/{userId}:
  *   get:
- *     summary: Get posts by user ID
+ *     summary: Get all posts by a specific user
  *     tags: [Posts]
  *     parameters:
  *       - in: path
  *         name: userId
  *         required: true
- *         description: The ID of the user to retrieve posts for.
  *         schema:
  *           type: string
+ *         description: The ID of the user to retrieve posts for.
  *     responses:
  *       200:
  *         description: List of posts by the user.
  *       404:
- *         description: User not found or no posts for user.
+ *         description: No posts found for this user.
+ *       400:
+ *         description: Invalid User ID.
  *       500:
  *         description: Internal server error.
  */
@@ -165,62 +176,40 @@ const {authenticate}= require('../auth/authController')
  *       - in: path
  *         name: userId
  *         required: true
- *         description: The ID of the user to retrieve liked posts for.
  *         schema:
  *           type: string
+ *         description: The ID of the user to retrieve liked posts for.
  *     responses:
  *       200:
  *         description: List of posts liked by the user.
  *       404:
- *         description: User not found or no liked posts.
+ *         description: No liked posts found for this user.
+ *       400:
+ *         description: Invalid User ID.
  *       500:
  *         description: Internal server error.
  */
+
 /**
  * @swagger
  * /posts/searchPost:
  *   get:
- *     summary: Search for posts by text query
- *     description: Retrieves posts that match the search query in their body. The search query is passed as a query parameter.
- *     tags:
- *       - Posts
+ *     summary: Search posts by a search term
+ *     tags: [Posts]
  *     parameters:
  *       - in: query
  *         name: q
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The search query string to find matching posts in the body.
+ *         description: The search query to match post body content.
  *     responses:
  *       200:
- *         description: A list of posts that match the search query
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   _id:
- *                     type: string
- *                     description: Unique identifier for the post
- *                   image:
- *                     type: string
- *                     description: URL of the post image
- *                   body:
- *                     type: string
- *                     description: The content of the post
- *                   authorId:
- *                     type: string
- *                     description: ID of the post's author
- *                   createdAt:
- *                     type: string
- *                     format: date-time
- *                     description: The time the post was created
- *       400:
- *         description: Missing search query parameter
+ *         description: List of posts matching the search query.
+ *       404:
+ *         description: No posts found for the search term.
  *       500:
- *         description: Internal server error
+ *         description: Internal server error.
  */
 
 // Post routes
