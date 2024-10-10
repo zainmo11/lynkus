@@ -20,6 +20,7 @@ const { loginValidator, registerValidator } = require('./Validator');
  * /auth/register:
  *   post:
  *     summary: Register a new user
+ *     description: This endpoint allows a new user to register by providing their name, email, password, and other details. It checks if the email or username already exists before creating a new user.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -28,18 +29,60 @@ const { loginValidator, registerValidator } = require('./Validator');
  *           schema:
  *             type: object
  *             properties:
- *               username:
+ *               name:
  *                 type: string
+ *                 description: The full name of the user.
+ *               email:
+ *                 type: string
+ *                 description: The user's email address.
  *               password:
  *                 type: string
+ *                 description: The password for the account.
+ *               userName:
+ *                 type: string
+ *                 description: The username for the account.
+ *               ProfileImg:
+ *                 type: string
+ *                 description: URL of the user's profile image (optional).
  *             required:
- *               - username
+ *               - name
+ *               - email
  *               - password
+ *               - userName
  *     responses:
  *       201:
- *         description: User registered successfully
+ *         description: User registered successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Register Successful
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     userName:
+ *                       type: string
+ *                     ProfileImg:
+ *                       type: string
+ *                     _id:
+ *                       type: string
  *       400:
- *         description: Bad request
+ *         description: Bad request. Email or name already exists.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Email or name already exists.
  */
 router.post('/register', registerValidator, registerUser);
 
@@ -48,6 +91,7 @@ router.post('/register', registerValidator, registerUser);
  * /auth/login:
  *   post:
  *     summary: Log in an existing user
+ *     description: This endpoint allows an existing user to log in by providing their username and password. It verifies the user's identity and returns a success message if the login is successful.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -56,18 +100,49 @@ router.post('/register', registerValidator, registerUser);
  *           schema:
  *             type: object
  *             properties:
- *               username:
+ *               name:
  *                 type: string
+ *                 description: The username of the user.
  *               password:
  *                 type: string
+ *                 description: The password for the account.
  *             required:
- *               - username
+ *               - name
  *               - password
  *     responses:
  *       200:
- *         description: User logged in successfully
+ *         description: User logged in successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Login Successful
+ *                 token:
+ *                   type: string
+ *                   description: A JWT token for authentication.
  *       401:
- *         description: Unauthorized
+ *         description: Unauthorized. Incorrect username or password.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Incorrect email or password.
+ *       404:
+ *         description: User not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: User not found.
  */
 router.post('/login', loginValidator, login);
 
