@@ -1,6 +1,6 @@
 const Like = require('./model');
 const Post = require('../posts/model');
-
+const Notification = require('../notifications/model');
 // Like a post
 exports.likePost = async (req, res) => {
     try {
@@ -14,6 +14,22 @@ exports.likePost = async (req, res) => {
 
         const like = new Like({ postId, userId });
         await like.save();
+
+
+         // Notify the post owner about the new liked post
+         const post = await Post.findById(postId);
+         if (!post) {
+             return res.status(404).send({ message: 'Post not found' });
+         }
+         const notification = new Notification({
+             to: post.authorId,
+             from: req.user._id,
+             content: `${req.user.name} liked your post`,
+             type: 'LIKE',
+             post: post._id
+         });
+         await notification.save();
+
 
         res.status(201).send(like);
     } catch (error) {

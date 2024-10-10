@@ -3,7 +3,7 @@ const router = express.Router();
 const commentController = require('./controller');
 const { validateComment } = require('./middleware');
 const {validateAuthentication} = require('../posts/middleware');
-
+const {authenticate}= require('../auth/authController')
 /**
  * @swagger
  * /comments:
@@ -114,10 +114,10 @@ const {validateAuthentication} = require('../posts/middleware');
  */
 
 // Comment routes
-router.post('/', validateAuthentication, validateComment, commentController.createComment);
+router.post('/', authenticate, validateComment, commentController.createComment);
 router.get('/:postId', commentController.getCommentsByPost);
-router.put('/:id', validateAuthentication, validateComment, commentController.updateComment);
-router.delete('/:id', validateAuthentication, commentController.deleteComment);
+router.put('/:id',authenticate, validateComment, commentController.updateComment);
+router.delete('/:id',authenticate, commentController.deleteComment);
 
 module.exports = router;
 

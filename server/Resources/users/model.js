@@ -36,7 +36,10 @@ const userSchema = new mongoose.Schema({
         select: false,
 
     },
-    passwordChangedAt: Date,
+    passwordChangedAt: {
+      type:Date,
+      select: false,
+    },
     passwordResetCode: String,
     passwordResetExpires: Date,
     passwordResetVerified: Boolean,
@@ -44,20 +47,29 @@ const userSchema = new mongoose.Schema({
    
     resetToken: String,
     resetTokenExpiration: Date,
+
 },
     {timestamps: true}
+
+    
 );
+
+userSchema.set('toObject', { virtuals: true });
+userSchema.set('toJSON', { virtuals: true });
+
 //Virtual Properties for Get Posts To User Profile 
 userSchema.virtual('posts', {
-    ref: 'Post',
-    foreignField: 'user',
-    localField: '_id',
-  });
+  ref: 'Post',
+  foreignField: 'authorId',
+  localField: '_id',
+});
+
 
 //For Hashing Password Before Save Into Database
 userSchema.pre('save', async function(next) {
     if(!this.isModified('password')) return next();
-
+    
+    //Hashing password
     this.password = await bcrypt.hash(this.password, 10);
 
     this.passwordChangedAt = Date.now() - 1000;
