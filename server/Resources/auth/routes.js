@@ -17,7 +17,7 @@ const { loginValidator, registerValidator } = require('./Validator');
 
 /**
  * @swagger
- * /register:
+ * /auth/register:
  *   post:
  *     summary: Register a new user
  *     tags: [Auth]
@@ -45,7 +45,7 @@ router.post('/register', registerValidator, registerUser);
 
 /**
  * @swagger
- * /login:
+ * /auth/login:
  *   post:
  *     summary: Log in an existing user
  *     tags: [Auth]
@@ -73,7 +73,7 @@ router.post('/login', loginValidator, login);
 
 /**
  * @swagger
- * /logout:
+ * /auth/logout:
  *   post:
  *     summary: Log out the current user
  *     tags: [Auth]
@@ -87,7 +87,7 @@ router.post('/logout', logout);
 
 /**
  * @swagger
- * /refresh:
+ * /auth/refresh:
  *   post:
  *     summary: Refresh the access token
  *     tags: [Auth]
@@ -103,7 +103,7 @@ router.post('/refresh', refreshAccessToken);
 
 /**
  * @swagger
- * /forgotPassword:
+ * /auth/forgotPassword:
  *   post:
  *     summary: Request a password reset
  *     tags: [Auth]
@@ -128,7 +128,7 @@ router.post('/forgotPassword', forgotPassword);
 
 /**
  * @swagger
- * /verifyResetCode:
+ * /auth/verifyResetCode:
  *   post:
  *     summary: Verify password reset code
  *     tags: [Auth]
@@ -153,7 +153,7 @@ router.post('/verifyResetCode', verifyPasswordResetCode);
 
 /**
  * @swagger
- * /resetPassword:
+ * /auth/resetPassword:
  *   put:
  *     summary: Reset user password
  *     tags: [Auth]

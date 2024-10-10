@@ -112,6 +112,41 @@ const {authenticate}= require('../auth/authController')
  *       500:
  *         description: Internal server error.
  */
+/**
+ * @swagger
+ * /hashtags/{id}:
+ *   delete:
+ *     summary: Delete a specific hashtag
+ *     description: This endpoint allows authenticated users to delete a hashtag by its unique ID.
+ *     tags: [Hashtags]
+ *     security:
+ *       - bearerAuth: []  # Ensures authentication is required
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique ID of the hashtag to delete.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Hashtag deleted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Hashtag deleted successfully.
+ *       401:
+ *         description: Unauthorized. Authentication required.
+ *       404:
+ *         description: Hashtag not found.
+ *       500:
+ *         description: Internal server error.
+ */
+
 
 // Hashtag routes
 router.post('/',authenticate, validateHashtag, hashtagController.createHashtagsFromPost);
@@ -123,6 +158,3 @@ router.delete('/:id',authenticate, hashtagController.deleteHashtag);
 
 module.exports = router;
 
-
-// to do
-// add authentication to the routes

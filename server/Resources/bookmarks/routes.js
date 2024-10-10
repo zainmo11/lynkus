@@ -9,7 +9,7 @@ const { createBookMarkValidator, deleteBookMarkValidator } = require('./Validato
 
 /**
  * @swagger
- * /api/bookmarks:
+ * /bookmarks/bookmarks:
  *   get:
  *     summary: Retrieve bookmarks for the authenticated user.
  *     tags:
@@ -58,7 +58,7 @@ const { createBookMarkValidator, deleteBookMarkValidator } = require('./Validato
 
 /**
  * @swagger
- * /api/bookmarks/{id}:
+ * /bookmarks/bookmarks/{id}:
  *   post:
  *     summary: Create a new bookmark.
  *     tags:
@@ -125,7 +125,7 @@ const { createBookMarkValidator, deleteBookMarkValidator } = require('./Validato
 
 /**
  * @swagger
- * /api/bookmarks/{id}:
+ * /bookmarks/bookmarks/{id}:
  *   delete:
  *     summary: Delete a bookmark.
  *     tags:

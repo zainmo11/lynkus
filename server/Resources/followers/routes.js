@@ -8,7 +8,7 @@ const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser}=req
 
 /**
  * @swagger
- * /followers/{id}:
+ * /follows/{id}:
  *   get:
  *     summary: Get User Followers
  *     tags: [Followers]
@@ -53,7 +53,7 @@ const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser}=req
 
 /**
  * @swagger
- * /following/{id}:
+ * /follows/following/{id}:
  *   get:
  *     summary: Get User Following
  *     tags: [Following]
@@ -98,7 +98,7 @@ const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser}=req
 
 /**
  * @swagger
- * /{id}:
+ * /follows/{id}:
  *   post:
  *     summary: Follow a User
  *     tags: [Followers]
@@ -138,7 +138,7 @@ const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser}=req
 
 /**
  * @swagger
- * /recommended:
+ * /follows/recommended:
  *   get:
  *     summary: Get Recommended Followers
  *     tags: [Followers]
