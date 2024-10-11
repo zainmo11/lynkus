@@ -5,6 +5,7 @@ import ProfilePage from "./pages/ProfilePage";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { setTheme } from "./store/themeSlice";
+import PostDetailsPage from "./pages/PostDetailsPage.jsx";
 
 function App() {
   const dispatch = useDispatch();
@@ -29,6 +30,7 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
+          <Route path="/post/:postId" element={<PostDetailsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Routes>

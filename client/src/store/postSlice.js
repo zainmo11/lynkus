@@ -151,8 +151,13 @@ export const postSlice = createSlice({
         !state.posts[action.payload].showPost;
     },
     likePost: (state, action) => {
-      state.posts[action.payload].postLiked =
-        !state.posts[action.payload].postLiked;
+      const post = state.posts[action.payload];
+      if (post.postLiked) {
+        post.likes--;
+      } else {
+        post.likes++;
+      }
+      post.postLiked = !post.postLiked;
     },
     toggleLikedPosts: (state, action) => {
       state.likedPosts[action.payload].postLiked =
