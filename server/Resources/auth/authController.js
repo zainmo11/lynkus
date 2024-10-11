@@ -9,7 +9,7 @@ const ApiError = require('../../utils/apiError')
 const sendEmail=require('../../utils/sendEmail')
 
  exports.registerUser=asyncHandler(async(req,res,next)=>{
-    const {name,email,password,userName,ProfileImg,}=req.body
+    const {name,email,password,userName,profileImg,}=req.body
     const isExist=await User.findOne({
     $or:[
             {email},
@@ -20,9 +20,11 @@ const sendEmail=require('../../utils/sendEmail')
     {
       return  next(new ApiError('Email or name already exists',400))
     }
-    const user=await User.create({name,email,password,userName,ProfileImg})
-   
-    res.status(201).json({user})
+    const user=await User.create({name,email,password,userName,profileImg})
+    const Suer=user.toObject();
+    delete Suer.password
+  
+    res.status(201).json({message:'Register Successful',data:Suer})
 
  })
  exports.login = asyncHandler(async (req, res, next) => {
@@ -52,15 +54,25 @@ const sendEmail=require('../../utils/sendEmail')
             Date.now() + 7 * 24 * 60 * 60 * 1000 //7 days in milliseconds
         ) });
     res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: true, 
-        sameSite: 'Strict', // sent from same site
-        path: '/',
+      httpOnly: true, // prevent xss attacks and cookies is sent over HTTP
+      secure: true, // make sure the token is only sent over encrypted HTTPS connections.
+      sameSite: 'Strict', // sent from same site prevent CSRF attacks
+      path: '/', // make sure cookie accessible to all routes
     });
+    
+   if (process.env.NODE_ENV !== "production") {
+    res.status(200)
+    .json({ message:'User logged in successfully',user, AccessToken });
+}
+
+
+    else {
+      res.status(200)
+      .json({ message:'User logged in successfully', AccessToken });
+   }
 
     
-    res.status(200)
-        .json({ data: user, AccessToken });
+   
 });
 
 
@@ -93,7 +105,7 @@ exports.authenticate = asyncHandler(async (req, res, next) =>{
 const token=  req.headers.authorization &&req.headers.authorization.startsWith('Bearer')?
 req.headers.authorization.split(' ')[1]:null
 
-if(!token) return next(new ApiError('you are not login , login ',401))
+if(!token) return next(new ApiError('you are not login , login now ',401))
 
     
         const decoded = jwt.verify(token, process.env.JWT_Access_SECRET_KEY);

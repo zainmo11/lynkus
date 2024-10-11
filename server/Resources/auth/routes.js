@@ -25,6 +25,29 @@ const { loginValidator, registerValidator } = require('./Validator');
  *     requestBody:
  *       required: true
  *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               userName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               passwordConfirm:
+ *                 type: string
+ *               profileImage:
+ *                 type: string
+ *                 format: binary
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *               - userName
+ *               - passwordConfirm
  *         application/json:
  *           schema:
  *             type: object
@@ -38,10 +61,13 @@ const { loginValidator, registerValidator } = require('./Validator');
  *               password:
  *                 type: string
  *                 description: The password for the account.
+ *               passwordConfirm:
+ *                  type: string
+ *                  description: The user's password confirmation
  *               userName:
  *                 type: string
  *                 description: The username for the account.
- *               ProfileImg:
+ *               profileImg:
  *                 type: string
  *                 description: URL of the user's profile image (optional).
  *             required:
@@ -49,6 +75,7 @@ const { loginValidator, registerValidator } = require('./Validator');
  *               - email
  *               - password
  *               - userName
+ *               - passwordConfirm
  *     responses:
  *       201:
  *         description: User registered successfully.
@@ -69,9 +96,11 @@ const { loginValidator, registerValidator } = require('./Validator');
  *                       type: string
  *                     userName:
  *                       type: string
- *                     ProfileImg:
+ *                     profileImg:
  *                       type: string
  *                     _id:
+ *                       type: string
+ *                     id:
  *                       type: string
  *       400:
  *         description: Bad request. Email or name already exists.
@@ -91,7 +120,11 @@ router.post('/register', registerValidator, registerUser);
  * /auth/login:
  *   post:
  *     summary: Log in an existing user
- *     description: This endpoint allows an existing user to log in by providing their username and password. It verifies the user's identity and returns a success message if the login is successful.
+ *     description: This endpoint allows an existing user to log in by providing their username and password. It verifies the user's identity and returns a success message if the login is successful
+ * 
+ *                   <h3>The refresh token is automatically stored in an HTTP-only cookie and not included in the response body.
+ *                    its ok to use The AccessToken as normal Token Without Caring About The Refresh Token
+ *                        .</h3>.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -113,6 +146,7 @@ router.post('/register', registerValidator, registerUser);
  *       200:
  *         description: User logged in successfully.
  *         content:
+ *         
  *           application/json:
  *             schema:
  *               type: object
@@ -120,9 +154,13 @@ router.post('/register', registerValidator, registerUser);
  *                 message:
  *                   type: string
  *                   example: Login Successful
- *                 token:
+ *                 AccessToken:
  *                   type: string
  *                   description: A JWT token for authentication.
+ *                 refreshToken:
+ *                   type: string
+ *                   description: "The refresh token is automatically stored in a secure, HTTP-only cookie and **will not** be visible in the response body."
+ *                   example: "Stored in cookie"
  *       401:
  *         description: Unauthorized. Incorrect username or password.
  *         content:

@@ -8,6 +8,11 @@ const { authenticate } = require('../auth/authController');
  * tags:
  *   name: Notifications
  *   description: API for managing user notifications
+ *   securitySchemes:
+ *     tokenAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 
 /**
@@ -32,6 +37,8 @@ const { authenticate } = require('../auth/authController');
  *                     type: object
  *                     properties:
  *                       _id:
+ *                         type: string
+ *                       id:
  *                         type: string
  *                       from:
  *                         type: object

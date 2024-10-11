@@ -6,19 +6,55 @@ const {authenticate}=require('../auth/authController')
 
 const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser}=require('./controller')
 
+
+
+
 /**
  * @swagger
- * /follows/{id}:
+ * components:
+ *   securitySchemes:
+ *     tokenAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
+
+
+/**
+ * 
+ * 
+ * 
+ * @swagger
+ * /follows/followers/{id}:
  *   get:
  *     summary: Get User Followers
- *     tags: [Followers]
+ *     tags: [Follows]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         description: The ID of the user whose followers are to be retrieved.
+ *                      <h4>You can send MongoObjectId or 'name' of the user</h4>
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search users by a keyword (name)
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of users per page for pagination
  *     responses:
  *       200:
  *         description: A list of followers for the user.
@@ -37,6 +73,8 @@ const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser}=req
  *                         properties:
  *                           _id:
  *                             type: string
+ *                           id:
+ *                             type: string
  *                           name:
  *                             type: string
  *                           profileImg:
@@ -50,20 +88,40 @@ const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser}=req
  *       404:
  *         description: User not found.
  */
+router.get('/followers/:id', getUserFollowers)
+
 
 /**
  * @swagger
  * /follows/following/{id}:
  *   get:
  *     summary: Get User Following
- *     tags: [Following]
+ *     tags: [Follows]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         description: The ID of the user whose followings are to be retrieved.
+ *                      <h4>You can send MongoObjectId or 'name' of the user</h4>
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search users by a keyword (name)
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of users per page for pagination
  *     responses:
  *       200:
  *         description: A list of users that the specified user is following.
@@ -82,6 +140,8 @@ const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser}=req
  *                         properties:
  *                           _id:
  *                             type: string
+ *                           id:
+ *                             type: string
  *                           name:
  *                             type: string
  *                           profileImg:
@@ -95,13 +155,13 @@ const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser}=req
  *       404:
  *         description: User not found.
  */
-
+router.get('/following/:id', getUserFollowing)
 /**
  * @swagger
  * /follows/{id}:
  *   post:
  *     summary: Follow a User
- *     tags: [Followers]
+ *     tags: [Follows]
  *     parameters:
  *       - in: path
  *         name: id
@@ -110,7 +170,7 @@ const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser}=req
  *         schema:
  *           type: string
  *     security:
- *       - bearerAuth: []  # Requires authentication
+ *       - tokenAuth: []  # Requires authentication
  *     responses:
  *       200:
  *         description: User followed or unfollowed successfully.
@@ -135,15 +195,15 @@ const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser}=req
  *       404:
  *         description: User not found.
  */
-
+router.post('/:id', authenticate,followUser)
 /**
  * @swagger
  * /follows/recommended:
  *   get:
  *     summary: Get Recommended Followers
- *     tags: [Followers]
+ *     tags: [Follows]
  *     security:
- *       - bearerAuth: []  # Requires authentication
+ *       - tokenAuth: []  # Requires authentication
  *     responses:
  *       200:
  *         description: A list of recommended users.
@@ -164,11 +224,6 @@ const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser}=req
  *       404:
  *         description: No recommended users found.
  */
-router.get('/followers/:id', getUserFollowers)
-
-router.get('/following/:id', getUserFollowing)
-
-router.post('/:id', authenticate,followUser)
 router.get('/recommended',authenticate, getRecommendedFollowers)
 
 

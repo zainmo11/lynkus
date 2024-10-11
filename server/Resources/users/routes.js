@@ -12,6 +12,11 @@ const router = express.Router();
  * tags:
  *   name: Users
  *   description: User management and operations
+ *   securitySchemes:
+ *     tokenAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 
 /**
@@ -19,7 +24,26 @@ const router = express.Router();
  * /users:
  *   get:
  *     summary: Search for users
+ *     description: Returns a list of users. If no parameters are provided, it will return all users with pagination.
  *     tags: [Users]
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search users by a keyword (name)
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of users per page for pagination
  *     responses:
  *       200:
  *         description: A list of users
@@ -32,9 +56,14 @@ const router = express.Router();
  *                 properties:
  *                   id:
  *                     type: string
+ *                   _id:
+ *                     type: string
  *                   name:
  *                     type: string
+ *                   email:
+ *                     type: string
  */
+
 router.get('/', searchUser);
 
 /**
@@ -68,7 +97,8 @@ router.put('/changePassword', authenticate, changeUserPasswordValidator, changeU
  * @swagger
  * /users/profile/{id}:
  *   get:
- *     summary: Get user profile by ID
+ *     summary: Get user profile by ID 
+ *     description: <h3>You Can Send MongoObjectId or "name" of the User.</h3>
  *     tags: [Users]
  *     parameters:
  *       - name: id
@@ -76,22 +106,56 @@ router.put('/changePassword', authenticate, changeUserPasswordValidator, changeU
  *         required: true
  *         schema:
  *           type: string
+ *         description: The ID or name of the user
  *     responses:
  *       200:
  *         description: User profile retrieved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     _id:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                     userName:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     profileImg:
+ *                       type: string
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                 FollowerCount:
+ *                   type: integer
+ *                   description: Number of followers
+ *                 FollowingCount:
+ *                   type: integer
+ *                   description: Number of users the user is following
  *       404:
  *         description: User not found
  */
+
 router.route('/profile/:id').get(getUserProfile);
 
 /**
  * @swagger
  * /users:
  *   delete:
- *     summary: Delete a user
+ *     summary: Delete user Account
  *     tags: [Users]
  *     security:
- *       - bearerAuth: []
+ *        - tokenAuth: []
  *     responses:
  *       200:
  *         description: User deleted
@@ -109,21 +173,20 @@ router.route('/').delete(authenticate, deleteUser);
  *     security:
  *       - bearerAuth: []
  *     requestBody:
- *       required: true
+ *       required: false
  *       content:
  *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               userName:
  *                 type: string
  *               email:
- *                 type: string
- *               password:
  *                 type: string
  *               profileImage:
  *                 type: string
  *                 format: binary
+ * 
  *     responses:
  *       200:
  *         description: User profile updated

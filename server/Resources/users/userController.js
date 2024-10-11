@@ -11,7 +11,7 @@ const Comment = require("../comments/model")
 const BookMark = require("../bookmarks/model")
 const {userUpload} = require("../../utils/upload")
 const refreshToken=require("../auth/RefreshTokenModel")
-
+const Follows=require("../followers/model")
 exports.UploadProfileImg=userUpload.single("profileImg");
 
 exports.resizeImg = asyncHandler(async (req, res, next) => {
@@ -150,6 +150,7 @@ exports.searchUser = asyncHandler(async (req, res, next) => {
 
     const totalCount = await User.countDocuments(query);
     const totalPages = Math.ceil(totalCount / limit);
+    
 
     res.status(200).json({ results: user.length, page, totalPages, data: user });
 });
@@ -159,10 +160,10 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
     const id = req.user._id;
 
     // Delete related posts, comments, bookmarks, and refresh tokens for the user
-    // await Post.deleteMany({ user: id });
-    // await Comment.deleteMany({ user: id });
-    // await BookMark.deleteMany({ user: id });
-    // await refreshToken.deleteMany({ user: id });
+    await Post.deleteMany({ user: id });
+    await Comment.deleteMany({ user: id });
+    await BookMark.deleteMany({ user: id });
+    await refreshToken.deleteMany({ user: id });
 
    
     const user = await User.findByIdAndDelete(id);
@@ -182,29 +183,76 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
 
 
 exports.getUserProfile = asyncHandler(async (req, res, next) => {
-
-
     const { id } = req.params;
 
-if (!mongoose.Types.ObjectId.isValid(id)) {
+    // const page = req.query.page*1 || 1; 
+    // const limit = req.query.limit*1 || 10; 
+    // const skip = (page - 1) * limit; 
+
+    // Check if id is  mongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      
+        const user = await User.findOne({ name: id })
+            // .populate({
+            //     path: 'posts',
+            //     options: {
+            //         limit: limit,  
+            //         skip: skip,    
+            //     }
+            // });
+
+        if (!user) {
+            return next(new ApiError("UserProfile Not Found", 404));
+        }
+        // const totalCount = await Post.countDocuments({ authorId: user._id });
+        // const totalPages = Math.ceil(totalCount / limit);
     
-    const user = await User.findOne({ name: id })
-    //dont forget to add it .populate("posts");
+        const followersCount=await Follows.countDocuments({following:user._id});
+        const followingCount=await Follows.countDocuments({user:user._id});
+        return res.status(200).json({
+            // pagination: {
+
+            //     results:user.posts.length,
+            //     page: page,
+            //     totalPages,
+            // },
+            followersCount,
+            followingCount,
+            data: user,
+           
+        });
+    }
+
+    // If id is  ObjectId, find the user by _id and paginate posts
+    const user = await User.findById(id)
+        // .populate({
+        //     path: 'posts',
+        //     options: {
+        //         limit: limit,  
+        //         skip: skip,    
+        //     }
+        // });
+
     if (!user) {
         return next(new ApiError("UserProfile Not Found", 404));
     }
-    return res.status(200).json({ data: user });
-}
-
-const user = await User.findById(id);
-  //dont forget to add it .populate("posts");
-
-if (!user) {
-    return next(new ApiError("UserProfile Not Found", 404));
-}
-res.status(200).json({ data: user });
-
+    // const totalCount = await Post.countDocuments({ authorId: id });
+    // const totalPages = Math.ceil(totalCount / limit);
+    const followersCount=await Follows.countDocuments({following:id})
+    const followingCount=await Follows.countDocuments({user:id})
+    res.status(200).json({
+       
+        // pagination: {
+        //     results:user.posts.length,
+        //     page: page,
+        //     totalPages,
+        // },
+        followersCount,
+        followingCount,
+         data: user,
+    });
 });
+
 
 exports.updateUser = asyncHandler(async (req, res, next) => {
     
@@ -216,8 +264,8 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   const user = await User.findOneAndUpdate( 
         req.user._id,
         {
-          username: req.body.userName,
-          email: req.body.email,
+            username: req.body.userName,
+            email: req.body.email,
             profileImg: req.body.profileImg,
   
            
