@@ -1,6 +1,7 @@
 ## Note:
 
- link for documentation : https://lynkus-3.onrender.com/api-docs/
+ link for documentation : [Lynkus Swagger](https://lynkus-3.onrender.com/api-docs/)
+
 create .env file in the root directory and add the following:
 
 ```
