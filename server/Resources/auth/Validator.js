@@ -6,9 +6,32 @@ const validatorMiddleware = require('../../Middleware/validateMiddleware');
 exports.registerValidator = [
   check('name')
     .notEmpty()
-    .withMessage('User required')
+    .withMessage('name required')
     .isLength({ min: 3 })
-    .withMessage('Too short User name')
+    .withMessage('Too short User name'),
+  check('userName')
+    .notEmpty()
+    .withMessage('userName required')
+    .isLength({ min: 3, max: 30 })
+    .withMessage('User Name must be between 3 and 30 characters')
+    .customSanitizer((value) => {
+      // Replace spaces with underscores in userName
+      return value.toLowerCase().replace(/\s+/g, '_');
+    }) .matches(/^[a-zA-Z0-9._]+$/)
+    .withMessage('User name can only contain letters, numbers, underscores, and periods')
+    .custom((value) => {
+      if (/^\./.test(value) || /^\_/.test(value)) {
+        throw new Error('User name cannot start with a period or underscore');
+      }
+      if (/\.\./.test(value) || /\_\_/.test(value)) {
+        throw new Error('User name cannot contain consecutive periods or underscores');
+      }
+      if (/\.$/.test(value) || /\_$/.test(value)) {
+        throw new Error('User name cannot end with a period or underscore');
+      }
+      return true;
+    })
+
 ,
   check('email')
     .notEmpty()
@@ -49,9 +72,9 @@ exports.registerValidator = [
 ];
 
 exports.loginValidator = [
-  check('name')
+  check('userName')
     .notEmpty()
-    .withMessage('Name required')
+    .withMessage('userName required')
     
     ,
 

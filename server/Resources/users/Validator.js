@@ -5,9 +5,9 @@ const User=require('./model')
 
 
 exports.updateUserValidator = [
-  body('userName')
+  body('name')
   .optional()
-    .notEmpty().withMessage('UserName is required'),
+    .notEmpty().withMessage('Name is required'),
     
     check('email')
     .optional()

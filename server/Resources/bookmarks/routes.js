@@ -4,16 +4,27 @@ const router = express.Router();
 
 const { createBookmark, deleteBookmark, getUserBookmarks } = require('./controller');
 const { createBookMarkValidator, deleteBookMarkValidator } = require('./Validator');
-
+const {authenticate}= require('../auth/authController')
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     tokenAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
 
 
 /**
  * @swagger
- * /bookmarks/bookmarks:
+ * /bookmarks/:
  *   get:
  *     summary: Retrieve bookmarks for the authenticated user.
  *     tags:
  *       - Bookmarks 
+ *     security:
+ *       - tokenAuth: []  # Requires authentication
  *     responses:
  *       200:
  *         description: A successful response
@@ -58,11 +69,13 @@ const { createBookMarkValidator, deleteBookMarkValidator } = require('./Validato
 
 /**
  * @swagger
- * /bookmarks/bookmarks/{id}:
+ * /bookmarks/{id}:
  *   post:
  *     summary: Create a new bookmark.
  *     tags:
  *       - Bookmarks  
+ *     security:
+ *       - tokenAuth: []  # Requires authentication
  *     parameters:
  *       - name: id
  *         in: path
@@ -125,11 +138,13 @@ const { createBookMarkValidator, deleteBookMarkValidator } = require('./Validato
 
 /**
  * @swagger
- * /bookmarks/bookmarks/{id}:
+ * /bookmarks/{id}:
  *   delete:
  *     summary: Delete a bookmark.
  *     tags:
  *       - Bookmarks  
+ *     security:
+ *       - tokenAuth: []  # Requires authentication
  *     parameters:
  *       - name: id
  *         in: path
@@ -152,7 +167,9 @@ const { createBookMarkValidator, deleteBookMarkValidator } = require('./Validato
  *         description: Bookmark not found
  */
 
-router.route('/').get(getUserBookmarks);
-router.route('/:id').post(createBookMarkValidator, createBookmark).delete(deleteBookMarkValidator, deleteBookmark);
+router.route('/').get(authenticate,getUserBookmarks);
+router.route('/:id')
+.post(authenticate,createBookMarkValidator, createBookmark)
+.delete(authenticate,deleteBookMarkValidator, deleteBookmark);
 
 module.exports = router;

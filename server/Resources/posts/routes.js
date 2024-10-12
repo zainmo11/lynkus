@@ -31,6 +31,9 @@ const {authenticate}= require('../auth/authController')
  *                 type: string
  *                 format: binary
  *                 description: Optional image file for the post.
+ *             required:
+ *                     body
+ *                     authorId
  *     responses:
  *       201:
  *         description: Post created successfully.

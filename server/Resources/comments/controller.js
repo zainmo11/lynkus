@@ -20,7 +20,7 @@ exports.createComment = async (req, res) => {
             from: req.user._id,
             type: 'COMMENT',
             post:postId,
-            content:`${req.user.name} has Commented on Your Post`, 
+            content:`${req.user.userName} has Commented on Your Post`, 
             comment: comment._id,
         });
         await notification.save();
