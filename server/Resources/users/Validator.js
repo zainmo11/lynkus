@@ -13,7 +13,7 @@ exports.updateUserValidator = [
     .optional()
     .isEmail().withMessage('Invalid email address')
     .custom(async (val, { req }) => {
-    
+    z
       const user = await User.findOne({ email: val });
       if (user && user._id.toString() !== req.user._id.toString()) {
        

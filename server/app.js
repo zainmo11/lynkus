@@ -18,6 +18,7 @@ const routes = require("./routes");
 const DBConnection = require("./DB");
 const globalError = require("./Middleware/errorMiddleware");
 const ApiError = require("./utils/apiError");
+const { header } = require("express-validator");
 
 // Initialize Database
 DBConnection();
@@ -141,11 +142,23 @@ const swaggerOptions = {
                             description: 'URL of the profile image',
                             example: 'http://localhost:3000/users/johndoe.png',
                         },
+                        headerImg:{
+                            type:'string',
+                            description: 'URL of the header image',
+                            example: 'http://localhost:3000/users/header.jpg',
+                        
+                        },
                         password: {
                             type: 'string',
                             description: 'Password of the user',
                             example: 'mypassword123',
                         },
+                        bio:{
+                            type:'string',
+                            description: 'Bio of the user',
+                            example: 'I am a software engineer.',
+                        },
+                        
                         createdAt: {
                             type: 'string',
                             format: 'date-time',

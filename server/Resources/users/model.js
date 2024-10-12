@@ -27,6 +27,9 @@ const userSchema = new mongoose.Schema({
     },
     
     profileImg:String,
+    headerImg:String,
+    bio:String,
+
 
     password: {
         type: String,
@@ -43,7 +46,7 @@ const userSchema = new mongoose.Schema({
     passwordResetExpires: Date,
     passwordResetVerified: Boolean,
     
-   
+    
     resetToken: String,
     resetTokenExpiration: Date,
 
@@ -76,20 +79,24 @@ userSchema.pre('save', async function(next) {
     next();
 });
 
-const setProfileImageURL = (doc) => {
+const setUserImagesURL = (doc) => {
     if (doc.profileImg) {
       const imageUrl = `${process.env.BASE_URI}/users/${doc.profileImg}`;
       doc.profileImg = imageUrl;
     }
+    if (doc.headerImg) {
+      const imageUrl = `${process.env.BASE_URI}/users/${doc.headerImg}`;
+      doc.headerImg = imageUrl;
+    }
   };
   // findOne, findAll
   userSchema.post('init', (doc) => {
-    setProfileImageURL(doc);
+    setUserImagesURL(doc);
   });
   
   // create and update
   userSchema.post('save', (doc) => {
-    setProfileImageURL(doc);
+    setUserImagesURL(doc);
   });
   
 
