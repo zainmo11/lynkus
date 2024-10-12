@@ -1,7 +1,7 @@
 // this is the route
 const express = require('express');
 
-const {updateUser,deleteUser,searchUser,getUserProfile,changeUserPassword,resizeImg,UploadProfileImg}=require('./userController')
+const {updateUser,deleteUser,searchUser,getUserProfile,changeUserPassword,resizeImg,UploadUserImgs}=require('./userController')
 const {authenticate}=require("../auth/authController")
 const {updateUserValidator,changeUserPasswordValidator}=require("./Validator")
 
@@ -183,7 +183,12 @@ router.route('/').delete(authenticate, deleteUser);
  *                 type: string
  *               email:
  *                 type: string
+ *               bio:
+ *                type: string
  *               profileImage:
+ *                 type: string
+ *                 format: binary
+ *               headerImage:
  *                 type: string
  *                 format: binary
  * 
@@ -194,6 +199,6 @@ router.route('/').delete(authenticate, deleteUser);
  *         description: Bad request
  */
 router.route('/')
-    .put(authenticate, UploadProfileImg, resizeImg, updateUserValidator, updateUser);
+    .put(authenticate, UploadUserImgs, resizeImg, updateUserValidator, updateUser);
 
 module.exports = router;
