@@ -13,12 +13,12 @@ const sendEmail=require('../../utils/sendEmail')
     const isExist=await User.findOne({
     $or:[
             {email},
-            {name}
+            {userName}
         ]
     })
     if(isExist)
     {
-      return  next(new ApiError('Email or name already exists',400))
+      return  next(new ApiError('Email or userName already exists',400))
     }
     const user=await User.create({name,email,password,userName,profileImg})
     const Suer=user.toObject();
@@ -29,7 +29,7 @@ const sendEmail=require('../../utils/sendEmail')
  })
  exports.login = asyncHandler(async (req, res, next) => {
     
-    const user = await User.findOne({ name: req.body.name }).select("+password");
+    const user = await User.findOne({ userName: req.body.userName }).select("+password");
 
    
     if (!user) {
@@ -167,7 +167,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
     const message = `
   <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
     <h2 style="text-align: center; color: #007BFF;">Password Reset Request</h2>
-    <p>Hi <strong>${user.name}</strong>,</p>
+    <p>Hi <strong>${user.userName}</strong>,</p>
     <p>We received a request to reset the password for your Lynkus account. Please use the following code to reset your password:</p>
     <div style="text-align: center; margin: 20px 0;">
       <span style="font-size: 24px; font-weight: bold; color: #007BFF;">${resetCode}</span>

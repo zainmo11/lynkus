@@ -31,7 +31,7 @@ const router = express.Router();
  *         name: search
  *         schema:
  *           type: string
- *         description: Search users by a keyword (name)
+ *         description: Search users by a keyword (userName)
  *       - in: query
  *         name: page
  *         schema:
@@ -98,7 +98,7 @@ router.put('/changePassword', authenticate, changeUserPasswordValidator, changeU
  * /users/profile/{id}:
  *   get:
  *     summary: Get user profile by ID 
- *     description: <h3>You Can Send MongoObjectId or "name" of the User.</h3>
+ *     description: <h3>You Can Send MongoObjectId or "userName" of the User.</h3>
  *     tags: [Users]
  *     parameters:
  *       - name: id
@@ -106,7 +106,7 @@ router.put('/changePassword', authenticate, changeUserPasswordValidator, changeU
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID or name of the user
+ *         description: The ID or userName of the user
  *     responses:
  *       200:
  *         description: User profile retrieved

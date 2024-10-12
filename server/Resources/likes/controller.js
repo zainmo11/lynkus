@@ -24,7 +24,7 @@ exports.likePost = async (req, res) => {
          const notification = new Notification({
              to: post.authorId,
              from: req.user._id,
-             content: `${req.user.name} liked your post`,
+             content: `${req.user.userName} liked your post`,
              type: 'LIKE',
              post: post._id
          });

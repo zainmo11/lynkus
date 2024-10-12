@@ -14,7 +14,7 @@ exports.followUser=asyncHandler(async(req,res,next)=>{
         return next(new ApiError("Invalid user id",400))
     }
 
-    //check if user is trying to follow a non-existing user
+    //check if user is trying to follow a non existing user
     const userExists=await User.findById(id)
     if(!userExists) return next(new ApiError("User not found",404))
 
@@ -46,7 +46,7 @@ exports.followUser=asyncHandler(async(req,res,next)=>{
         to:id,
         from:req.user._id,
         type:"FOLLOW",
-        content:`${req.user.name} started following you`,
+        content:`${req.user.userName} started following you`,
         
     })
     await notification.save()
@@ -74,9 +74,9 @@ exports.getUserFollowers=asyncHandler(async(req,res,next)=>{
   
    
   
-    // Determine if the id is MongoId or  name
+    // Determine if the id is MongoId or  userName
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      const user = await User.findOne({ name: id }).select('_id');
+      const user = await User.findOne({ userName: id }).select('_id');
      
       if (!user) {
         return next(new ApiError("User Not Found",404))
@@ -92,7 +92,7 @@ exports.getUserFollowers=asyncHandler(async(req,res,next)=>{
     
     let followers=await Follows.find(query)
     .select('user -_id')
-    .populate('user','name profileImg')
+    .populate('user','userName profileImg')
     .skip(skip)
     .limit(limit)
 
@@ -102,7 +102,7 @@ exports.getUserFollowers=asyncHandler(async(req,res,next)=>{
     if (search) {
        
        followers = followers.filter(user => 
-        user.user.name.toLowerCase().includes(search.toLowerCase())
+        user.user.userName.toLowerCase().includes(search.toLowerCase())
       ); 
       
     }
@@ -136,9 +136,9 @@ exports.getUserFollowing = asyncHandler(async (req, res, next) => {
   
    
   
-    // Determine if the id is MongoId or  name
+    // Determine if the id is MongoId or  userName
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      const user = await User.findOne({ name: id }).select('_id');
+      const user = await User.findOne({ userName: id }).select('_id');
       if (!user) {
         return next(new ApiError("User Not Found",404))
       }
@@ -154,23 +154,23 @@ exports.getUserFollowing = asyncHandler(async (req, res, next) => {
     
     
     
-    // get the following users and populate name profileImg
+    // get the following users and populate userName profileImg
     let following = await Follows.find(query)
         .select('following -_id')
-        .populate('following', 'name profileImg')
+        .populate('following', 'userName profileImg')
         .skip(skip)
         .limit(limit);
         
         console.log(following)
-    // get the following users and populate name profile
+    // get the following users and populate userName profile
    
    
-    // search the following users by name
+    // search the following users by userName
     console.log(following)
     if (search) {
-        // filter the following users by name
+        // filter the following users by userName
         following = following.filter(user =>
-            user.following.name.toLowerCase().includes(search.toLowerCase())
+            user.following.userName.toLowerCase().includes(search.toLowerCase())
         );
         console.log(following)
         }
@@ -220,12 +220,12 @@ exports.getRecommendedFollowers = asyncHandler(async (req, res, next) => {
     let recommendedUsers;
     if (recommendedUserId.length > 0) {
       recommendedUsers = await User.find({ _id: { $in: recommendedUserId } })
-      .select("name profileImg")
+      .select("userName profileImg")
       .limit(req.query.limit*1||10);;
     } else {
       // if no recommend make random users
       recommendedUsers = await User.find({ _id: { $ne: userId } })
-      .select("name profileImg")
+      .select("userName profileImg")
       .limit(req.query.limit*1||10);
     }
   

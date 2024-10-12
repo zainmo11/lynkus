@@ -13,7 +13,7 @@ exports.getNotifications = asyncHandler(async (req, res) => {
 
     const notifications = await Notifications.find({to:userId }).select('-to').populate({
         path: 'from',
-        select: 'name profileImg'
+        select: 'userName profileImg'
     })
     .sort({ createdAt: -1 })
 

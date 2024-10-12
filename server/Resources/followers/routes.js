@@ -35,7 +35,7 @@ const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser}=req
  *         name: id
  *         required: true
  *         description: The ID of the user whose followers are to be retrieved.
- *                      <h4>You can send MongoObjectId or 'name' of the user</h4>
+ *                      <h4>You can send MongoObjectId or 'userName' of the user</h4>
  *         schema:
  *           type: string
  *       - in: query
@@ -102,7 +102,7 @@ router.get('/followers/:id', getUserFollowers)
  *         name: id
  *         required: true
  *         description: The ID of the user whose followings are to be retrieved.
- *                      <h4>You can send MongoObjectId or 'name' of the user</h4>
+ *                      <h4>You can send MongoObjectId or 'userName' of the user</h4>
  *         schema:
  *           type: string
  *       - in: query

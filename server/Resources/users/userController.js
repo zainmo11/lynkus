@@ -74,11 +74,11 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
 //     if (!req.user.isAdmin) {
 //         return next(new ApiError("Not Authorized",401))
 //     }
-//     const {userName,name,email,profileImg,password,isAdmin} =req.body
+//     const {userName,userName,email,profileImg,password,isAdmin} =req.body
 
 //     const user1 = await User.findOne({
 //         $or: [
-//             { name: name }, 
+//             { userName: userName }, 
 //             { email: email } 
 //         ]
 //     });
@@ -86,7 +86,7 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
 //         return next(new ApiError('User already exists', 400));
 //     }
 
-//     const user = await User.create({ userName, name, email,profileImg, password,isAdmin });
+//     const user = await User.create({ userName, userName, email,profileImg, password,isAdmin });
    
 
 //     res.status(201).json({ message: 'User created successfully' ,data: user });
@@ -107,7 +107,7 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
 //     const query = { user: userId }; 
 
 //     if (search) {
-//         query.name = { $regex: search, $options: 'i' }; 
+//         query.userName = { $regex: search, $options: 'i' }; 
 //     }
 
 //     const user = await User.find(query)
@@ -135,7 +135,7 @@ exports.searchUser = asyncHandler(async (req, res, next) => {
     const query = { }; 
 
     if (search) {
-        query.name = { $regex: search, $options: 'i' }; 
+        query.userName = { $regex: search, $options: 'i' }; 
     }
 
     const user = await User.find(query)
@@ -159,6 +159,9 @@ exports.searchUser = asyncHandler(async (req, res, next) => {
 exports.deleteUser = asyncHandler(async (req, res, next) => {
     const id = req.user._id;
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return next(new ApiError("Invalid User ID", 404));
+    }
     // Delete related posts, comments, bookmarks, and refresh tokens for the user
     await Post.deleteMany({ user: id });
     await Comment.deleteMany({ user: id });
@@ -192,7 +195,7 @@ exports.getUserProfile = asyncHandler(async (req, res, next) => {
     // Check if id is  mongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
       
-        const user = await User.findOne({ name: id })
+        const user = await User.findOne({ userName: id })
             // .populate({
             //     path: 'posts',
             //     options: {
