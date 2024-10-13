@@ -1,24 +1,26 @@
 const Post = require('./model');
 const Like = require('../likes/model');
-
+const jwt = require('jsonwebtoken');
 // Create a new post
 exports.createPost = async (req, res) => {
     try {
-        const { body, authorId } = req.body;
+        const token = req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const { body } = req.body;
+        const authorId = decoded.userId;
 
-        // Ensure all required fields are present
         if (!body || !authorId) {
-            return res.status(400).send({ message: 'Post body and authorId are required' });
+            return res.status(400).send({ message: 'Post body is required' });
         }
 
-        // Check if an image file was uploaded
         const image = req.file ? req.file.path : null;
 
         const post = new Post({ image, body, authorId });
         await post.save();
+
         res.status(201).send(post);
     } catch (error) {
-        console.error("Error creating post:", error);  // Log any error that occurs
+        console.error("Error creating post:", error);
         res.status(500).send(error);
     }
 };
