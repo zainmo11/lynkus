@@ -37,6 +37,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json({ limit: "20kb" })); // Limit request payload size
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/users/headerImg', express.static(path.join(__dirname, 'uploads/users/headerImg')));
+app.use('/users/profileImg', express.static(path.join(__dirname, 'uploads/users/profileImg')));
 app.use(compression()); // Compress responses
 app.use(hpp()); // Protect against HTTP parameter pollution
 app.use(mongoSanitize()); // Prevent NoSQL injection

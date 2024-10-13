@@ -9,7 +9,7 @@ const ApiError = require('../../utils/apiError')
 const sendEmail=require('../../utils/sendEmail')
 
  exports.registerUser=asyncHandler(async(req,res,next)=>{
-    const {name,email,password,userName,profileImg,}=req.body
+    const {name,email,password,userName}=req.body
     const isExist=await User.findOne({
     $or:[
             {email},
@@ -20,7 +20,7 @@ const sendEmail=require('../../utils/sendEmail')
     {
       return  next(new ApiError('Email or userName already exists',400))
     }
-    const user=await User.create({name,email,password,userName,profileImg})
+    const user=await User.create({name,email,password,userName})
     const Suer=user.toObject();
     delete Suer.password
   
@@ -94,7 +94,20 @@ const sendEmail=require('../../utils/sendEmail')
     if (!decoded) {
         return next(new ApiError('Forbidden Refresh Token not Exist',403))
     }
+          // Implement refresh token rotation: generate a new refresh token
+    const newRefreshToken = createRefreshToken(decoded.userId);
 
+    // Store the new refresh token and delete the old one
+    await RefreshToken.deleteOne({ token: storedToken.token });
+    await new RefreshToken({ token: newRefreshToken }).save();
+
+    // Set the new refresh token as a cookie
+    res.cookie('refreshToken', newRefreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
       const AccessToken =createAccessToken(decoded.userId)
       res.json({AccessToken:AccessToken} );
     });

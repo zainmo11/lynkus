@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { registerUser, login, logout, forgotPassword, verifyPasswordResetCode, resetPassword, refreshAccessToken } = require('./authController');
 const { loginValidator, registerValidator } = require('./Validator');
-
+const {UploadUserImgs,resizeImg}=require('../users/userController')
 
 /**
  * @swagger
@@ -25,33 +25,13 @@ const { loginValidator, registerValidator } = require('./Validator');
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               userName:
- *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *               passwordConfirm:
- *                 type: string
- *               profileImage:
- *                 type: string
- *                 format: binary
- *             required:
- *               - name
- *               - email
- *               - password
- *               - userName
- *               - passwordConfirm
  *         application/json:
  *           schema:
  *             type: object
  *             properties:
+ *               userName:
+ *                 type: string
+ *                 description: The username for the account.
  *               name:
  *                 type: string
  *                 description: The full name of the user.
@@ -64,12 +44,6 @@ const { loginValidator, registerValidator } = require('./Validator');
  *               passwordConfirm:
  *                  type: string
  *                  description: The user's password confirmation
- *               userName:
- *                 type: string
- *                 description: The username for the account.
- *               profileImg:
- *                 type: string
- *                 description: URL of the user's profile image (optional).
  *             required:
  *               - name
  *               - email
@@ -96,8 +70,6 @@ const { loginValidator, registerValidator } = require('./Validator');
  *                       type: string
  *                     userName:
  *                       type: string
- *                     profileImg:
- *                       type: string
  *                     _id:
  *                       type: string
  *                     id:
@@ -113,7 +85,8 @@ const { loginValidator, registerValidator } = require('./Validator');
  *                   type: string
  *                   example: Email or name already exists.
  */
-router.post('/register', registerValidator, registerUser);
+router.post('/register',registerValidator, registerUser);
+//router.post('/register', UploadUserImgs, resizeImg,registerValidator, registerUser); //to form-data When add ProfileImg in register
 
 /**
  * @swagger
@@ -133,14 +106,14 @@ router.post('/register', registerValidator, registerUser);
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               userName:
  *                 type: string
  *                 description: The username of the user.
  *               password:
  *                 type: string
  *                 description: The password for the account.
  *             required:
- *               - name
+ *               - userName
  *               - password
  *     responses:
  *       200:
