@@ -12,6 +12,9 @@ const BookMark = require("../bookmarks/model")
 const {userUpload} = require("../../utils/upload")
 const refreshToken=require("../auth/RefreshTokenModel")
 const Follows=require("../followers/model")
+const {cleanupTempImages} =require('../../utils/cleanupTempImages')
+
+
 exports.UploadUserImgs=userUpload.fields([
     {
         name: 'profileImg',
@@ -27,20 +30,24 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
 
     if (req.files) {
 
-        const profileImg = path.join(__dirname, '../../uploads/users/profileImg');
-        const headerImg = path.join(__dirname, '../../uploads/users/headerImg');
+        //Create temp for save path of new Image if the update is Not successful to cleanup  it 
+        req.tempImg={};
+
+
+        const profileImgDir = path.join(__dirname, '../../uploads/users/profileImg');
+        const headerImgDir = path.join(__dirname, '../../uploads/users/headerImg');
     // Check if profileImg directory exists, if not create it
-    if (!fs.existsSync(profileImg)) {
+    if (!fs.existsSync(profileImgDir)) {
         // recursive ensures parent directories are created if necessary
-        fs.mkdirSync(profileImg, { recursive: true }); 
+        fs.mkdirSync(profileImgDir, { recursive: true }); 
         
     }
 
     // Check if headerImg directory exists, if not create it
-    if (!fs.existsSync(headerImg)) {
-        fs.mkdirSync(headerImg, { recursive: true });
+    if (!fs.existsSync(headerImgDir)) {
+        fs.mkdirSync(headerImgDir, { recursive: true });
        
-    }
+    }  
         // Handle Profile Image
         if (req.files.profileImg) 
             {
@@ -57,6 +64,9 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
             console.log({newFileName:newFileName}); 
             // Path for the resized file
             const outputPath = path.join(__dirname, '../../uploads/users/profileImg', newFileName); 
+
+           
+
 
             await sharp(originalPath)
                 .resize(300, 300)
@@ -80,7 +90,8 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
                     console.error(`Error deleting old profile image: ${err.message}`);
                 }
             }
-
+                 //add path of new profileImg
+                req.tempImg.profileImg=outputPath;
             // Set the resized image path to the request body for saving
             req.body.profileImg = newFileName;
 
@@ -102,6 +113,8 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
              // Path for the resized file
             const outputPath = path.join(__dirname, '../../uploads/users/headerImg', newFileName);
 
+
+            
             await sharp(originalPath)
                 .resize(1000, 500)  
                 .toFormat('jpeg')
@@ -124,6 +137,7 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
                 }
             }
 
+            req.tempImg.headerImg=outputPath
             // Set the resized image path to the request body for saving
             req.body.headerImg = newFileName;
 
@@ -369,7 +383,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   const user = await User.findOneAndUpdate( 
         req.user._id,
         {
-            username: req.body.userName,
+            name: req.body.name,
             email: req.body.email,
             profileImg: req.body.profileImg,
             headerImg: req.body.headerImg,
@@ -380,6 +394,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
 
     );
     if (!user) {
+        cleanupTempImages(req.tempImg);
         return next(new ApiError("User Not Found", 404));
     }
     

@@ -22,18 +22,23 @@ exports.followUser=asyncHandler(async(req,res,next)=>{
     //check if user is trying to follow himSelf
     if(req.user._id.toString()===id) return next(new ApiError("You can't follow yourself",400))
 
+
+
         const user = await User.findById(id)
         if(!user) return next(new ApiError("User not found",404))
 
     //check if user is already following this user
     const followsExists=await Follows.findOne({user:req.user._id,following:id})
     if(followsExists) 
-        {
+        {   
+            // in development mode, delete the follow record
             if (process.env.NODE_ENV !== 'production') {
                 const deletedFollows= await Follows.findByIdAndDelete(followsExists._id)
                 return res.status(200).json({message:"User unFollowed successfully",deletedFollows})
             }
-            
+
+            // in production
+             await Follows.findByIdAndDelete(followsExists._id)
             return res.status(200).json({message:"User unFollowed successfully"})
     }
 
@@ -51,7 +56,7 @@ exports.followUser=asyncHandler(async(req,res,next)=>{
     })
     await notification.save()
     if (process.env.NODE_ENV !== 'production') 
-    {res.status(200).json({message:"User followed successfully",newFollow,notification})}
+    {return res.status(200).json({message:"User followed successfully",newFollow,notification})}
     
     
     res.status(200).json({message:"User followed successfully"})

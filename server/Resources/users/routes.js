@@ -171,7 +171,7 @@ router.route('/').delete(authenticate, deleteUser);
  *     summary: Update user profile
  *     tags: [Users]
  *     security:
- *       - bearerAuth: []
+ *       - tokenAuth: []
  *     requestBody:
  *       required: false
  *       content:
@@ -179,16 +179,16 @@ router.route('/').delete(authenticate, deleteUser);
  *           schema:
  *             type: object
  *             properties:
- *               userName:
+ *               name:
  *                 type: string
  *               email:
  *                 type: string
  *               bio:
  *                type: string
- *               profileImage:
+ *               profileImg:
  *                 type: string
  *                 format: binary
- *               headerImage:
+ *               headerImg:
  *                 type: string
  *                 format: binary
  * 

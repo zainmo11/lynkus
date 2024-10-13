@@ -2,21 +2,22 @@ const {check,body}=require('express-validator')
 const bcrypt = require('bcrypt')
 const validatorMiddleware=require('../../Middleware/validateMiddleware')
 const User=require('./model')
+const {cleanupTempImages} =require('../../utils/cleanupTempImages')
 
 
 exports.updateUserValidator = [
   body('name')
   .optional()
-    .notEmpty().withMessage('Name is required'),
+ ,
     
     check('email')
     .optional()
     .isEmail().withMessage('Invalid email address')
     .custom(async (val, { req }) => {
-    z
+    
       const user = await User.findOne({ email: val });
       if (user && user._id.toString() !== req.user._id.toString()) {
-       
+        cleanupTempImages(req.tempImg)
         return Promise.reject(new Error('E-mail already in use'));
       }
     }),
