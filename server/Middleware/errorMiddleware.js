@@ -1,5 +1,5 @@
 const ApiError = require('../utils/apiError');
-
+const {cleanupTempImages} =require('../utils/cleanupTempImages')
 
 
 
@@ -9,6 +9,12 @@ const globalError = (err, req, res, next) => {
   err.status = err.status || 'error';
   if (err.name === 'JsonWebTokenError') err = new ApiError('Invalid token, please login again.', 401);
   if (err.name === 'TokenExpiredError') err = new ApiError('Expired token, please login again.', 401);
+
+
+  //for cleanup
+  if (req.tempImg) {
+    cleanupTempImages(req.tempImg)
+}
 
   // Development Mode Error Handling
   if (process.env.NODE_ENV === 'development') {

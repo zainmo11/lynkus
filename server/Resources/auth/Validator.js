@@ -16,7 +16,7 @@ exports.registerValidator = [
     .withMessage('User Name must be between 3 and 30 characters')
     .customSanitizer((value) => {
       // Replace spaces with underscores in userName
-      return value.toLowerCase().replace(/\s+/g, '_');
+      return value? value.toLowerCase().replace(/\s+/g, '_'):''
     }) .matches(/^[a-zA-Z0-9._]+$/)
     .withMessage('User name can only contain letters, numbers, underscores, and periods')
     .custom((value) => {

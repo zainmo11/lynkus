@@ -81,11 +81,11 @@ userSchema.pre('save', async function(next) {
 
 const setUserImagesURL = (doc) => {
     if (doc.profileImg) {
-      const imageUrl = `${process.env.BASE_URI}/users/${doc.profileImg}`;
+      const imageUrl = `${process.env.BASE_URI}/users/profileImg/${doc.profileImg}`;
       doc.profileImg = imageUrl;
     }
     if (doc.headerImg) {
-      const imageUrl = `${process.env.BASE_URI}/users/${doc.headerImg}`;
+      const imageUrl = `${process.env.BASE_URI}/users/headerImg/${doc.headerImg}`;
       doc.headerImg = imageUrl;
     }
   };

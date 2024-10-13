@@ -12,6 +12,9 @@ const BookMark = require("../bookmarks/model")
 const {userUpload} = require("../../utils/upload")
 const refreshToken=require("../auth/RefreshTokenModel")
 const Follows=require("../followers/model")
+const {cleanupTempImages} =require('../../utils/cleanupTempImages')
+
+
 exports.UploadUserImgs=userUpload.fields([
     {
         name: 'profileImg',
@@ -26,14 +29,44 @@ exports.UploadUserImgs=userUpload.fields([
 exports.resizeImg = asyncHandler(async (req, res, next) => {
 
     if (req.files) {
+
+        //Create temp for save path of new Image if the update is Not successful to cleanup  it 
+        req.tempImg={};
+
+
+        const profileImgDir = path.join(__dirname, '../../uploads/users/profileImg');
+        const headerImgDir = path.join(__dirname, '../../uploads/users/headerImg');
+    // Check if profileImg directory exists, if not create it
+    if (!fs.existsSync(profileImgDir)) {
+        // recursive ensures parent directories are created if necessary
+        fs.mkdirSync(profileImgDir, { recursive: true }); 
+        
+    }
+
+    // Check if headerImg directory exists, if not create it
+    if (!fs.existsSync(headerImgDir)) {
+        fs.mkdirSync(headerImgDir, { recursive: true });
+       
+    }  
         // Handle Profile Image
-        if (req.files.profileImg) {
-            const originalPath = req.files.profileImg[0].path;  // Use req.files.profileImg[0] for single file in array
+        if (req.files.profileImg) 
+            {
+            // Use req.files.profileImg[0] for single file in array
+            const originalPath = req.files.profileImg[0].path;  
             console.log(originalPath);
 
+            // Remove the extension
+            const fileNameWithoutExt = req.files.profileImg[0].filename
+            .replace(path.extname(req.files.profileImg[0].filename), ''); 
+
             // Path to the original file
-            const newFileName = `ProfileImg-${req.files.profileImg[0].filename}.jpeg`; 
-            const outputPath = path.join(__dirname, '../../uploads/users/profileImg', newFileName); // Path for the resized file
+            const newFileName = `ProfileImg-${fileNameWithoutExt}.jpeg`;
+            console.log({newFileName:newFileName}); 
+            // Path for the resized file
+            const outputPath = path.join(__dirname, '../../uploads/users/profileImg', newFileName); 
+
+           
+
 
             await sharp(originalPath)
                 .resize(300, 300)
@@ -42,19 +75,23 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
                 .toFile(outputPath);
 
             // Delete old profile image if it exists
-            if (req.user.profileImg) {
-                const oldImgFileName = req.user.profileImg.split('/').pop(); // Extract the file name from URL
+            if (req.user && req.user.profileImg) {
+                // Extract the file name from URL
+                const oldImgFileName = req.user.profileImg.split('/').pop(); 
                 const oldImgPath = path.join(__dirname, '../../uploads/users/profileImg', oldImgFileName);
 
-                try {
-                    if (fs.existsSync(oldImgPath)) {
-                        fs.unlinkSync(oldImgPath); // Delete the old profile image if it exists
+                try {   
+                    if (fs.existsSync(oldImgPath)) 
+                        {
+                        // Delete the old profile image if it exists
+                        fs.unlinkSync(oldImgPath); 
                     }
                 } catch (err) {
                     console.error(`Error deleting old profile image: ${err.message}`);
                 }
             }
-
+                 //add path of new profileImg
+                req.tempImg.profileImg=outputPath;
             // Set the resized image path to the request body for saving
             req.body.profileImg = newFileName;
 
@@ -62,23 +99,33 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
         }
 
         // Handle Header Image
-        if (req.files.headerImg) {
-            const originalPath = req.files.headerImg[0].path;  // Use req.files.headerImg[0] for single file in array
+        if (req.files.headerImg) 
+            {
+            // Use req.files.headerImg[0] for single file in array
+            const originalPath = req.files.headerImg[0].path;  
             console.log(originalPath);
 
+            // Remove the extension
+            const fileNameWithoutExt = req.files.headerImg[0].filename
+            .replace(path.extname(req.files.headerImg[0].filename), ''); 
             // Path to the original file
-            const newFileName = `HeaderImg-${req.files.headerImg[0].filename}.jpeg`; 
-            const outputPath = path.join(__dirname, '../../uploads/users/headerImg', newFileName); // Path for the resized file
+            const newFileName = `HeaderImg-${fileNameWithoutExt}.jpeg`; 
+             // Path for the resized file
+            const outputPath = path.join(__dirname, '../../uploads/users/headerImg', newFileName);
 
+
+            
             await sharp(originalPath)
-                .resize(1000, 500)  // Example dimensions for header image
+                .resize(1000, 500)  
                 .toFormat('jpeg')
                 .jpeg({ quality: 90 })
                 .toFile(outputPath);
 
             // Delete old header image if it exists
-            if (req.user.headerImg) {
-                const oldImgFileName = req.user.headerImg.split('/').pop(); // Extract the file name from URL
+            if (req.user &&req.user.headerImg) 
+                {
+                // Extract the file name from URL
+                const oldImgFileName = req.user.headerImg.split('/').pop(); 
                 const oldImgPath = path.join(__dirname, '../../uploads/users/headerImg', oldImgFileName);
 
                 try {
@@ -90,6 +137,7 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
                 }
             }
 
+            req.tempImg.headerImg=outputPath
             // Set the resized image path to the request body for saving
             req.body.headerImg = newFileName;
 
@@ -212,7 +260,31 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
     await BookMark.deleteMany({ user: id });
     await refreshToken.deleteMany({ user: id });
 
-   
+    //delete profileImg and headerImg
+    if (req.user && req.user.profileImg) {
+        const oldImgFileName = req.user.profileImg.split('/').pop(); // Extract the file name from URL
+        const oldImgPath = path.join(__dirname, '../../uploads/users/profileImg', oldImgFileName);
+
+        try {
+            if (fs.existsSync(oldImgPath)) {
+                fs.unlinkSync(oldImgPath); // Delete the old profile image if it exists
+            }
+        } catch (err) {
+            console.error(`Error deleting old profile image: ${err.message}`);
+        }
+    }
+    if (req.user && req.user.headerImg) {
+        const oldImgFileName = req.user.headerImg.split('/').pop(); // Extract the file name from URL
+        const oldImgPath = path.join(__dirname, '../../uploads/users/headerImg', oldImgFileName);
+
+        try {
+            if (fs.existsSync(oldImgPath)) {
+                fs.unlinkSync(oldImgPath); // Delete the old header image if it exists
+            }
+        } catch (err) {
+            console.error(`Error deleting old header image: ${err.message}`);
+        }
+    }
     const user = await User.findByIdAndDelete(id);
 
     if (!user) {
@@ -311,7 +383,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   const user = await User.findOneAndUpdate( 
         req.user._id,
         {
-            username: req.body.userName,
+            name: req.body.name,
             email: req.body.email,
             profileImg: req.body.profileImg,
             headerImg: req.body.headerImg,
@@ -322,6 +394,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
 
     );
     if (!user) {
+        cleanupTempImages(req.tempImg);
         return next(new ApiError("User Not Found", 404));
     }
     

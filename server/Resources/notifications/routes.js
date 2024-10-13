@@ -22,7 +22,7 @@ const { authenticate } = require('../auth/authController');
  *     summary: Get all notifications for the authenticated user
  *     tags: [Notifications]
  *     security:
- *       - bearerAuth: []  # Requires authentication
+ *       - tokenAuth: []  # Requires authentication
  *     responses:
  *       200:
  *         description: A list of notifications for the user.
@@ -65,7 +65,7 @@ const { authenticate } = require('../auth/authController');
  *     summary: Delete a notification by ID
  *     tags: [Notifications]
  *     security:
- *       - bearerAuth: []  # Requires authentication
+ *       - tokenAuth: []  # Requires authentication
  *     parameters:
  *       - in: path
  *         name: id
@@ -96,7 +96,7 @@ const { authenticate } = require('../auth/authController');
  *     summary: Delete all notifications for the authenticated user
  *     tags: [Notifications]
  *     security:
- *       - bearerAuth: []  # Requires authentication
+ *       - tokenAuth: []  # Requires authentication
  *     responses:
  *       200:
  *         description: All notifications deleted successfully.
