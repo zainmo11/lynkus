@@ -26,6 +26,21 @@ exports.UploadUserImgs=userUpload.fields([
 exports.resizeImg = asyncHandler(async (req, res, next) => {
 
     if (req.files) {
+
+        const profileImg = path.join(__dirname, '../../uploads/users/profileImg');
+        const headerImg = path.join(__dirname, '../../uploads/users/headerImg');
+    // Check if profileImg directory exists, if not create it
+    if (!fs.existsSync(profileImg)) {
+        // recursive ensures parent directories are created if necessary
+        fs.mkdirSync(profileImg, { recursive: true }); 
+        
+    }
+
+    // Check if headerImg directory exists, if not create it
+    if (!fs.existsSync(headerImg)) {
+        fs.mkdirSync(headerImg, { recursive: true });
+       
+    }
         // Handle Profile Image
         if (req.files.profileImg) 
             {
