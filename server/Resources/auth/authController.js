@@ -53,24 +53,20 @@ const sendEmail=require('../../utils/sendEmail')
           expiresAt: new Date(
             Date.now() + 7 * 24 * 60 * 60 * 1000 //7 days in milliseconds
         ) });
+        
+    // Set the refreshToken as a cookie
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true, // prevent xss attacks and cookies is sent over HTTP
       secure: true, // make sure the token is only sent over encrypted HTTPS connections.
       sameSite: 'Strict', // sent from same site prevent CSRF attacks
       path: '/', // make sure cookie accessible to all routes
     });
-    
-   if (process.env.NODE_ENV !== "production") {
-    res.status(200)
-    .json({ message:'User logged in successfully',user, AccessToken });
-}
 
 
-    else {
-      res.status(200)
-      .json({ message:'User logged in successfully', AccessToken });
-   }
-
+  const Suer=user.toObject();
+  delete Suer.password
+  res.status(200)
+  .json({ message:'User logged in successfully',data:Suer, AccessToken });
     
    
 });
