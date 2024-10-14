@@ -1,6 +1,7 @@
 import logo from "../assets/logo.png";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
+import { logout } from "../store/authSlice";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   HomeIcon,
   MagnifyingGlassIcon,
@@ -22,6 +23,7 @@ import { DefaultButton, ErrorButton } from "../components/Buttons";
 import { toggleTheme } from "../store/themeSlice";
 
 function Navbar() {
+  const navigate = useNavigate();
   const location = useLocation();
   const { pathname } = location;
   const theme = useSelector((state) => state.theme.theme);
@@ -33,6 +35,11 @@ function Navbar() {
     dispatch(toggleTheme());
     localStorage.setItem("theme", newTheme);
     document.documentElement.classList.toggle("dark", newTheme === "dark");
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login");
   };
 
   return (
@@ -145,7 +152,7 @@ function Navbar() {
             <ErrorButton
               label="Sign Out"
               Icon={ArrowLeftStartOnRectangleIcon}
-              onClick={() => {}}
+              onClick={() => handleLogout()}
             />
           </div>
           <div className="w-full hidden md:flex mb-8 lg:hidden flex-col gap-8 order-2">
@@ -162,6 +169,7 @@ function Navbar() {
             </button>
             <button
               type="button"
+              onClick={() => handleLogout()}
               className="mx-auto p-2 text-dark-primaryText bg-button-error hover:bg-red-800 rounded-full"
             >
               <ArrowLeftStartOnRectangleIcon className="size-6" />

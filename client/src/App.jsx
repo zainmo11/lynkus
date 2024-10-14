@@ -5,6 +5,8 @@ import ProfilePage from "./pages/ProfilePage";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { setTheme } from "./store/themeSlice";
+import Welcome from "./pages/Welcome";
+import Error from "./pages/Error";
 
 function App() {
   const dispatch = useDispatch();
@@ -27,6 +29,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/login" element={<Welcome />} />
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
