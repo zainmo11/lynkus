@@ -14,10 +14,10 @@ exports.registerValidator = [
     .withMessage('userName required')
     .isLength({ min: 3, max: 30 })
     .withMessage('User Name must be between 3 and 30 characters')
-    .customSanitizer((value) => {
+    .customSanitizer((value) => 
       // Replace spaces with underscores in userName
-      return value? value.toLowerCase().replace(/\s+/g, '_'):''
-    }) .matches(/^[a-zA-Z0-9._]+$/)
+       value? value.toLowerCase().replace(/\s+/g, '_'):''
+    ) .matches(/^[a-zA-Z0-9._]+$/)
     .withMessage('User name can only contain letters, numbers, underscores, and periods')
     .custom((value) => {
       if (/^\./.test(value) || /^\_/.test(value)) {

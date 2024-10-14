@@ -33,14 +33,14 @@ const sendEmail=require('../../utils/sendEmail')
 
    
     if (!user) {
-        return next(new ApiError('User not found', 404)); 
+        return next(new ApiError('Incorrect userName or password', 401)); 
     }
 
     
     const passwordMatch = await bcrypt.compare(req.body.password, user.password);
 
     if (!passwordMatch) {
-        return next(new ApiError('Incorrect email or password', 401)); 
+        return next(new ApiError('Incorrect userName or password', 401)); 
     }
 
     
