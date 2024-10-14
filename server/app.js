@@ -18,7 +18,7 @@ const routes = require("./routes");
 const DBConnection = require("./DB");
 const globalError = require("./Middleware/errorMiddleware");
 const ApiError = require("./utils/apiError");
-const { header } = require("express-validator");
+
 
 // Initialize Database
 DBConnection();
