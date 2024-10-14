@@ -30,13 +30,16 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
 
     if (req.files) {
 
-        //Create temp for save path of new Image if the update is Not successful to cleanup  it 
+        //Create temp for save path of new Image if the update is Not successful , cleanup  it 
         req.tempImg={};
 
 
         const profileImgDir = path.join(__dirname, '../../uploads/users/profileImg');
         const headerImgDir = path.join(__dirname, '../../uploads/users/headerImg');
-    // Check if profileImg directory exists, if not create it
+   
+  
+  
+     // Check if profileImg directory exists, if not create it
     if (!fs.existsSync(profileImgDir)) {
         // recursive ensures parent directories are created if necessary
         fs.mkdirSync(profileImgDir, { recursive: true }); 
