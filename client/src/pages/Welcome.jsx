@@ -3,6 +3,7 @@ import image from "../assets/image (14) 1.png";
 import logo from "../assets/Logo.png";
 import { useForm } from "react-hook-form";
 import Loading from "../components/Loading";
+import { SecondaryButton } from "../components/Buttons";
 
 export default function Welcome() {
   const [formStatus, setformStatus] = useState(true);
@@ -55,7 +56,7 @@ export default function Welcome() {
             </h2>
             <input
               {...register("userName", { required: "Username is Required" })}
-              className="block w-full mb-2 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2 "
+              className="block w-full mb-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2 "
               type="text"
               id="userName"
               placeholder="Username"
@@ -99,7 +100,7 @@ export default function Welcome() {
             </h2>
             <input
               {...register("fullName", { required: "Name is Required" })}
-              className="block w-full mb-2 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2 "
+              className="block w-full mb-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2 "
               type="text"
               id="fullName"
               placeholder="Username"
@@ -109,7 +110,7 @@ export default function Welcome() {
             </p>
             <input
               {...register("email", { required: "Email is Required" })}
-              className="block w-full mb-2 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2 "
+              className="block w-full mb-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2 "
               type="email"
               id="email"
               placeholder="Email"
@@ -119,7 +120,7 @@ export default function Welcome() {
             </p>
             <input
               {...register("Spassword", { required: "Password is Required" })}
-              className="block w-full mb-2 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2 "
+              className="block w-full mb-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2 "
               type="password"
               id="Spassword"
               placeholder="Password"
@@ -133,7 +134,7 @@ export default function Welcome() {
                 validate: (value) =>
                   value === password || "Passwords do not match",
               })}
-              className="block w-full mb-2 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2 "
+              className="block w-full mb-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2 "
               type="password"
               id="confirmPassword"
               placeholder="Confirm Password"
@@ -147,6 +148,7 @@ export default function Welcome() {
             >
               {loading ? <Loading /> : "Sign up"}
             </button>
+            <SecondaryButton label="Have an account? Login" />
             <button
               type="button"
               onClick={() => {
