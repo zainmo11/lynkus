@@ -179,6 +179,8 @@ router.route('/').delete(authenticate, deleteUser);
  *           schema:
  *             type: object
  *             properties:
+ *               userName:
+ *                 type: string
  *               name:
  *                 type: string
  *               email:

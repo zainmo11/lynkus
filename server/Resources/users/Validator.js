@@ -11,7 +11,7 @@ exports.updateUserValidator = [
  ,
     
     check('email')
-    .optional()
+    .notEmpty().withMessage('Email Address is required')
     .isEmail().withMessage('Invalid email address')
     .custom(async (val, { req }) => {
     
@@ -19,6 +19,35 @@ exports.updateUserValidator = [
       if (user && user._id.toString() !== req.user._id.toString()) {
         cleanupTempImages(req.tempImg)
         return Promise.reject(new Error('E-mail already in use'));
+      }
+    }),
+    check('userName')
+    .notEmpty().withMessage('userName Required')
+    .isLength({ min: 3, max: 20 })
+    .customSanitizer((value) => 
+      // Replace spaces with underscores in userName
+       value? value.toLowerCase().replace(/\s+/g, '_'):''
+    ) .matches(/^[a-zA-Z0-9._]+$/)
+    .withMessage('User name can only contain letters, numbers, underscores, and periods')
+    .custom((value) => {
+      if (/^\./.test(value) || /^\_/.test(value)) {
+        throw new Error('User name cannot start with a period or underscore');
+      }
+      if (/\.\./.test(value) || /\_\_/.test(value)) {
+        throw new Error('User name cannot contain consecutive periods or underscores');
+      }
+      if (/\.$/.test(value) || /\_$/.test(value)) {
+        throw new Error('User name cannot end with a period or underscore');
+      }
+      return true;
+    })
+
+    .custom(async (val, { req }) => {
+    
+      const user = await User.findOne({ userName: val });
+      if (user && user._id.toString() !== req.user._id.toString()) {
+        cleanupTempImages(req.tempImg)
+        return Promise.reject(new Error('userName already in use'));
       }
     }),
 

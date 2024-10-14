@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { registerUser, login, logout, forgotPassword, verifyPasswordResetCode, resetPassword, refreshAccessToken } = require('./authController');
 const { loginValidator, registerValidator } = require('./Validator');
-const {UploadUserImgs,resizeImg}=require('../users/userController')
+// const {UploadUserImgs,resizeImg}=require('../users/userController')
 
 /**
  * @swagger
@@ -143,17 +143,7 @@ router.post('/register',registerValidator, registerUser);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: Incorrect email or password.
- *       404:
- *         description: User not found.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: User not found.
+ *                   example: Incorrect username or password.
  */
 router.post('/login', loginValidator, login);
 

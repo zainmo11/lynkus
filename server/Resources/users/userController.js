@@ -383,6 +383,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   const user = await User.findOneAndUpdate( 
         req.user._id,
         {
+            userName: req.body.userName,
             name: req.body.name,
             email: req.body.email,
             profileImg: req.body.profileImg,

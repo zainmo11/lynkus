@@ -71,15 +71,15 @@ exports.getUserFollowers = asyncHandler(async (req, res, next) => {
 
     // Fetch followers
     let followers = await Follows.find(query)
-        .select('user -_id')
+        .select('user')
         .populate({
             path: 'user',
-            select: 'userName profileImg',
+            select: 'userName profileImg name',
         })
         .skip(skip)
         .limit(limit);
 
-    // Search functionality
+    // Search 
     if (search) {
         followers = followers.filter(follower =>
             follower.user.userName.toLowerCase().includes(search.toLowerCase())
@@ -90,10 +90,11 @@ exports.getUserFollowers = asyncHandler(async (req, res, next) => {
     followers = followers.map(follower => ({
         ...follower.user._doc,  // Extract plain user data without Mongoose methods
         profileImg: follower.user.profileImg || generateDefaultProfileImg(follower.user.userName),
+        id: follower.user._id, // Add id to the response for easy identification in frontend
     }));
 
-    const totalDocs = await Follows.countDocuments(query);
-    const totalPages = Math.ceil(totalDocs / limit);
+    const totalCount = await Follows.countDocuments(query);
+    const totalPages = Math.ceil(totalCount / limit);
 
     res.status(200).json({ results: followers.length, totalPages, page, data: followers });
 });
@@ -118,10 +119,10 @@ exports.getUserFollowing = asyncHandler(async (req, res, next) => {
 
     // Fetch following users
     let following = await Follows.find(query)
-        .select('following -_id')
+        .select('following')
         .populate({
             path: 'following',
-            select: 'userName profileImg',
+            select: 'userName profileImg name',
         })
         .skip(skip)
         .limit(limit);
@@ -137,10 +138,11 @@ exports.getUserFollowing = asyncHandler(async (req, res, next) => {
     following = following.map(follow => ({
         ...follow.following._doc,  // Extract plain user data without Mongoose methods
         profileImg: follow.following.profileImg || generateDefaultProfileImg(follow.following.userName),
+        id: follow.following._id,  // Add id to the response for easy identification in frontend
     }));
 
-    const totalDocs = await Follows.countDocuments(query);
-    const totalPages = Math.ceil(totalDocs / limit);
+    const totalCount = await Follows.countDocuments(query);
+    const totalPages = Math.ceil(totalCount / limit);
 
     res.status(200).json({
         results: following.length,
@@ -155,7 +157,7 @@ exports.getRecommendedFollowers = asyncHandler(async (req, res, next) => {
     const userId = req.user._id;
 
     // Get the users the current user follows
-    const userFollowing = await Follows.find({ user: userId }).select("following -_id");
+    const userFollowing = await Follows.find({ user: userId }).select("following ");
 
     // Recommend random users if the user is not following anyone
     if (userFollowing.length === 0) {
@@ -166,22 +168,23 @@ exports.getRecommendedFollowers = asyncHandler(async (req, res, next) => {
     const followingId = userFollowing.map(f => f.following);
 
     // Get the users followed by the people the current user follows
-    const secondFollowing = await Follows.find({ user: { $in: followingId } }).select("following -_id");
+    const secondFollowing = await Follows.find({ user: { $in: followingId } }).select("following");
     const secondFollowingId = secondFollowing.map(e => e.following.toString());
 
     // Filter out users already followed by the current user and the current user itself
-    const recommendedUserId = secondFollowingId.filter(followingId => !followingId.includes(followingId) && followingId !== userId.toString());
+    const recommendedUserId = secondFollowingId.filter(
+      followingId => !followingId.includes(followingId) && followingId !== userId.toString());
 
     // Get recommended users
     let recommendedUsers;
     if (recommendedUserId.length > 0) {
         recommendedUsers = await User.find({ _id: { $in: recommendedUserId } })
-            .select("userName profileImg")
+            .select("userName profileImg name")
             .limit(req.query.limit * 1 || 10);
     } else {
         // Recommend random users if no relevant connections are found
         recommendedUsers = await User.find({ _id: { $ne: userId } })
-            .select("userName profileImg")
+            .select("userName profileImg name")
             .limit(req.query.limit * 1 || 10);
     }
 
@@ -189,6 +192,7 @@ exports.getRecommendedFollowers = asyncHandler(async (req, res, next) => {
     recommendedUsers = recommendedUsers.map(user => ({
         ...user._doc,
         profileImg: user.profileImg || generateDefaultProfileImg(user.userName),
+        id: user._id, // Add id to the response for easy identification in frontend
     }));
 
     res.status(200).json({ recommendedUsers });

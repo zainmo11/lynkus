@@ -84,6 +84,9 @@ const setUserImagesURL = (doc) => {
       const imageUrl = `${process.env.BASE_URI}/users/profileImg/${doc.profileImg}`;
       doc.profileImg = imageUrl;
     }
+    else{
+      doc.profileImg = `https://avatar.iran.liara.run/username?username=${doc.userName}&background=008080&color=F0F8FF&length=1`;
+    }
     if (doc.headerImg) {
       const imageUrl = `${process.env.BASE_URI}/users/headerImg/${doc.headerImg}`;
       doc.headerImg = imageUrl;

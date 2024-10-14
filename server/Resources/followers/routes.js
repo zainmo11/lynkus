@@ -75,6 +75,8 @@ const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser}=req
  *                             type: string
  *                           id:
  *                             type: string
+ *                           userName:
+ *                             type: string
  *                           name:
  *                             type: string
  *                           profileImg:
@@ -142,6 +144,8 @@ router.get('/followers/:id', getUserFollowers)
  *                             type: string
  *                           id:
  *                             type: string
+ *                           userName:
+ *                             type: string
  *                           name:
  *                             type: string
  *                           profileImg:
@@ -181,12 +185,6 @@ router.get('/following/:id', getUserFollowing)
  *               properties:
  *                 message:
  *                   type: string
- *                 deletedFollows:
- *                   type: object
- *                   nullable: true
- *                 newFollow:
- *                   type: object
- *                   nullable: true
  *                 notification:
  *                   type: object
  *                   nullable: true
@@ -217,10 +215,16 @@ router.post('/:id', authenticate,followUser)
  *                   items:
  *                     type: object
  *                     properties:
- *                       name:
- *                         type: string
- *                       profileImg:
- *                         type: string
+ *                           _id:
+ *                             type: string
+ *                           id:
+ *                             type: string
+ *                           userName:
+ *                             type: string
+ *                           name:
+ *                             type: string
+ *                           profileImg:
+ *                             type: string
  *       404:
  *         description: No recommended users found.
  */
