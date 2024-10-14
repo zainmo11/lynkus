@@ -1,10 +1,9 @@
-const asyncHandler=require('express-async-handler')
-const mongoose = require("mongoose")
-const Notifications = require("../notifications/model")
-const User = require("../users/model")
-const Follows= require("./model")
-const ApiError=require("../../utils/apiError")
-
+const asyncHandler = require('express-async-handler');
+const mongoose = require("mongoose");
+const Notifications = require("../notifications/model");
+const User = require("../users/model");
+const Follows = require("./model");
+const ApiError = require("../../utils/apiError");
 
 const generateDefaultProfileImg = (userName) => {
     return `https://avatar.iran.liara.run/username?username=${userName}&background=008080&color=F0F8FF&length=1`;
@@ -82,14 +81,14 @@ exports.getUserFollowers = asyncHandler(async (req, res, next) => {
 
     // Search functionality
     if (search) {
-        followers = followers.filter(user =>
-            user.user.userName.toLowerCase().includes(search.toLowerCase())
+        followers = followers.filter(follower =>
+            follower.user.userName.toLowerCase().includes(search.toLowerCase())
         );
     }
 
     // Add fallback for profileImg if not present
     followers = followers.map(follower => ({
-        ...follower.user._doc,
+        ...follower.user._doc,  // Extract plain user data without Mongoose methods
         profileImg: follower.user.profileImg || generateDefaultProfileImg(follower.user.userName),
     }));
 
@@ -129,14 +128,14 @@ exports.getUserFollowing = asyncHandler(async (req, res, next) => {
 
     // Search functionality
     if (search) {
-        following = following.filter(user =>
-            user.following.userName.toLowerCase().includes(search.toLowerCase())
+        following = following.filter(follow =>
+            follow.following.userName.toLowerCase().includes(search.toLowerCase())
         );
     }
 
     // Add fallback for profileImg if not present
     following = following.map(follow => ({
-        ...follow.following._doc,
+        ...follow.following._doc,  // Extract plain user data without Mongoose methods
         profileImg: follow.following.profileImg || generateDefaultProfileImg(follow.following.userName),
     }));
 
@@ -171,7 +170,7 @@ exports.getRecommendedFollowers = asyncHandler(async (req, res, next) => {
     const secondFollowingId = secondFollowing.map(e => e.following.toString());
 
     // Filter out users already followed by the current user and the current user itself
-    const recommendedUserId = secondFollowingId.filter(FollowingId => !followingId.includes(FollowingId) && FollowingId !== userId.toString());
+    const recommendedUserId = secondFollowingId.filter(followingId => !followingId.includes(followingId) && followingId !== userId.toString());
 
     // Get recommended users
     let recommendedUsers;
