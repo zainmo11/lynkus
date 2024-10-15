@@ -4,7 +4,8 @@ import image from "../assets/image (14) 1.png";
 import logo from "../assets/Logo.png";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { login, signup, isAuthorized } from "../store/authSlice";
+import { login, signup } from "../store/authSlice";
+import { isAuthorized } from "../utils/checkAuth";
 import Loading from "../components/Loading";
 import { DefaultButton, SecondaryButton } from "../components/Buttons";
 
@@ -51,7 +52,7 @@ export default function Welcome() {
           <img src={logo} alt="logo" />
         </div>
       </div>
-      <div className="content flex flex-col justify-center items-center w-full lg:w-[45%]">
+      <div className="content flex flex-col justify-center items-center w-full lg:w-[45%] py-10 lg:py-0">
         <h1 className="text-light-primaryText text-6xl mb-3 font-bold dark:text-dark-primaryText">
           Lynkus
         </h1>
