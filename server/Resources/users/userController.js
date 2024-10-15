@@ -52,7 +52,7 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
        
     }  
         // Handle Profile Image
-        if (req.files.profileImg) 
+        if (req.files && req.files.profileImg && req.files.profileImg.length > 0) 
             {
             // Use req.files.profileImg[0] for single file in array
             const originalPath = req.files.profileImg[0].path;  
@@ -102,7 +102,7 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
         }
 
         // Handle Header Image
-        if (req.files.headerImg) 
+        if (req.files && req.files.headerImg && req.files.headerImg.length > 0) 
             {
             // Use req.files.headerImg[0] for single file in array
             const originalPath = req.files.headerImg[0].path;  
@@ -146,7 +146,9 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
 
             fs.unlinkSync(originalPath); // Remove the original file
         }
+
     }
+    
 
     next();
 });

@@ -32,6 +32,7 @@ exports.followUser = asyncHandler(async (req, res, next) => {
             const deletedFollows = await Follows.findByIdAndDelete(followsExists._id);
             return res.status(200).json({ message: "User unfollowed successfully", deletedFollows });
         }
+        await Follows.findByIdAndDelete(followsExists._id);
         return res.status(200).json({ message: "User unfollowed successfully" });
     }
 
