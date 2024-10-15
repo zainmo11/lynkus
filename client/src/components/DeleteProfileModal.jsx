@@ -5,26 +5,29 @@ import { ErrorButton, SecondaryButton } from "./Buttons";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteUserProfile } from "../store/userSlice";
 import { modalTheme } from "../utils/flowbiteThemes";
+import { logout } from "../store/authSlice";
+import { useNavigate } from "react-router-dom";
 
 function DeleteProfileModal({ openModal, setOpenModal }) {
   const dispatch = useDispatch();
+  const nav = useNavigate();
   const { loading, err } = useSelector((state) => state.user);
 
-  if (loading) {
-    return (
-      <div className="w-full h-full flex items-center justify-center md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText opacity-80">
-        Loading...
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="w-full h-full flex items-center justify-center md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText opacity-80">
+  //       Loading...
+  //     </div>
+  //   );
+  // }
 
-  if (err) {
-    return (
-      <div className="w-full h-full flex items-center justify-center md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText opacity-80">
-        Error: {err}
-      </div>
-    );
-  }
+  // if (err) {
+  //   return (
+  //     <div className="w-full h-full flex items-center justify-center md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText opacity-80">
+  //       Error: {err}
+  //     </div>
+  //   );
+  // }
   return (
     <Modal
       theme={modalTheme}
@@ -42,11 +45,13 @@ function DeleteProfileModal({ openModal, setOpenModal }) {
           <h3 className="mb-5 text-lg font-normal ">
             Are you sure you want to delete your account?
           </h3>
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center items-center gap-4">
             <ErrorButton
               label="Yes, I'm sure"
               onClick={() => {
                 dispatch(deleteUserProfile());
+                dispatch(logout());
+                nav("/welcome");
                 setOpenModal(false);
               }}
             />

@@ -1,9 +1,16 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import CreatePost from "../components/CreatePost";
 import Post from "../components/Post";
+import { useEffect } from "react";
+import { fetchUserDataFromCookies } from "../store/userSlice";
 
 function HomePage() {
+  const dispatch = useDispatch();
   const posts = useSelector((state) => state.post.posts);
+
+  // useEffect(() => {
+  //   dispatch(fetchUserDataFromCookies());
+  // }, [dispatch]);
 
   return (
     <div className="w-full max-h-screen bg-light-background dark:bg-dark-background md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar">
