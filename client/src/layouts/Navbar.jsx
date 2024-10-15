@@ -73,17 +73,17 @@ function Navbar() {
             </li>
             <li className="w-full lg:flex items-center">
               <Link
-                to={"/profile"}
+                to={`/@${"samguy"}`}
                 className="flex justify-center items-center gap-2"
               >
-                {pathname == "/profile" ? (
+                {pathname == `/@${"samguy"}` ? (
                   <UserSolid className="size-7 text-button-default hover:text-button-hover" />
                 ) : (
                   <UserIcon className="size-6 text-button-default hover:text-button-hover" />
                 )}
                 <p
                   className={`hidden lg:block ${
-                    pathname == "/profile" ? "text-3xl" : "text-2xl"
+                    pathname == `/@${"samguy"}` ? "text-3xl" : "text-2xl"
                   } font-bold text-light-primaryText hover:text-button-hover dark:text-dark-primaryText dark:hover:text-button-hover`}
                 >
                   Profile

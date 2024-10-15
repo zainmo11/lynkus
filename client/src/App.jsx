@@ -38,7 +38,7 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/:username" element={<ProfilePage />} />
           <Route path="/notfication" element={<NotificationsPage />} />
         </Route>
         <Route path="/welcome" element={<Welcome />} />
