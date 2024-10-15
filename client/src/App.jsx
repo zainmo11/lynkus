@@ -36,6 +36,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/login" element={<Welcome />} />
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
           <Route path="/:username" element={<ProfilePage />} />

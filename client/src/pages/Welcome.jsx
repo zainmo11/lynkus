@@ -1,45 +1,58 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import image from "../assets/image (14) 1.png";
 import logo from "../assets/Logo.png";
 import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import { login, signup } from "../store/authSlice";
+import { isAuthorized } from "../utils/checkAuth";
 import Loading from "../components/Loading";
-import { SecondaryButton } from "../components/Buttons";
+import { DefaultButton, SecondaryButton } from "../components/Buttons";
 
 export default function Welcome() {
-  const [formStatus, setformStatus] = useState(true);
-  const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.auth);
+  const [formStatus, setFormStatus] = useState(true);
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
+    reset,
   } = useForm();
 
-  const onSubmitLogin = (data) => {
-    setLoading(true);
-    // Call Login API
-    console.log(data);
-  };
-
-  const onSubmitSignup = (data) => {
-    setLoading(true);
-    // Call Signup API
-    console.log(data);
-  };
-
-  // To watch the password field for confirmation match
   const password = watch("password");
 
+  // Login
+  const onSubmitLogin = (data) => {
+    dispatch(login(data)).then(() => {
+      if (isAuthorized()) {
+        navigate("/");
+      }
+    });
+  };
+
+  // Signup
+  const onSubmitSignup = (data) => {
+    dispatch(signup(data));
+    setFormStatus(true);
+  };
+
+  const toggleForm = (status) => {
+    setFormStatus(status);
+    reset();
+  };
+
   return (
-    <div className="welcome h-screen flex dark:bg-dark-background">
+    <div className="welcome flex dark:bg-dark-background">
       <div className="image w-[55%] relative hidden lg:block">
-        <img className="w-full h-screen" src={image} alt="welcome image" />
+        <img className="w-full" src={image} alt="welcome image" />
         <div className="logo flex items-center justify-center absolute bottom-3 w-full">
           <img src={logo} alt="logo" />
         </div>
       </div>
-      <div className="content flex flex-col justify-center items-center w-full lg:w-[45%] py-10">
+      <div className="content flex flex-col justify-center items-center w-full lg:w-[45%] py-10 lg:py-0">
         <h1 className="text-light-primaryText text-6xl mb-3 font-bold dark:text-dark-primaryText">
           Lynkus
         </h1>
@@ -51,113 +64,116 @@ export default function Welcome() {
             onSubmit={handleSubmit(onSubmitLogin)}
             className="bg-light-secondaryBackground rounded-lg py-8 px-6 mt-10 w-[90%] md:w-[80%] lg:w-[70%] dark:bg-dark-secondaryBackground"
           >
-            <h2 className="text-light-primaryText  text-5xl text-center font-bold mb-12 dark:text-dark-primaryText">
+            <h2 className="text-light-primaryText text-5xl text-center font-bold mb-12 dark:text-dark-primaryText">
               Welcome back
             </h2>
+            {error && (
+              <p className="text-red-600 bg-red-200 rounded-md p-3 text-center">
+                {error}
+              </p>
+            )}
             <input
-              {...register("userName", { required: "Username is Required" })}
-              className="block w-full mb-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2 "
+              {...register("userName", {
+                required: "Username is Required",
+              })}
+              className="block w-full mt-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2"
               type="text"
-              id="userName"
               placeholder="Username"
             />
-            <p className="text-light-primaryText mb-2 pl-1 text-md font-bold dark:text-dark-primaryText">
+            <p className="text-light-primaryText mt-2 pl-1 text-md font-bold dark:text-dark-primaryText">
               {errors.userName?.message}
             </p>
             <input
-              {...register("password", { required: "Password is Required" })}
-              className="block w-full mb-2  border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2 "
+              {...register("password", {
+                required: "Password is Required",
+              })}
+              className="block w-full mt-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2"
               type="password"
-              id="password"
               placeholder="Password"
             />
-            <p className="text-light-primaryText mb-2 pl-1 text-md font-bold dark:text-dark-primaryText">
+            <p className="text-light-primaryText mt-2 pl-1 text-md font-bold dark:text-dark-primaryText">
               {errors.password?.message}
             </p>
-            <button
-              type="submit"
-              className="bg-light-secondaryText hover:bg-light-primaryText font-semibold text-md text-white block mx-auto mt-12 py-2 rounded-lg w-[200px] dark:hover:bg-dark-background"
-            >
-              {loading ? <Loading /> : "Log in"}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setformStatus(false);
-              }}
-              className="border-2 border-light-secondaryText font-semibold text-md text-light-primaryText block mx-auto mt-2 py-2 rounded-lg w-[200px] hover:bg-light-primaryText hover:text-white hover:border-light-primaryText dark:text-dark-primaryText dark:hover:bg-dark-background"
-            >
-              New here? Register
-            </button>
+            <DefaultButton
+              label={loading ? <Loading /> : "Log in"}
+              onClick={handleSubmit(onSubmitLogin)}
+            />
+            <SecondaryButton
+              label="New here? Register"
+              onClick={() => toggleForm(false)}
+            />
           </form>
         ) : (
           <form
             onSubmit={handleSubmit(onSubmitSignup)}
             className="bg-light-secondaryBackground rounded-lg py-4 px-6 mt-6 w-[90%] md:w-[80%] lg:w-[70%] dark:bg-dark-secondaryBackground"
           >
-            <h2 className="text-light-primaryText text-4xl text-center font-bold mb-2 dark:text-dark-primaryText">
+            <h2 className="text-light-primaryText text-5xl text-center font-bold mb-12 dark:text-dark-primaryText">
               Join the Lynkus Community
             </h2>
             <input
-              {...register("fullName", { required: "Name is Required" })}
-              className="block w-full mb-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2 "
+              {...register("userName", { required: "Full Name is Required" })}
+              className="block w-full mt-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2"
               type="text"
-              id="fullName"
-              placeholder="Username"
+              placeholder="Full Name"
             />
-            <p className="text-light-primaryText mb-2 pl-1 text-md font-bold dark:text-dark-primaryText">
-              {errors.fullName?.message}
+            <p className="text-light-primaryText mt-2 pl-1 text-md font-bold dark:text-dark-primaryText">
+              {errors.userName?.message}
+            </p>
+            <input
+              {...register("name", { required: "Username is Required" })}
+              className="block w-full mt-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2"
+              type="text"
+              placeholder="@Username"
+            />
+            <p className="text-light-primaryText mt-2 pl-1 text-md font-bold dark:text-dark-primaryText">
+              {errors.name?.message}
             </p>
             <input
               {...register("email", { required: "Email is Required" })}
-              className="block w-full mb-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2 "
+              className="block w-full mt-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2"
               type="email"
-              id="email"
               placeholder="Email"
             />
-            <p className="text-light-primaryText mb-2 pl-1 text-md font-bold dark:text-dark-primaryText">
+            <p className="text-light-primaryText mt-2 pl-1 text-md font-bold dark:text-dark-primaryText">
               {errors.email?.message}
             </p>
             <input
-              {...register("Spassword", { required: "Password is Required" })}
-              className="block w-full mb-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2 "
+              {...register("password", {
+                required: "Password is Required",
+                minLength: {
+                  value: 6,
+                  message: "Password must be at least 6 characters",
+                },
+              })}
+              className="block w-full mt-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2"
               type="password"
-              id="Spassword"
               placeholder="Password"
             />
-            <p className="text-light-primaryText mb-2 pl-1 text-md font-bold dark:text-dark-primaryText">
-              {errors.Spassword?.message}
+            <p className="text-light-primaryText mt-2 pl-1 text-md font-bold dark:text-dark-primaryText">
+              {errors.password?.message}
             </p>
             <input
-              {...register("confirmPassword", {
+              {...register("passwordConfirm", {
                 required: "Confirm Password is Required",
                 validate: (value) =>
-                  value === password || "Passwords do not match",
+                  value === password || "Passwords must match",
               })}
-              className="block w-full mb-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2 "
+              className="block w-full mt-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2"
               type="password"
-              id="confirmPassword"
               placeholder="Confirm Password"
             />
-            <p className="text-light-primaryText mb-2 pl-1 text-md font-bold dark:text-dark-primaryText">
-              {errors.confirmPassword?.message}
+            <p className="text-light-primaryText mt-2 pl-1 text-md font-bold dark:text-dark-primaryText">
+              {errors.passwordConfirm?.message}
             </p>
-            <button
-              type="submit"
-              className="bg-light-secondaryText hover:bg-light-primaryText font-semibold text-md text-white block mx-auto py-2 rounded-lg w-[200px] dark:hover:bg-dark-background"
-            >
-              {loading ? <Loading /> : "Sign up"}
-            </button>
-            <SecondaryButton label="Have an account? Login" />
-            <button
-              type="button"
-              onClick={() => {
-                setformStatus(true);
-              }}
-              className="border-2 border-light-secondaryText font-semibold text-md text-light-primaryText block mx-auto mt-2 py-2 rounded-lg w-[200px] hover:bg-light-primaryText hover:text-white hover:border-light-primaryText dark:text-dark-primaryText dark:hover:bg-dark-background"
-            >
-              Have an account? Login
-            </button>
+            <DefaultButton
+              label={loading ? <Loading /> : "Register"}
+              onClick={handleSubmit(onSubmitSignup)}
+            />
+            <SecondaryButton
+              label="Already have an account? Log in"
+              onClick={() => toggleForm(true)}
+            />
           </form>
         )}
       </div>

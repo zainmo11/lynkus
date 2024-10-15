@@ -3,6 +3,7 @@ import themeSlice from "./themeSlice";
 import userSlice from "./userSlice";
 import postSlice from "./postSlice";
 import notificationSlice from "./notificationSlice";
+import authReducer from "./authSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,5 +11,6 @@ export const store = configureStore({
     user: userSlice,
     post: postSlice,
     notification: notificationSlice,
+    auth: authReducer,
   },
 });

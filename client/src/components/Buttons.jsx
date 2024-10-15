@@ -4,7 +4,7 @@ import { Button } from "flowbite-react";
 export const DefaultButton = ({ Icon, label, onClick }) => {
   return (
     <Button
-      className="bg-button-default hover:bg-button-hover border-button-default hover:border-button-hover border-[2px] xl:px-2 rounded-[10px] focus:ring-0"
+      className="bg-button-default hover:bg-button-hover border-button-default hover:border-button-hover border-[2px] xl:px-2 rounded-[10px] focus:ring-0 mt-5"
       onClick={onClick}
     >
       <div className="flex items-center font-medium text-sm xl:text-lg text-dark-primaryText">
@@ -18,7 +18,7 @@ export const DefaultButton = ({ Icon, label, onClick }) => {
 export const SecondaryButton = ({ Icon, label, onClick }) => {
   return (
     <Button
-      className="bg-transparent hover:bg-button-hover text-light-primaryText dark:text-dark-primaryText hover:text-dark-primaryText border-button-default border-[2px] xl:px-2 rounded-[10px] focus:ring-0"
+      className="bg-transparent hover:bg-button-hover text-light-primaryText dark:text-dark-primaryText hover:text-dark-primaryText border-button-default border-[2px] xl:px-2 rounded-[10px] focus:ring-0 mt-5"
       onClick={onClick}
     >
       <div className="flex items-center font-medium text-sm xl:text-lg">
