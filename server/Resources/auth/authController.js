@@ -57,7 +57,7 @@ const sendEmail=require('../../utils/sendEmail')
     // Set the refreshToken as a cookie
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true, // prevent xss attacks and cookies is sent over HTTP
-      secure: false, // make sure the token is only sent over encrypted HTTPS connections.
+      secure: true, // make sure the token is only sent over encrypted HTTPS connections.
       sameSite: 'Strict', // sent from same site prevent CSRF attacks
       path: '/', // make sure cookie accessible to all routes
     });
