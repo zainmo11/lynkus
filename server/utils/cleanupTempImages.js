@@ -1,5 +1,4 @@
 const fs = require('fs');
-const { nextTick } = require('process');
 
 const cleanupTempImages = (tempImages) => {
   if (tempImages) {

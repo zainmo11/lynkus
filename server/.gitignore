@@ -1,3 +1,4 @@
 node_modules
 users/headerImg/*
 users/profileImg/*
+.env
