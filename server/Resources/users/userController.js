@@ -100,26 +100,6 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
 
             fs.unlinkSync(originalPath); // Remove the original file
         }
-        else{
-            if (req.user && req.user.profileImg) {
-                // Extract the file name from URL
-                const oldImgFileName = req.user.profileImg.split('/').pop(); 
-                const oldImgPath = path.join(__dirname, '../../uploads/users/profileImg', oldImgFileName);
-
-                try {   
-                    if (fs.existsSync(oldImgPath)) 
-                        {
-                        // Delete the old profile image if it exists
-                        fs.unlinkSync(oldImgPath); 
-                    }
-                } catch (err) {
-                    console.error(`Error deleting old profile image: ${err.message}`);
-                }
-            }
-            console.log("No profile image uploaded");
-            req.tempImg.profileImg=null;
-
-        }
 
         // Handle Header Image
         if (req.files && req.files.headerImg && req.files.headerImg.length > 0) 
@@ -166,24 +146,7 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
 
             fs.unlinkSync(originalPath); // Remove the original file
         }
-        else{
-            if (req.user &&req.user.headerImg) 
-                {
-                // Extract the file name from URL
-                const oldImgFileName = req.user.headerImg.split('/').pop(); 
-                const oldImgPath = path.join(__dirname, '../../uploads/users/headerImg', oldImgFileName);
-    
-                try {
-                    if (fs.existsSync(oldImgPath)) {
-                        fs.unlinkSync(oldImgPath); // Delete the old header image if it exists
-                    }
-                } catch (err) {
-                    console.error(`Error deleting old header image: ${err.message}`);
-                }
-            }
-            console.log("No header image uploaded");
-            req.tempImg.headerImg=null;
-        }
+
     }
     
 
