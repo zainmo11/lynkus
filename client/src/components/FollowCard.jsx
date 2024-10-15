@@ -16,7 +16,7 @@ function FollowCard({ name, username, profileImg, followed }) {
   };
   return (
     <div className="w-full flex justify-between items-center">
-      <Link to={"/profile"}>
+      <Link to={`/user/${username}`}>
         <Head username={username} name={name} profileImg={profileImg} />
       </Link>
 

@@ -11,6 +11,7 @@ import Error from "./pages/Error";
 import NotificationsPage from "./pages/NotificationsPage";
 import usePeriodicFetch from "./hooks/usePeriodicFetch";
 import { getAllNotifications } from "./store/notificationSlice";
+import PrivateRouter from "./components/PrivateRouter";
 
 function App() {
   const dispatch = useDispatch();
@@ -36,11 +37,32 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Welcome />} />
+        {/* <Route path="/login" element={<Welcome />} /> */}
         <Route element={<Layout />}>
-          <Route index element={<HomePage />} />
-          <Route path="/:username" element={<ProfilePage />} />
-          <Route path="/notfication" element={<NotificationsPage />} />
+          <Route
+            index
+            element={
+              <PrivateRouter>
+                <HomePage />
+              </PrivateRouter>
+            }
+          />
+          <Route
+            path="/user/:username"
+            element={
+              <PrivateRouter>
+                <ProfilePage />
+              </PrivateRouter>
+            }
+          />
+          <Route
+            path="/notfication"
+            element={
+              <PrivateRouter>
+                <NotificationsPage />
+              </PrivateRouter>
+            }
+          />
         </Route>
         <Route path="/welcome" element={<Welcome />} />
         <Route path="/loading" element={<Loading />} />

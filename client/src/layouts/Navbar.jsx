@@ -7,7 +7,7 @@ import {
   MagnifyingGlassIcon,
   BellIcon,
   UserIcon,
-  EnvelopeIcon,
+  // EnvelopeIcon,
   SunIcon,
   MoonIcon,
   ArrowLeftStartOnRectangleIcon,
@@ -17,12 +17,15 @@ import {
   MagnifyingGlassIcon as MagnifyingGlassSolid,
   BellIcon as BellSolid,
   UserIcon as UserSolid,
-  EnvelopeIcon as EnvelopeSolid,
+  // EnvelopeIcon as EnvelopeSolid,
 } from "@heroicons/react/24/solid";
 import { DefaultButton, ErrorButton } from "../components/Buttons";
 import { toggleTheme } from "../store/themeSlice";
+import { useEffect, useState } from "react";
+import { fetchUserDataFromCookies } from "../utils/helpers";
 
 function Navbar() {
+  const [userData, setUserData] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
   const { pathname } = location;
@@ -43,8 +46,13 @@ function Navbar() {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/login");
+    navigate("/welcome");
   };
+
+  useEffect(() => {
+    const cookiesData = fetchUserDataFromCookies();
+    setUserData({ ...cookiesData });
+  }, []);
 
   return (
     <div className="w-full fixed bottom-0 md:static md:col-span-1 md:h-screen lg:col-span-2">
@@ -80,17 +88,19 @@ function Navbar() {
             </li>
             <li className="w-full lg:flex items-center">
               <Link
-                to={`/@${"samguy"}`}
+                to={`/user/${userData.userName}`}
                 className="flex justify-center items-center gap-2"
               >
-                {pathname == `/@${"samguy"}` ? (
+                {pathname == `/user/${userData.userName}` ? (
                   <UserSolid className="size-7 text-button-default hover:text-button-hover" />
                 ) : (
                   <UserIcon className="size-6 text-button-default hover:text-button-hover" />
                 )}
                 <p
                   className={`hidden lg:block ${
-                    pathname == `/@${"samguy"}` ? "text-3xl" : "text-2xl"
+                    pathname == `/user/${userData.userName}`
+                      ? "text-3xl"
+                      : "text-2xl"
                   } font-bold text-light-primaryText hover:text-button-hover dark:text-dark-primaryText dark:hover:text-button-hover`}
                 >
                   Profile
@@ -137,7 +147,8 @@ function Navbar() {
                 </p>
               </Link>
             </li>
-            <li className="w-full lg:flex items-center">
+            {/* CHAT BONUS */}
+            {/* <li className="w-full lg:flex items-center">
               <Link to={"/"} className="flex justify-center items-center gap-2">
                 {pathname == "" ? (
                   <EnvelopeSolid className="size-7 text-button-default hover:text-button-hover" />
@@ -152,7 +163,7 @@ function Navbar() {
                   Chat
                 </p>
               </Link>
-            </li>
+            </li> */}
           </ul>
           <div className="hidden mb-4 lg:flex flex-col gap-4 order-2 w-3/4">
             {/* <DefaultButton label={"Dark Mode"} /> */}

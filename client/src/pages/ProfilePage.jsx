@@ -19,7 +19,7 @@ function ProfilePage() {
   // const [isOwnProfile, setIsOwnProfile] = useState(username === "@samguy");
   console.log(username);
 
-  const isOwnProfile = username === "3bkr";
+  const isOwnProfile = username === "admin";
   const {
     userData,
     loading,
@@ -64,6 +64,7 @@ function ProfilePage() {
         isOwnProfile={isOwnProfile}
         initiateDelModal={() => {
           setDelModal(true);
+          console.log("INITIATE DEL MODAL");
         }}
         initiateEditModal={() => {
           setEditModal(true);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import image from "../assets/image (14) 1.png";
 import logo from "../assets/Logo.png";
@@ -45,11 +45,15 @@ export default function Welcome() {
   };
 
   return (
-    <div className="welcome flex dark:bg-dark-background">
+    <div className="welcome flex dark:bg-dark-background w-screen min-h-screen">
       <div className="image w-[55%] relative hidden lg:block">
-        <img className="w-full" src={image} alt="welcome image" />
+        <img
+          className="w-full h-screen object-cover"
+          src={image}
+          alt="welcome image"
+        />
         <div className="logo flex items-center justify-center absolute bottom-3 w-full">
-          <img src={logo} alt="logo" />
+          <img src={logo} alt="logo" className="size-16 rounded-full" />
         </div>
       </div>
       <div className="content flex flex-col justify-center items-center w-full lg:w-[45%] py-10 lg:py-0">
@@ -94,14 +98,16 @@ export default function Welcome() {
             <p className="text-light-primaryText mt-2 pl-1 text-md font-bold dark:text-dark-primaryText">
               {errors.password?.message}
             </p>
-            <DefaultButton
-              label={loading ? <Loading /> : "Log in"}
-              onClick={handleSubmit(onSubmitLogin)}
-            />
-            <SecondaryButton
-              label="New here? Register"
-              onClick={() => toggleForm(false)}
-            />
+            <div className="flex flex-col gap-5 mt-5">
+              <DefaultButton
+                label={loading ? <Loading /> : "Log in"}
+                onClick={handleSubmit(onSubmitLogin)}
+              />
+              <SecondaryButton
+                label="New here? Register"
+                onClick={() => toggleForm(false)}
+              />
+            </div>
           </form>
         ) : (
           <form
@@ -124,7 +130,7 @@ export default function Welcome() {
               {...register("name", { required: "Username is Required" })}
               className="block w-full mt-5 border-light-secondaryText focus:border-light-primaryText outline-none border-2 rounded-lg p-2"
               type="text"
-              placeholder="@Username"
+              placeholder="Username"
             />
             <p className="text-light-primaryText mt-2 pl-1 text-md font-bold dark:text-dark-primaryText">
               {errors.name?.message}
@@ -166,14 +172,16 @@ export default function Welcome() {
             <p className="text-light-primaryText mt-2 pl-1 text-md font-bold dark:text-dark-primaryText">
               {errors.passwordConfirm?.message}
             </p>
-            <DefaultButton
-              label={loading ? <Loading /> : "Register"}
-              onClick={handleSubmit(onSubmitSignup)}
-            />
-            <SecondaryButton
-              label="Already have an account? Log in"
-              onClick={() => toggleForm(true)}
-            />
+            <div className="flex flex-col gap-5 mt-5">
+              <DefaultButton
+                label={loading ? <Loading /> : "Register"}
+                onClick={handleSubmit(onSubmitSignup)}
+              />
+              <SecondaryButton
+                label="Already have an account? Log in"
+                onClick={() => toggleForm(true)}
+              />
+            </div>
           </form>
         )}
       </div>
