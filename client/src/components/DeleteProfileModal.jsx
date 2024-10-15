@@ -2,24 +2,37 @@
 import { ExclamationCircleIcon } from "@heroicons/react/24/solid";
 import { Modal } from "flowbite-react";
 import { ErrorButton, SecondaryButton } from "./Buttons";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteUserProfile } from "../store/userSlice";
+import { modalTheme } from "../utils/flowbiteThemes";
 
-const customTheme = {
-  header: {
-    close: {
-      base: "ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-button-default hover:bg-button-hover hover:text-gray-900 ",
-      icon: "size-5",
-    },
-  },
-};
+function DeleteProfileModal({ openModal, setOpenModal }) {
+  const dispatch = useDispatch();
+  const { loading, err } = useSelector((state) => state.user);
 
-function DeleteProfileModal({ openModal, setOpenModal, delFunction }) {
+  if (loading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText opacity-80">
+        Loading...
+      </div>
+    );
+  }
+
+  if (err) {
+    return (
+      <div className="w-full h-full flex items-center justify-center md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText opacity-80">
+        Error: {err}
+      </div>
+    );
+  }
   return (
     <Modal
-      theme={customTheme}
+      theme={modalTheme}
       show={openModal}
       onClose={() => setOpenModal(false)}
       position="center"
       popup
+      size="2xl"
     >
       <Modal.Header className=" bg-light-secondaryBackground dark:bg-dark-secondaryBackground rounded-t-[10px]" />
 
@@ -32,9 +45,9 @@ function DeleteProfileModal({ openModal, setOpenModal, delFunction }) {
           <div className="flex justify-center gap-4">
             <ErrorButton
               label="Yes, I'm sure"
-              onClick={async () => {
+              onClick={() => {
+                dispatch(deleteUserProfile());
                 setOpenModal(false);
-                await delFunction();
               }}
             />
 

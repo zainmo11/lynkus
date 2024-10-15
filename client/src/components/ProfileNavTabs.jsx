@@ -1,7 +1,10 @@
 /* eslint-disable react/prop-types */
 import { Tabs } from "flowbite-react";
-import Post from "./Post";
-import FollowCard from "./FollowCard";
+import { useSelector } from "react-redux";
+import FollowersTab from "./FollowersTab";
+import FollowingsTab from "./FollowingsTab";
+import UserPostsTab from "./UserPostsTab";
+import UserLikesTab from "./UserLikesTab";
 
 const customTheme = {
   base: "flex flex-col gap-2",
@@ -25,7 +28,24 @@ const customTheme = {
   },
 };
 
-function ProfileNavTabs({ userPosts, likedPosts, users }) {
+function ProfileNavTabs() {
+  const { loading, err } = useSelector((state) => state.user);
+
+  if (loading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText opacity-80">
+        Loading...
+      </div>
+    );
+  }
+
+  // if (err) {
+  //   return (
+  //     <div className="w-full h-full flex items-center justify-center md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText opacity-80">
+  //       Error: {err}
+  //     </div>
+  //   );
+  // }
   return (
     <div className="min-h-full my-[20px] bg-light-background dark:bg-dark-background rounded-[10px]">
       <Tabs
@@ -34,92 +54,17 @@ function ProfileNavTabs({ userPosts, likedPosts, users }) {
         variant="fullWidth"
         className="w-full "
       >
-        <Tabs.Item
-          title="Followers"
-          className="bg-light-accent rounded-xl"
-          color="error"
-        >
-          <ul className="w-full divide-y divide-light-secondaryText dark:divide-dark-secondaryText border-light-secondaryText dark:border-dark-secondaryText">
-            {users.map((x, i) => {
-              return (
-                <li key={i} className={`p-6 `}>
-                  <FollowCard
-                    key={i}
-                    username={x.username}
-                    name={x.name}
-                    profileImg={x.profileImg}
-                  />
-                </li>
-              );
-            })}
-          </ul>
+        <Tabs.Item title="Followers">
+          <FollowersTab />
         </Tabs.Item>
         <Tabs.Item title="Follwings">
-          <ul className="w-full divide-y divide-light-secondaryText dark:divide-dark-secondaryText border-light-secondaryText dark:border-dark-secondaryText">
-            {users.map((x, i) => {
-              return (
-                <li key={i} className={`p-6 `}>
-                  <FollowCard
-                    key={i}
-                    username={x.username}
-                    name={x.name}
-                    profileImg={x.profileImg}
-                    followed={true}
-                  />
-                </li>
-              );
-            })}
-          </ul>
+          <FollowingsTab />
         </Tabs.Item>
         <Tabs.Item active title="Posts">
-          <ul className="w-full divide-y divide-light-secondaryText dark:divide-dark-secondaryText border-light-secondaryText dark:border-dark-secondaryText">
-            {userPosts.map((x, i) => {
-              return (
-                <li
-                  key={i}
-                  className={`pt-6 px-6 ${x.showPost ? "block" : "hidden"}`}
-                >
-                  <Post
-                    username={x.username}
-                    name={x.name}
-                    profileImg={x.profileImg}
-                    body={x.body}
-                    postImg={x.postImg}
-                    likes={x.likes}
-                    commemts={x.comments}
-                    showPost={x.showPost}
-                    postLiked={x.postLiked}
-                    index={i}
-                  />
-                </li>
-              );
-            })}
-          </ul>
+          <UserPostsTab />
         </Tabs.Item>
         <Tabs.Item title="Likes">
-          <ul className="w-full divide-y divide-light-secondaryText dark:divide-dark-secondaryText border-light-secondaryText dark:border-dark-secondaryText">
-            {likedPosts.map((x, i) => {
-              return (
-                <li
-                  key={i}
-                  className={`pt-6 px-6 ${x.showPost ? "block" : "hidden"}`}
-                >
-                  <Post
-                    username={x.username}
-                    name={x.name}
-                    profileImg={x.profileImg}
-                    body={x.body}
-                    postImg={x.postImg}
-                    likes={x.likes}
-                    commemts={x.comments}
-                    showPost={x.showPost}
-                    postLiked={x.postLiked}
-                    index={i}
-                  />
-                </li>
-              );
-            })}
-          </ul>
+          <UserLikesTab />
         </Tabs.Item>
       </Tabs>
     </div>

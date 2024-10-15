@@ -6,10 +6,17 @@ import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { setTheme } from "./store/themeSlice";
 import Welcome from "./pages/Welcome";
+import Loading from "./components/Loading";
 import Error from "./pages/Error";
+import NotificationsPage from "./pages/NotificationsPage";
+import usePeriodicFetch from "./hooks/usePeriodicFetch";
+import { getAllNotifications } from "./store/notificationSlice";
 
 function App() {
   const dispatch = useDispatch();
+
+  //Fetch notifications globally
+  usePeriodicFetch(() => dispatch(getAllNotifications()), 300000);
 
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme");
@@ -32,8 +39,12 @@ function App() {
         <Route path="/login" element={<Welcome />} />
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/:username" element={<ProfilePage />} />
+          <Route path="/notfication" element={<NotificationsPage />} />
         </Route>
+        <Route path="/welcome" element={<Welcome />} />
+        <Route path="/loading" element={<Loading />} />
+        <Route path="/error" element={<Error />} />
       </Routes>
     </BrowserRouter>
   );

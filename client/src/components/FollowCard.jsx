@@ -4,10 +4,13 @@ import { LinkIcon } from "@heroicons/react/24/outline";
 import { DefaultButton } from "./Buttons";
 import { Link } from "react-router-dom";
 import { LinkSlashIcon } from "@heroicons/react/24/solid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function FollowCard({ name, username, profileImg, followed }) {
-  const [following, setFollowing] = useState(followed);
+  const [following, setFollowing] = useState(false);
+  useEffect(() => {
+    setFollowing(followed);
+  }, [followed]);
   const toggleFollowing = () => {
     setFollowing(!following);
   };
