@@ -3,67 +3,47 @@ import api, { setAuthToken } from "../utils/axios";
 import Cookies from "universal-cookie";
 const cookies = new Cookies();
 
-// Login
 export const login = createAsyncThunk(
   "auth/login",
   async (loginValues, thunkAPI) => {
     try {
       const response = await api.post("/auth/login", loginValues);
-      console.log(loginValues);
 
       const { AccessToken, data } = response.data;
 
       cookies.set("token", AccessToken, { path: "/" });
       cookies.set("user", JSON.stringify(data), { path: "/" });
-      localStorage.setItem("token", AccessToken);
 
       setAuthToken(AccessToken);
 
       return { AccessToken, data };
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
+      return thunkAPI.rejectWithValue(
+        error.response?.data || { message: "An error occurred" }
+      );
     }
   }
 );
 
-// Signup
 export const signup = createAsyncThunk(
   "auth/signup",
   async (values, thunkAPI) => {
     try {
       const response = await api.post("/auth/register", values);
-      const { AccessToken, user } = response.data;
-
-      cookies.set("token", AccessToken, { path: "/" });
-      cookies.set("user", JSON.stringify(user), { path: "/" });
-      localStorage.setItem("token", AccessToken);
-
-      setAuthToken(AccessToken);
-
-      return { AccessToken, user };
+      return response.data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
+      return thunkAPI.rejectWithValue(
+        error.response?.data || { message: "An error occurred" }
+      );
     }
   }
 );
 
-export const isAuthorized = () => {
-  const token = localStorage.getItem("token");
-  const cookiesToken = cookies.get("token");
-  const cookiesData = cookies.get("user");
-  if (token && cookiesToken && cookiesData) {
-    return true;
-  } else {
-    return false;
-  }
-};
-
-// Create auth slice
 const authSlice = createSlice({
   name: "auth",
   initialState: {
     token: cookies.get("token") || null,
-    user: cookies.get("user") ? JSON.parse(cookies.get("user")) : null,
+    user: cookies.get("user") ? JSON.stringify(cookies.get("user")) : null,
     loading: false,
     error: null,
   },
@@ -71,7 +51,6 @@ const authSlice = createSlice({
     logout: (state) => {
       cookies.remove("token", { path: "/" });
       cookies.remove("user", { path: "/" });
-      localStorage.removeItem("token");
 
       setAuthToken(null);
 
@@ -100,8 +79,6 @@ const authSlice = createSlice({
       })
       .addCase(signup.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload.AccessToken;
-        state.user = action.payload.user;
         state.error = null;
       })
       .addCase(signup.rejected, (state, action) => {
