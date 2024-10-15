@@ -28,7 +28,7 @@ const app = express();
 // Middleware
 // Configure CORS options
 const corsOptions = {
-    origin: '*', // Allow requests from all origins
+    origin: 'https://lynkus-3.onrender.com', // Allow requests from all origins
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
     credentials: true, // Allow credentials (if needed)
 };
