@@ -6,9 +6,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteUserProfile } from "../store/userSlice";
 import { modalTheme } from "../utils/flowbiteThemes";
 import { logout } from "../store/authSlice";
+import { useNavigate } from "react-router-dom";
 
 function DeleteProfileModal({ openModal, setOpenModal }) {
   const dispatch = useDispatch();
+  const nav = useNavigate();
   const { loading, err } = useSelector((state) => state.user);
 
   // if (loading) {
@@ -49,6 +51,7 @@ function DeleteProfileModal({ openModal, setOpenModal }) {
               onClick={() => {
                 dispatch(deleteUserProfile());
                 dispatch(logout());
+                nav("/welcome");
                 setOpenModal(false);
               }}
             />

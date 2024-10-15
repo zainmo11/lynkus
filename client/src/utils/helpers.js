@@ -7,9 +7,9 @@ export function capitalizeName(name) {
     .join(" ");
 }
 
-export function fetchUserDataFromCookies() {
-  const cookies = new Cookies();
-  const userData = cookies.get("user");
-  console.log(userData);
-  return userData;
-}
+// export function fetchUserDataFromCookies() {
+//   const cookies = new Cookies();
+//   const userData = cookies.get("user");
+//   console.log(userData);
+//   return userData;
+// }

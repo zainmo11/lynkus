@@ -21,11 +21,9 @@ import {
 } from "@heroicons/react/24/solid";
 import { DefaultButton, ErrorButton } from "../components/Buttons";
 import { toggleTheme } from "../store/themeSlice";
-import { useEffect, useState } from "react";
-import { fetchUserDataFromCookies } from "../utils/helpers";
 
 function Navbar() {
-  const [userData, setUserData] = useState({});
+  const { userData } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const location = useLocation();
   const { pathname } = location;
@@ -48,11 +46,6 @@ function Navbar() {
     dispatch(logout());
     navigate("/welcome");
   };
-
-  useEffect(() => {
-    const cookiesData = fetchUserDataFromCookies();
-    setUserData({ ...cookiesData });
-  }, []);
 
   return (
     <div className="w-full fixed bottom-0 md:static md:col-span-1 md:h-screen lg:col-span-2">

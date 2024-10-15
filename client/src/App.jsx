@@ -12,6 +12,7 @@ import NotificationsPage from "./pages/NotificationsPage";
 import usePeriodicFetch from "./hooks/usePeriodicFetch";
 import { getAllNotifications } from "./store/notificationSlice";
 import PrivateRouter from "./components/PrivateRouter";
+import { fetchUserDataFromCookies } from "./store/userSlice";
 
 function App() {
   const dispatch = useDispatch();
@@ -20,6 +21,7 @@ function App() {
   usePeriodicFetch(() => dispatch(getAllNotifications()), 300000);
 
   useEffect(() => {
+    dispatch(fetchUserDataFromCookies());
     const storedTheme = localStorage.getItem("theme");
 
     if (storedTheme) {

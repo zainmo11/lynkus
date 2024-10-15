@@ -1,6 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import logo from "../assets/logo.png";
 import api from "../utils/axios";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
 
 const initialState = {
   // Dummy data (replace with actual data fetching logic later)
@@ -63,6 +66,9 @@ export const deleteUserProfile = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await api.delete("/users");
+      console.log("DELETED");
+      console.log(res.data.message);
+
       return res.data.message;
     } catch (e) {
       console.log(e);
@@ -139,7 +145,18 @@ export const toggleFollow = createAsyncThunk(
 export const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    fetchUserDataFromCookies: (state) => {
+      const userData = cookies.get("user");
+      if (userData) {
+        console.log(userData);
+        state.userData = userData;
+        console.log("FETCHED USER DATA FROM COOKIES");
+      } else {
+        console.log("NO USER DATA FROM COOKIES");
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getUserData.pending, (state) => {
@@ -257,6 +274,6 @@ export const userSlice = createSlice({
   },
 });
 
-// export const {} = userSlice.actions
+export const { fetchUserDataFromCookies } = userSlice.actions;
 
 export default userSlice.reducer;

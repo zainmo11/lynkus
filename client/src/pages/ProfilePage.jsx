@@ -19,7 +19,6 @@ function ProfilePage() {
   // const [isOwnProfile, setIsOwnProfile] = useState(username === "@samguy");
   console.log(username);
 
-  const isOwnProfile = username === "admin";
   const {
     userData,
     loading,
@@ -31,7 +30,8 @@ function ProfilePage() {
   } = useSelector((state) => state.user);
   const [deleteModal, setDelModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
-  const userId = "670b57df007bf694898314f4"; //TODO: MAKE IT DYNAMIC
+  const userId = userData.id; //TODO: MAKE IT DYNAMIC
+  const isOwnProfile = username === userData.userName;
 
   useEffect(() => {
     dispatch(getUserData(username));
