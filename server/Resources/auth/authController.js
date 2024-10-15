@@ -57,7 +57,7 @@ const sendEmail=require('../../utils/sendEmail')
     // Set the refreshToken as a cookie
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true, // prevent xss attacks and cookies is sent over HTTP
-      secure: true, // make sure the token is only sent over encrypted HTTPS connections.
+      secure: false, // make sure the token is only sent over encrypted HTTPS connections.
       sameSite: 'Strict', // sent from same site prevent CSRF attacks
       path: '/', // make sure cookie accessible to all routes
     });
@@ -130,18 +130,18 @@ if(!token) return next(new ApiError('you are not login , login now ',401))
 
        
        
-  const refreshToken = req.cookies.refreshToken || req.headers['x-refresh-token'];
+  // const refreshToken = req.cookies.refreshToken || req.headers['x-refresh-token'];
 
-  if (!refreshToken) {
-    return next(new ApiError('Invalid or expired refresh token. ', 401));
-  }
+  // if (!refreshToken) {
+  //   return next(new ApiError('Invalid or expired refresh token. ', 401));
+  // }
 
 
-        const checkRefreshToken =RefreshToken.findOne(refreshToken)
+  //       const checkRefreshToken =RefreshToken.findOne(refreshToken)
 
-  if (!checkRefreshToken) {
-    return next(new ApiError('Invalid or expired refresh token.', 401));
-  }
+  // if (!checkRefreshToken) {
+  //   return next(new ApiError('Invalid or expired refresh token.', 401));
+  // }
    
             req.user=currUser;
             next();
