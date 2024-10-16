@@ -14,6 +14,10 @@ const getLikesAndCommentsCount = async (postId) => {
     return { likesCount, commentsCount };
 };
 
+const userLikesPost = async (postId, userId) => {
+    const like = await Like.findOne({ postId, userId });
+    return !!like; // Returns true if the user has liked the post, otherwise false
+};
 // Create a new post
 exports.createPost = async (req, res) => {
     try {
@@ -37,7 +41,6 @@ exports.createPost = async (req, res) => {
     }
 };
 
-// Get a single post by ID along with likes, comments count, and user information
 exports.getPost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id).populate('authorId');
@@ -45,7 +48,10 @@ exports.getPost = async (req, res) => {
             return res.status(404).send({ message: 'Post not found' });
         }
 
-        // Fetch user details
+        const token = req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId; // Get current user ID from token
+
         const user = await User.findById(post.authorId);
         if (!user) {
             return res.status(404).send({ message: 'User not found' });
@@ -60,18 +66,23 @@ exports.getPost = async (req, res) => {
         // Get likes and comments count
         const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
 
+        // Check if the current user likes this post
+        const likedByUser = await userLikesPost(post._id, userId);
+
         res.status(200).send({
             post,
             likesCount,
             commentsCount,
-            userName: user.userName,
-            name: user.name
+            userName: user.userName || "unknown UserName",
+            name: user.name || "unknown User",
+            likedByUser
         });
     } catch (error) {
         if (error.kind === 'ObjectId') {
             return res.status(400).send({ message: 'Invalid Post ID' });
         }
-        res.status(500).send({ message: 'Error retrieving post', error });
+        console.error('Error retrieving post:', error);
+        res.status(500).send({ message: 'Error retrieving post', error: error.message || error });
     }
 };
 
@@ -156,12 +167,13 @@ exports.deletePost = async (req, res) => {
 exports.getAllPosts = async (req, res) => {
     try {
         const posts = await Post.find().populate('authorId');
-
+        const token = req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
         const baseUrl = `${req.protocol}://${req.get('host')}`;
-
+        const {userId} = decoded;
         const postsWithCounts = await Promise.all(posts.map(async post => {
-            console.log(post.authorId);
             const user = await User.findById(post.authorId);
+            const likedByUser = await userLikesPost(post._id, userId);
 
             // Check if user is found
             const userName = user ? user.userName : "unknown UserName";
@@ -178,7 +190,8 @@ exports.getAllPosts = async (req, res) => {
                 likes: likesCount,
                 comments: commentsCount,
                 userName,
-                name
+                name,
+                likedByUser
             };
         }));
 
@@ -200,44 +213,6 @@ const prependBaseUrlToImages = (posts, req) => {
 };
 
 
-// Get a single post by ID with likes, comments count, and user information
-exports.getPost = async (req, res) => {
-    try {
-        const post = await Post.findById(req.params.id).populate('authorId');
-        if (!post) {
-            return res.status(404).send({ message: 'Post not found' });
-        }
-
-        const user = await User.findById(post.authorId);
-        if (!user) {
-            return res.status(404).send({ message: 'User not found' });
-        }
-
-        // Prepend the base URL to the image if it exists
-        const baseUrl = `${req.protocol}://${req.get('host')}`;
-        if (post.image) {
-            post.image = `${baseUrl}/uploads/posts/${post.image.split('\\').pop()}`;
-        }
-
-        // Get likes and comments count
-        const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
-
-        res.status(200).send({
-            post,
-            likesCount,
-            commentsCount,
-            userName: user.userName || "unknown UserName",
-            name: user.name || "unknown User"
-        });
-    } catch (error) {
-        if (error.kind === 'ObjectId') {
-            return res.status(400).send({ message: 'Invalid Post ID' });
-        }
-        console.error('Error retrieving post:', error);
-        res.status(500).send({ message: 'Error retrieving post', error: error.message || error });
-    }
-};
-
 // Get all posts by a specific user with user information
 exports.getPostsByUser = async (req, res) => {
     try {
@@ -246,6 +221,10 @@ exports.getPostsByUser = async (req, res) => {
             return res.status(200).json({ message: 'No posts found for this user', posts: [] });
         }
 
+        const token = req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId; // Get current user ID from token
+
         // Prepend base URL to image paths
         prependBaseUrlToImages(posts, req);
 
@@ -253,10 +232,12 @@ exports.getPostsByUser = async (req, res) => {
         const postsWithCounts = await Promise.all(posts.map(async post => {
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
             const user = await User.findById(post.authorId);
+            const likedByUser = await userLikesPost(post._id, userId); // Check if the user likes this post
             post.likesCount = likesCount;
             post.commentsCount = commentsCount;
             post.userName = user.userName || "unknown UserName";
             post.name = user.name || "unknown User";
+            post.likedByUser = likedByUser; // Add this field to the post object
             return post;
         }));
 
@@ -293,6 +274,7 @@ exports.getPostsLikedByUser = async (req, res) => {
             post.commentsCount = commentsCount;
             post.userName = user.userName || "unknown UserName";
             post.name = user.name || "unknown User";
+            post.likedByUser = true;
             return post;
         }));
 
@@ -305,7 +287,6 @@ exports.getPostsLikedByUser = async (req, res) => {
         res.status(500).send({ message: 'Error retrieving liked posts', error: error.message || error });
     }
 };
-
 
 exports.searchPosts = async (req, res) => {
     try {
