@@ -44,7 +44,6 @@ exports.authorizePost = async (req, res, next) => {
 // Validation rules for posts
 exports.validatePost = [
     check('body').notEmpty().withMessage('Post body is required'),
-    check('authorId').notEmpty().withMessage('Author ID is required'),
 
     // Middleware to handle validation results
     (req, res, next) => {
