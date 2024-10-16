@@ -44,8 +44,6 @@ exports.authorizePost = async (req, res, next) => {
 
 // Validation rules for posts
 exports.validatePost = [
-    check('body').notEmpty().withMessage('Post body is required'),
-
     // Middleware to handle validation results
     (req, res, next) => {
         const errors = validationResult(req);
