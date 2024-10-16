@@ -33,7 +33,7 @@ const {authenticate}= require('../auth/authController')
  *           schema:
  *             type: object
  *             properties:
- *               body:
+ *               postBody:
  *                 type: string
  *                 description: The body content of the post.
  *               authorId:
@@ -44,13 +44,13 @@ const {authenticate}= require('../auth/authController')
  *                 format: binary
  *                 description: Optional image file for the post.
  *             required:
- *                     body
- *                     authorId
+ *               - postBody
+ *               - authorId
  *     responses:
  *       201:
  *         description: Post created successfully.
  *       400:
- *         description: Invalid request - missing body or authorId.
+ *         description: Invalid request - missing postBody or authorId.
  *       500:
  *         description: Internal server error.
  */
@@ -232,10 +232,11 @@ const {authenticate}= require('../auth/authController')
  */
 
 // Post routes
-router.post('/',authenticate, validatePost, postController.createPost);
+// Route Definitions
+router.post('/', authenticate, validatePost, postUpload, postController.createPost);
 router.get('/:id', postController.getPost);
-router.put('/:id',authenticate,  authorizePost, validatePost, postController.updatePost);
-router.delete('/:id',authenticate, authorizePost, postController.deletePost);
+router.put('/:id', authenticate, authorizePost, validatePost, postUpload, postController.updatePost);
+router.delete('/:id', authenticate, authorizePost, postController.deletePost);
 router.get('/', postController.getAllPosts);
 router.get('/user/:userId', postController.getPostsByUser);
 router.get('/likes/:userId', postController.getPostsLikedByUser);

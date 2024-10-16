@@ -5,6 +5,8 @@ const Like = require('../likes/model');
 const Comment = require('../comments/model');
 const User = require('../users/model');
 
+
+
 // Get likes and comments count for a post
 const getLikesAndCommentsCount = async (postId) => {
     const likesCount = await Like.countDocuments({ postId });
@@ -17,15 +19,15 @@ exports.createPost = async (req, res) => {
     try {
         const token = req.headers.authorization.split(" ")[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const { body } = req.body;
+        const { postBody } = req.body;
         const authorId = decoded.userId;
 
-        if (!body || !authorId) {
+        if (!postBody || !authorId) {
             return res.status(400).send({ message: 'Post body is required' });
         }
 
         const image = req.file ? req.file.path : null;
-        const post = new Post({ image, body, authorId });
+        const post = new Post({ image, body: postBody, authorId });
         await post.save();
 
         res.status(201).send(post);

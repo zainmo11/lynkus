@@ -71,7 +71,7 @@ const postUpload = multer({
         }
         cb(new Error('File type not allowed'), false);
     },
-}).single('image'); // Ensure the field name matches the file input in your form
+}).single('image');
 
 module.exports = {
     userUpload,
