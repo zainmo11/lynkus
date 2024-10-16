@@ -158,6 +158,7 @@ exports.getAllPosts = async (req, res) => {
         const baseUrl = `${req.protocol}://${req.get('host')}`;
 
         const postsWithCounts = await Promise.all(posts.map(async post => {
+
             const user = await User.findById(post.authorId);
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
 
@@ -169,14 +170,15 @@ exports.getAllPosts = async (req, res) => {
                 ...post._doc,
                 likes: likesCount,
                 comments: commentsCount,
-                userName: user.userName,
-                name: user.name
+                userName: user.userName || "unknown UserName",
+                name: user.name || "unknown User"
             };
         }));
 
         res.status(200).send(postsWithCounts);
     } catch (error) {
-        res.status(500).send({ message: 'Error retrieving posts', error });
+        console.error('Error details:', error);
+        res.status(500).send({ message: 'Error retrieving posts', error: error.message || error });
     }
 };
 
