@@ -36,7 +36,7 @@ exports.followUser = asyncHandler(async (req, res, next) => {
 
         // Send a response indicating the user has been unfollowed
         return res.status(200).json({ message: "User unfollowed successfully" });
-    } else {
+    } 
         // User is not currently following, so follow
         const newFollow = new Follows({ user: req.user._id, following: id });
         await newFollow.save();
@@ -52,7 +52,7 @@ exports.followUser = asyncHandler(async (req, res, next) => {
 
         // Send a response indicating the user has been followed
         return res.status(200).json({ message: "User followed successfully", newFollow, notification });
-    }
+    
 });
 
 // Get user's followers

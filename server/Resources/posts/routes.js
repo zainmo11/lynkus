@@ -10,10 +10,22 @@ const {authenticate}= require('../auth/authController')
 
 /**
  * @swagger
+ * components:
+ *   securitySchemes:
+ *     tokenAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
+/**
+ * @swagger
  * /posts:
  *   post:
  *     summary: Create a new post
  *     tags: [Posts]
+ *     security:
+ *       - tokenAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -73,6 +85,8 @@ const {authenticate}= require('../auth/authController')
  *   put:
  *     summary: Update a post by ID
  *     tags: [Posts]
+ *     security:
+ *       - tokenAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -114,6 +128,8 @@ const {authenticate}= require('../auth/authController')
  *   delete:
  *     summary: Delete a post by ID
  *     tags: [Posts]
+ *     security:
+ *       - tokenAuth: []
  *     parameters:
  *       - in: path
  *         name: id

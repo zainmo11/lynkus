@@ -30,6 +30,8 @@ const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser,getF
  *   get:
  *     summary: Get User Followers
  *     tags: [Follows]
+ *     security:
+ *       - tokenAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -90,7 +92,7 @@ const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser,getF
  *       404:
  *         description: User not found.
  */
-router.get('/followers/:id', getUserFollowers)
+router.get('/followers/:id',authenticate, getUserFollowers)
 
 
 /**
@@ -100,6 +102,8 @@ router.get('/followers/:id', getUserFollowers)
  *     summary: Get User Following
  *     tags: [Follows]
  *     parameters:
+ *     security:
+ *       - tokenAuth: []
  *       - in: path
  *         name: id
  *         required: true
@@ -159,13 +163,14 @@ router.get('/followers/:id', getUserFollowers)
  *       404:
  *         description: User not found.
  */
-router.get('/following/:id', getUserFollowing)
+router.get('/following/:id',authenticate, getUserFollowing)
 /**
  * @swagger
  * /follows/{id}:
  *   post:
  *     summary: Follow a User
  *     tags: [Follows]
+ * 
  *     parameters:
  *       - in: path
  *         name: id
