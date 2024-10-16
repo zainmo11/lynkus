@@ -232,3 +232,24 @@ exports.getFollowStats = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 };
+
+// Controller function to get follower and following count by id
+exports.getFollowStatsByid = async (req, res) => {
+    try {
+        const {userId} = req.params;
+
+        // Count the number of followers (users who follow the current user)
+        const followersCount = await Follows.countDocuments({ following: userId });
+
+        // Count the number of users the current user is following
+        const followingCount = await Follows.countDocuments({ user: userId });
+
+        return res.status(200).json({
+            success: true,
+            followers: followersCount,
+            following: followingCount,
+        });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
