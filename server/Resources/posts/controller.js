@@ -226,14 +226,15 @@ exports.getPost = async (req, res) => {
             post,
             likesCount,
             commentsCount,
-            userName: user.userName,
-            name: user.name
+            userName: user.userName || "unknown UserName",
+            name: user.name || "unknown User"
         });
     } catch (error) {
         if (error.kind === 'ObjectId') {
             return res.status(400).send({ message: 'Invalid Post ID' });
         }
-        res.status(500).send({ message: 'Error retrieving post', error });
+        console.error('Error retrieving post:', error);
+        res.status(500).send({ message: 'Error retrieving post', error: error.message || error });
     }
 };
 
@@ -249,23 +250,23 @@ exports.getPostsByUser = async (req, res) => {
         prependBaseUrlToImages(posts, req);
 
         // Add likes and comments count to each post
-        // eslint-disable-next-line no-restricted-syntax
-        for (const post of posts) {
+        const postsWithCounts = await Promise.all(posts.map(async post => {
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
-            // eslint-disable-next-line no-await-in-loop
             const user = await User.findById(post.authorId);
             post.likesCount = likesCount;
             post.commentsCount = commentsCount;
-            post.userName = user.userName;
-            post.name = user.name;
-        }
+            post.userName = user.userName || "unknown UserName";
+            post.name = user.name || "unknown User";
+            return post;
+        }));
 
-        res.status(200).send(posts);
+        res.status(200).send(postsWithCounts);
     } catch (error) {
         if (error.kind === 'ObjectId') {
             return res.status(400).send({ message: 'Invalid User ID' });
         }
-        res.status(500).send({ message: 'Error retrieving user posts', error });
+        console.error('Error retrieving user posts:', error);
+        res.status(500).send({ message: 'Error retrieving user posts', error: error.message || error });
     }
 };
 
@@ -285,30 +286,31 @@ exports.getPostsLikedByUser = async (req, res) => {
         prependBaseUrlToImages(posts, req);
 
         // Add likes and comments count to each post
-        // eslint-disable-next-line no-restricted-syntax
-        for (const post of posts) {
+        const postsWithCounts = await Promise.all(posts.map(async post => {
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
-            // eslint-disable-next-line no-await-in-loop
             const user = await User.findById(post.authorId);
             post.likesCount = likesCount;
             post.commentsCount = commentsCount;
-            post.userName = user.userName;
-            post.name = user.name;
-        }
+            post.userName = user.userName || "unknown UserName";
+            post.name = user.name || "unknown User";
+            return post;
+        }));
 
-        res.status(200).send(posts);
+        res.status(200).send(postsWithCounts);
     } catch (error) {
         if (error.kind === 'ObjectId') {
             return res.status(400).send({ message: 'Invalid User ID' });
         }
-        res.status(500).send({ message: 'Error retrieving liked posts', error });
+        console.error('Error retrieving liked posts:', error);
+        res.status(500).send({ message: 'Error retrieving liked posts', error: error.message || error });
     }
 };
 
-// Search posts by a search term with user information
+
 exports.searchPosts = async (req, res) => {
     try {
         const posts = await Post.find({ $text: { $search: req.query.q } }).populate('authorId');
+
         if (!posts.length) {
             return res.status(200).json({ message: 'No posts found for this search term', posts: [] });
         }
@@ -317,19 +319,35 @@ exports.searchPosts = async (req, res) => {
         prependBaseUrlToImages(posts, req);
 
         // Add likes and comments count to each post
-        // eslint-disable-next-line no-restricted-syntax
         for (const post of posts) {
+            // Check if post ID is valid
+            if (!post._id) {
+                return res.status(400).json({ message: 'Invalid Post ID', post });
+            }
+
+            // Get likes and comments count
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
-            // eslint-disable-next-line no-await-in-loop
+
+            // Check if authorId is valid before fetching user
+            if (!post.authorId) {
+                return res.status(400).json({ message: 'Invalid Author ID', post });
+            }
+
             const user = await User.findById(post.authorId);
+            if (!user) {
+                return res.status(404).json({ message: 'User not found for this post', post });
+            }
+
+            // Assign values
             post.likesCount = likesCount;
             post.commentsCount = commentsCount;
-            post.userName = user.userName;
-            post.name = user.name;
+            post.userName = user.userName || "unknown UserName";
+            post.name = user.name || "unknown User";
         }
 
         res.status(200).send(posts);
     } catch (error) {
-        res.status(500).send({ message: 'Error searching posts', error });
+        console.error('Error details:', error);
+        res.status(500).send({ message: 'Error searching posts', error: error.message || error });
     }
 };
