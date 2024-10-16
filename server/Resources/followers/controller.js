@@ -28,29 +28,31 @@ exports.followUser = asyncHandler(async (req, res, next) => {
 
     // Check if user is already following this user
     const followsExists = await Follows.findOne({ user: req.user._id, following: id });
+
+    // Toggle follow/unfollow
     if (followsExists) {
-        if (process.env.NODE_ENV !== 'production') {
-            const deletedFollows = await Follows.findByIdAndDelete(followsExists._id);
-            return res.status(200).json({ message: "User unfollowed successfully", deletedFollows });
-        }
+        // User is currently following, so unfollow
         await Follows.findByIdAndDelete(followsExists._id);
+
+        // Send a response indicating the user has been unfollowed
         return res.status(200).json({ message: "User unfollowed successfully" });
+    } else {
+        // User is not currently following, so follow
+        const newFollow = new Follows({ user: req.user._id, following: id });
+        await newFollow.save();
+
+        // Send notification to the followed user
+        const notification = new Notifications({
+            to: id,
+            from: req.user._id,
+            type: "FOLLOW",
+            content: `${req.user.userName} started following you`,
+        });
+        await notification.save();
+
+        // Send a response indicating the user has been followed
+        return res.status(200).json({ message: "User followed successfully", newFollow, notification });
     }
-
-    // Create a new follow
-    const newFollow = new Follows({ user: req.user._id, following: id });
-    await newFollow.save();
-
-    // Send notification to the followed user
-    const notification = new Notifications({
-        to: id,
-        from: req.user._id,
-        type: "FOLLOW",
-        content: `${req.user.userName} started following you`,
-    });
-    await notification.save();
-
-    res.status(200).json({ message: "User followed successfully", newFollow, notification });
 });
 
 // Get user's followers
