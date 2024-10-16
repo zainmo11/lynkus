@@ -26,6 +26,8 @@ const router = express.Router();
  *     summary: Search for users
  *     description: Returns a list of users. If no parameters are provided, it will return all users with pagination.
  *     tags: [Users]
+ *     security:
+ *       - tokenAuth: []
  *     parameters:
  *       - in: query
  *         name: search
@@ -73,7 +75,7 @@ router.get('/', authenticate, searchUser);
  *     summary: Change user password
  *     tags: [Users]
  *     security:
- *       - bearerAuth: []
+ *       - tokenAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -100,6 +102,8 @@ router.put('/changePassword', authenticate, changeUserPasswordValidator, changeU
  *     summary: Get user profile by ID 
  *     description: <h3>You Can Send MongoObjectId or "userName" of the User.</h3>
  *     tags: [Users]
+ *     security:
+ *       - tokenAuth: []
  *     parameters:
  *       - name: id
  *         in: path

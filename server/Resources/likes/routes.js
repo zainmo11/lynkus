@@ -4,12 +4,27 @@ const router = express.Router();
 const {validateLike} = require('./middleware');
 const {validateAuthentication} = require('../posts/middleware');
 const {authenticate}= require('../auth/authController')
+
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     tokenAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
+
 /**
  * @swagger
  * /likes:
  *   post:
  *     summary: Like a post
  *     tags: [Likes]
+ *     security:
+ *       - tokenAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -62,6 +77,8 @@ const {authenticate}= require('../auth/authController')
  *   delete:
  *     summary: Unlike a post
  *     tags: [Likes]
+ *     security:
+ *       - tokenAuth: []
  *     requestBody:
  *       required: true
  *       content:

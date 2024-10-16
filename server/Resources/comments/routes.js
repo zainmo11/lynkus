@@ -4,12 +4,26 @@ const commentController = require('./controller');
 const { validateComment } = require('./middleware');
 const {validateAuthentication} = require('../posts/middleware');
 const {authenticate}= require('../auth/authController')
+
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     tokenAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
 /**
  * @swagger
  * /comments:
  *   post:
  *     summary: Create a new comment
  *     tags: [Comments]
+ *     security:
+ *       - tokenAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -65,6 +79,8 @@ const {authenticate}= require('../auth/authController')
  *   put:
  *     summary: Update a comment
  *     tags: [Comments]
+ *     security:
+ *       - tokenAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -97,6 +113,8 @@ const {authenticate}= require('../auth/authController')
  *   delete:
  *     summary: Delete a comment
  *     tags: [Comments]
+ *     security:
+ *       - tokenAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -116,21 +134,21 @@ const {authenticate}= require('../auth/authController')
 /**
  * @swagger
  * /comments/count/{postId}:
- *  get:
- *  summary: Get the number of comments for a specific post
- *  tags: [Comments]
- *  parameters:
- *  - in: path
- *  name: postId
- *  required: true
- *  description: The ID of the post to retrieve comment count for.
- *  schema:
- *  type: string
- *  responses:
- *  200:
- *  description: Number of comments for the post.
- *  500:
- *  description: Internal server error.
+ *   get:
+ *     summary: Get the number of comments for a specific post
+ *     tags: [Comments]
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         description: The ID of the post to retrieve comment count for.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Number of comments for the post.
+ *       500:
+ *         description: Internal server error.
  */
 
 // Comment routes

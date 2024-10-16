@@ -4,11 +4,26 @@ const hashtagController = require('./controller');
 const { validateHashtag } = require('./middleware');
 const {validateAuthentication} = require('../posts/middleware');
 const {authenticate}= require('../auth/authController')
+
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     tokenAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
+
 /**
  * @swagger
  * /hashtags/from-post:
  *   post:
  *     summary: Create hashtags from a post body
+ *     security:
+ *       - tokenAuth: []
  *     tags: [Hashtags]
  *     requestBody:
  *       required: true
@@ -62,6 +77,8 @@ const {authenticate}= require('../auth/authController')
  *   delete:
  *     summary: Delete a hashtag
  *     tags: [Hashtags]
+ *     security:
+ *       - tokenAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -120,7 +137,7 @@ const {authenticate}= require('../auth/authController')
  *     description: This endpoint allows authenticated users to delete a hashtag by its unique ID.
  *     tags: [Hashtags]
  *     security:
- *       - bearerAuth: []  # Ensures authentication is required
+ *       - tokenAuth: []  # Ensures authentication is required
  *     parameters:
  *       - in: path
  *         name: id
