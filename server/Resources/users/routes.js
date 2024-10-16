@@ -64,7 +64,7 @@ const router = express.Router();
  *                     type: string
  */
 
-router.get('/', searchUser);
+router.get('/', authenticate, searchUser);
 
 /**
  * @swagger
