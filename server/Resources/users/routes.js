@@ -146,7 +146,7 @@ router.put('/changePassword', authenticate, changeUserPasswordValidator, changeU
  *         description: User not found
  */
 
-router.route('/profile/:id').get(getUserProfile);
+router.route('/profile/:id').get(authenticate, getUserProfile);
 
 /**
  * @swagger
