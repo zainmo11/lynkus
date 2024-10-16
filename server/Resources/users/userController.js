@@ -316,9 +316,8 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
 
 exports.getUserProfile = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
-    const currentUserId = req.user._id; // Assuming user is authenticated
+    const currentUserId = req.user._id;
 
-    // Check if the provided id is a MongoDB ObjectId or a username
     let user;
     if (!mongoose.Types.ObjectId.isValid(id)) {
         user = await User.findOne({ userName: id });
