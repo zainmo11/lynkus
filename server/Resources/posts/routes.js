@@ -224,6 +224,8 @@ const {authenticate}= require('../auth/authController')
  *   get:
  *     summary: Search posts by a search term
  *     tags: [Posts]
+ *     security:
+ *       - tokenAuth: []
  *     parameters:
  *       - in: query
  *         name: q
@@ -250,7 +252,7 @@ router.delete('/:id', authenticate, authorizePost, postController.deletePost);
 router.get('/', authenticate, postController.getAllPosts);
 router.get('/user/:userId', authenticate, postController.getPostsByUser);
 router.get('/likes/:userId',authenticate, postController.getPostsLikedByUser);
-router.get('/searchPost', postController.searchPosts);
+router.get('/searchPost',authenticate, postController.searchPosts);
 module.exports = router;
 
 
