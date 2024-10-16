@@ -7,14 +7,15 @@ import { fetchUserDataFromCookies } from "../store/userSlice";
 function HomePage() {
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.post.posts);
+  const user = useSelector((state) => state.user.userData);
 
-  // useEffect(() => {
-  //   dispatch(fetchUserDataFromCookies());
-  // }, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchUserDataFromCookies());
+  }, [dispatch]);
 
   return (
     <div className="w-full max-h-screen bg-light-background dark:bg-dark-background md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar">
-      <CreatePost />
+      <CreatePost profileImg={user.profileImg} />
       <ul className="w-full divide-y divide-light-secondaryText dark:divide-dark-secondaryText border-t border-light-secondaryText dark:border-dark-secondaryText">
         {posts.map((x, i) => {
           return (

@@ -100,7 +100,7 @@ function Navbar() {
                 </p>
               </Link>
             </li>
-            <li className="w-full lg:hidden items-center">
+            <li className="w-full lg:flex items-center">
               <Link to={"/"} className="flex justify-center items-center gap-2">
                 {pathname == "" ? (
                   <MagnifyingGlassSolid className="size-7 text-button-default hover:text-button-hover" />

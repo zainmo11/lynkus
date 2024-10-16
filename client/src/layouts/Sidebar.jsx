@@ -7,7 +7,8 @@ function Sidebar() {
 
   return (
     <div className="w-full max-h-screen bg-light-background dark:bg-dark-background hidden lg:grid grid-rows-6 col-span-2 border-l border-light-secondaryText dark:border-dark-secondaryText">
-      <div className="h-full row-span-1 pt-6 px-4">
+      {/* Search Bar */}
+      {/* <div className="h-full row-span-1 pt-6 px-4">
         <div className="relative hidden md:block">
           <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
             <MagnifyingGlassIcon className="size-5  fill-light-secondaryText dark:fill-dark-secondaryText" />
@@ -19,9 +20,9 @@ function Sidebar() {
             placeholder="Search..."
           />
         </div>
-      </div>
+      </div> */}
       {/* Need 4 Random users unique */}
-      <div className="min-h-96 row-span-3 pt-4 px-4">
+      <div className="min-h-96 row-span-3 pt-10 px-4">
         <h1 className="text-3xl font-bold mb-8 text-light-primaryText dark:text-dark-primaryText">
           Link Up With
         </h1>
