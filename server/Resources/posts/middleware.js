@@ -1,5 +1,6 @@
-const Post = require('./model');
 const { check, validationResult } = require('express-validator');
+const Post = require('./model');
+const User = require('../users/model');
 
 
 exports.validateAuthentication = async (req, res, next) => {

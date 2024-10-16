@@ -3,6 +3,7 @@ const fs = require('fs');
 const Post = require('./model');
 const Like = require('../likes/model');
 const Comment = require('../comments/model');
+const User = require('../users/model');
 
 // Get likes and comments count for a post
 const getLikesAndCommentsCount = async (postId) => {
@@ -24,7 +25,6 @@ exports.createPost = async (req, res) => {
         }
 
         const image = req.file ? req.file.path : null;
-
         const post = new Post({ image, body, authorId });
         await post.save();
 
@@ -35,7 +35,7 @@ exports.createPost = async (req, res) => {
     }
 };
 
-// Get a single post by ID along with likes and comments count
+// Get a single post by ID along with likes, comments count, and user information
 exports.getPost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id).populate('authorId');
@@ -43,23 +43,27 @@ exports.getPost = async (req, res) => {
             return res.status(404).send({ message: 'Post not found' });
         }
 
-        // If the post has an image, prepend the base URL
+        // Fetch user details
+        const user = await User.findById(post.authorId);
+        if (!user) {
+            return res.status(404).send({ message: 'User not found' });
+        }
+
+        // Prepend the base URL to the image if it exists
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         if (post.image) {
-            // Ensure the image path is correctly formatted with base URL
             post.image = `${baseUrl}/uploads/posts/${post.image.split('\\').pop()}`;
         }
 
-        // Get likes and comments count for the post
+        // Get likes and comments count
         const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
 
-
-        // Respond with the post, likes count, and comments count
-        res.status(200).json({
-            success: true,
+        res.status(200).send({
             post,
-            likes: likesCount,
-            comments: commentsCount,
+            likesCount,
+            commentsCount,
+            userName: user.userName,
+            name: user.name
         });
     } catch (error) {
         if (error.kind === 'ObjectId') {
@@ -72,33 +76,35 @@ exports.getPost = async (req, res) => {
 // Update a post by ID
 exports.updatePost = async (req, res) => {
     try {
-        const { body, authorId } = req.body;
+        const { body } = req.body;
+        const token = req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const authorId = decoded.userId;
 
-        // Find the post by ID
         const post = await Post.findById(req.params.id);
         if (!post) {
             return res.status(404).send({ message: 'Post not found' });
         }
 
+        // Ensure the user updating the post is the author
+        if (post.authorId.toString() !== authorId) {
+            return res.status(403).send({ message: 'Unauthorized to update this post' });
+        }
+
         // Update post fields
         if (body) post.body = body;
-        if (authorId) post.authorId = authorId;
-
-        // If a new image is uploaded, update the image path
         if (req.file) {
             post.image = req.file.path;
         }
 
-        // Save updated post
         await post.save();
 
-        // Prepend base URL to image path in response
-        const baseUrl = `${req.protocol}://${req.get('host')}`;
-        if (post.image) {
-            post.image = `${baseUrl}/uploads/posts/${post.image.split('\\').pop()}`;
-        }
-
-        res.status(200).send(post);
+        const user = await User.findById(authorId);
+        res.status(200).send({
+            post,
+            userName: user.userName,
+            name: user.name
+        });
     } catch (error) {
         if (error.kind === 'ObjectId') {
             return res.status(400).send({ message: 'Invalid Post ID' });
@@ -110,10 +116,21 @@ exports.updatePost = async (req, res) => {
 // Delete a post by ID
 exports.deletePost = async (req, res) => {
     try {
-        const post = await Post.findByIdAndDelete(req.params.id);
+        const token = req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const authorId = decoded.userId;
+
+        const post = await Post.findById(req.params.id);
         if (!post) {
             return res.status(404).send({ message: 'Post not found' });
         }
+
+        // Ensure the user deleting the post is the author
+        if (post.authorId.toString() !== authorId) {
+            return res.status(403).send({ message: 'Unauthorized to delete this post' });
+        }
+
+        await post.remove();
 
         // Optionally: delete the image file associated with the post
         if (post.image) {
@@ -133,24 +150,28 @@ exports.deletePost = async (req, res) => {
     }
 };
 
+// Get all posts
 exports.getAllPosts = async (req, res) => {
     try {
         const posts = await Post.find().populate('authorId');
 
-        // Prepend base URL to image paths
         const baseUrl = `${req.protocol}://${req.get('host')}`;
 
-        // Iterate over posts and get likes/comments count for each post
         const postsWithCounts = await Promise.all(posts.map(async post => {
+            const user = await User.findById(post.authorId);
+            const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
+
             if (post.image) {
                 post.image = `${baseUrl}/uploads/posts/${post.image.split('\\').pop()}`;
             }
 
-            // Get likes and comments count for the post
-            const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
-
-
-            return { ...post._doc, likes: likesCount, comments: commentsCount };
+            return {
+                ...post._doc,
+                likes: likesCount,
+                comments: commentsCount,
+                userName: user.userName,
+                name: user.name
+            };
         }));
 
         res.status(200).send(postsWithCounts);
@@ -158,7 +179,6 @@ exports.getAllPosts = async (req, res) => {
         res.status(500).send({ message: 'Error retrieving posts', error });
     }
 };
-
 
 // Helper function to prepend base URL to image paths
 const prependBaseUrlToImages = (posts, req) => {
@@ -171,12 +191,17 @@ const prependBaseUrlToImages = (posts, req) => {
 };
 
 
-// Get a single post by ID with likes and comments count
+// Get a single post by ID with likes, comments count, and user information
 exports.getPost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id).populate('authorId');
         if (!post) {
             return res.status(404).send({ message: 'Post not found' });
+        }
+
+        const user = await User.findById(post.authorId);
+        if (!user) {
+            return res.status(404).send({ message: 'User not found' });
         }
 
         // Prepend the base URL to the image if it exists
@@ -191,7 +216,9 @@ exports.getPost = async (req, res) => {
         res.status(200).send({
             post,
             likesCount,
-            commentsCount
+            commentsCount,
+            userName: user.userName,
+            name: user.name
         });
     } catch (error) {
         if (error.kind === 'ObjectId') {
@@ -201,7 +228,7 @@ exports.getPost = async (req, res) => {
     }
 };
 
-// Get all posts by a specific user
+// Get all posts by a specific user with user information
 exports.getPostsByUser = async (req, res) => {
     try {
         const posts = await Post.find({ authorId: req.params.userId }).populate('authorId');
@@ -215,10 +242,13 @@ exports.getPostsByUser = async (req, res) => {
         // Add likes and comments count to each post
         // eslint-disable-next-line no-restricted-syntax
         for (const post of posts) {
-            // eslint-disable-next-line no-await-in-loop
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
+            // eslint-disable-next-line no-await-in-loop
+            const user = await User.findById(post.authorId);
             post.likesCount = likesCount;
             post.commentsCount = commentsCount;
+            post.userName = user.userName;
+            post.name = user.name;
         }
 
         res.status(200).send(posts);
@@ -230,7 +260,7 @@ exports.getPostsByUser = async (req, res) => {
     }
 };
 
-// Get all posts that a user has liked
+// Get all posts that a user has liked with user information
 exports.getPostsLikedByUser = async (req, res) => {
     try {
         const likedPosts = await Like.find({ userId: req.params.userId }).select('postId');
@@ -248,10 +278,13 @@ exports.getPostsLikedByUser = async (req, res) => {
         // Add likes and comments count to each post
         // eslint-disable-next-line no-restricted-syntax
         for (const post of posts) {
-            // eslint-disable-next-line no-await-in-loop
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
+            // eslint-disable-next-line no-await-in-loop
+            const user = await User.findById(post.authorId);
             post.likesCount = likesCount;
             post.commentsCount = commentsCount;
+            post.userName = user.userName;
+            post.name = user.name;
         }
 
         res.status(200).send(posts);
@@ -263,7 +296,7 @@ exports.getPostsLikedByUser = async (req, res) => {
     }
 };
 
-// Search posts by a search term
+// Search posts by a search term with user information
 exports.searchPosts = async (req, res) => {
     try {
         const posts = await Post.find({ $text: { $search: req.query.q } }).populate('authorId');
@@ -277,10 +310,13 @@ exports.searchPosts = async (req, res) => {
         // Add likes and comments count to each post
         // eslint-disable-next-line no-restricted-syntax
         for (const post of posts) {
-            // eslint-disable-next-line no-await-in-loop
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
+            // eslint-disable-next-line no-await-in-loop
+            const user = await User.findById(post.authorId);
             post.likesCount = likesCount;
             post.commentsCount = commentsCount;
+            post.userName = user.userName;
+            post.name = user.name;
         }
 
         res.status(200).send(posts);
