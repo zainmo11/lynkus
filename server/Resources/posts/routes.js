@@ -234,15 +234,13 @@ const {authenticate}= require('../auth/authController')
 // Post routes
 // Route Definitions
 router.post('/', authenticate, validatePost, postUpload, postController.createPost);
-router.get('/:id', postController.getPost);
+router.get('/:id', authenticate, postController.getPost);
 router.put('/:id', authenticate, authorizePost, validatePost, postUpload, postController.updatePost);
 router.delete('/:id', authenticate, authorizePost, postController.deletePost);
-router.get('/', postController.getAllPosts);
-router.get('/user/:userId', postController.getPostsByUser);
-router.get('/likes/:userId', postController.getPostsLikedByUser);
+router.get('/', authenticate, postController.getAllPosts);
+router.get('/user/:userId', authenticate, postController.getPostsByUser);
+router.get('/likes/:userId',authenticate, postController.getPostsLikedByUser);
 router.get('/searchPost', postController.searchPosts);
 module.exports = router;
 
 
-// to-do list
-// add authentication to the routes

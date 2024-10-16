@@ -14,6 +14,12 @@ const getLikesAndCommentsCount = async (postId) => {
     return { likesCount, commentsCount };
 };
 
+// Check if a user likes a specific post
+const userLikesPost = async (postId, userId) => {
+    const like = await Like.findOne({ postId, userId });
+    return !!like;
+};
+
 // Create a new post
 exports.createPost = async (req, res) => {
     try {
@@ -45,6 +51,10 @@ exports.getPost = async (req, res) => {
             return res.status(404).send({ message: 'Post not found' });
         }
 
+        const token = req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
+
         // Fetch user details
         const user = await User.findById(post.authorId);
         if (!user) {
@@ -60,12 +70,15 @@ exports.getPost = async (req, res) => {
         // Get likes and comments count
         const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
 
+        const likedByUser = await userLikesPost(post._id, userId);
+
         res.status(200).send({
             post,
             likesCount,
             commentsCount,
-            userName: user.userName,
-            name: user.name
+            userName: user.userName || "unknown UserName",
+            name: user.name || "unknown User",
+            likedByUser
         });
     } catch (error) {
         if (error.kind === 'ObjectId') {
@@ -156,7 +169,9 @@ exports.deletePost = async (req, res) => {
 exports.getAllPosts = async (req, res) => {
     try {
         const posts = await Post.find().populate('authorId');
-
+        const token = req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const {userId} = decoded;
         const baseUrl = `${req.protocol}://${req.get('host')}`;
 
         const postsWithCounts = await Promise.all(posts.map(async post => {
@@ -169,6 +184,7 @@ exports.getAllPosts = async (req, res) => {
 
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
 
+            const likedByUser = await userLikesPost(post._id, userId);
             if (post.image) {
                 post.image = `${baseUrl}/uploads/posts/${post.image.split('\\').pop()}`;
             }
@@ -178,7 +194,8 @@ exports.getAllPosts = async (req, res) => {
                 likes: likesCount,
                 comments: commentsCount,
                 userName,
-                name
+                name,
+                likedByUser
             };
         }));
 
@@ -209,23 +226,28 @@ exports.getPostsByUser = async (req, res) => {
         if (!posts.length) {
             return res.status(200).json({ message: 'No posts found for this user', posts: [] });
         }
+        const token = req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const {userId} = decoded;
 
         // Prepend base URL to image paths
         prependBaseUrlToImages(posts, req);
 
         // Add likes and comments count to each post
         // eslint-disable-next-line no-restricted-syntax
-        for (const post of posts) {
+        const postsWithCounts = await Promise.all(posts.map(async post => {
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
-            // eslint-disable-next-line no-await-in-loop
             const user = await User.findById(post.authorId);
+            const likedByUser = await userLikesPost(post._id, userId); // Check if the user likes this post
             post.likesCount = likesCount;
             post.commentsCount = commentsCount;
-            post.userName = user.userName;
-            post.name = user.name;
-        }
+            post.userName = user.userName || "unknown UserName";
+            post.name = user.name || "unknown User";
+            post.likedByUser = likedByUser;
+            return post;
+        }));
 
-        res.status(200).send(posts);
+        res.status(200).send(postsWithCounts);
     } catch (error) {
         if (error.kind === 'ObjectId') {
             return res.status(400).send({ message: 'Invalid User ID' });
@@ -251,17 +273,18 @@ exports.getPostsLikedByUser = async (req, res) => {
 
         // Add likes and comments count to each post
         // eslint-disable-next-line no-restricted-syntax
-        for (const post of posts) {
+        const postsWithCounts = await Promise.all(posts.map(async post => {
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
-            // eslint-disable-next-line no-await-in-loop
             const user = await User.findById(post.authorId);
             post.likesCount = likesCount;
             post.commentsCount = commentsCount;
-            post.userName = user.userName;
-            post.name = user.name;
-        }
+            post.userName = user.userName || "unknown UserName";
+            post.name = user.name || "unknown User";
+            post.likedByUser = true;
+            return post;
+        }));
 
-        res.status(200).send(posts);
+        res.status(200).send(postsWithCounts);
     } catch (error) {
         if (error.kind === 'ObjectId') {
             return res.status(400).send({ message: 'Invalid User ID' });
@@ -282,6 +305,7 @@ exports.searchPosts = async (req, res) => {
         prependBaseUrlToImages(posts, req);
 
         // Add likes and comments count to each post
+        // eslint-disable-next-line no-restricted-syntax
         for (const post of posts) {
             // Check if post ID is valid
             if (!post._id) {
@@ -289,6 +313,7 @@ exports.searchPosts = async (req, res) => {
             }
 
             // Get likes and comments count
+            // eslint-disable-next-line no-await-in-loop
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
 
             // Check if authorId is valid before fetching user
@@ -296,6 +321,7 @@ exports.searchPosts = async (req, res) => {
                 return res.status(400).json({ message: 'Invalid Author ID', post });
             }
 
+            // eslint-disable-next-line no-await-in-loop
             const user = await User.findById(post.authorId);
             if (!user) {
                 return res.status(404).json({ message: 'User not found for this post', post });
