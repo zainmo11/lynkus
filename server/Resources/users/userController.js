@@ -319,19 +319,17 @@ exports.getUserProfile = asyncHandler(async (req, res, next) => {
     const currentUserId = req.user._id;
 
     // Check if the ID is a valid MongoDB ObjectId
-    let query;
-    if (mongoose.Types.ObjectId.isValid(id)) {
-        query = { _id: id };
-    } else {
-        query = { userName: id };
-    }
+    const isObjectId = mongoose.Types.ObjectId.isValid(id);
+
+    // Define the query based on whether the ID is an ObjectId or a username
+    const query = isObjectId ? { _id: id } : { userName: id };
 
     // Fetch user profile, followers count, following count, and following status in parallel
     const [user, followersCount, followingCount, isFollowing] = await Promise.all([
         User.findOne(query).lean(), // Fetch the user profile
-        Follows.countDocuments({ following: query._id }), // Count followers
-        Follows.countDocuments({ user: query._id }), // Count following
-        Follows.findOne({ user: currentUserId, following: query._id }), // Check if current user follows
+        Follows.countDocuments(isObjectId ? { following: id } : { following: user ? user._id : null }), // Count followers
+        Follows.countDocuments(isObjectId ? { user: id } : { user: user ? user._id : null }), // Count following
+        Follows.findOne({ user: currentUserId, following: isObjectId ? id : user ? user._id : null }), // Check if current user follows
     ]);
 
     // Handle user not found
@@ -347,7 +345,6 @@ exports.getUserProfile = asyncHandler(async (req, res, next) => {
         data: user,
     });
 });
-
 
 exports.updateUser = asyncHandler(async (req, res, next) => {
     
