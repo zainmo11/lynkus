@@ -1,6 +1,16 @@
+const jwt = require('jsonwebtoken');
+const fs = require('fs');
 const Post = require('./model');
 const Like = require('../likes/model');
-const jwt = require('jsonwebtoken');
+const Comment = require('../comments/model');
+
+// Get likes and comments count for a post
+const getLikesAndCommentsCount = async (postId) => {
+    const likesCount = await Like.countDocuments({ postId });
+    const commentsCount = await Comment.countDocuments({ postId });
+    return { likesCount, commentsCount };
+};
+
 // Create a new post
 exports.createPost = async (req, res) => {
     try {
@@ -25,7 +35,7 @@ exports.createPost = async (req, res) => {
     }
 };
 
-// Get a single post by ID
+// Get a single post by ID along with likes and comments count
 exports.getPost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id).populate('authorId');
@@ -40,7 +50,17 @@ exports.getPost = async (req, res) => {
             post.image = `${baseUrl}/uploads/posts/${post.image.split('\\').pop()}`;
         }
 
-        res.status(200).send(post);
+        // Get likes and comments count for the post
+        const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
+
+
+        // Respond with the post, likes count, and comments count
+        res.status(200).json({
+            success: true,
+            post,
+            likes: likesCount,
+            comments: commentsCount,
+        });
     } catch (error) {
         if (error.kind === 'ObjectId') {
             return res.status(400).send({ message: 'Invalid Post ID' });
@@ -97,7 +117,6 @@ exports.deletePost = async (req, res) => {
 
         // Optionally: delete the image file associated with the post
         if (post.image) {
-            const fs = require('fs');
             fs.unlink(post.image, (err) => {
                 if (err) {
                     console.log('Error deleting image:', err);
@@ -114,21 +133,27 @@ exports.deletePost = async (req, res) => {
     }
 };
 
-// Get all posts
 exports.getAllPosts = async (req, res) => {
     try {
         const posts = await Post.find().populate('authorId');
 
         // Prepend base URL to image paths
         const baseUrl = `${req.protocol}://${req.get('host')}`;
-        posts.forEach(post => {
+
+        // Iterate over posts and get likes/comments count for each post
+        const postsWithCounts = await Promise.all(posts.map(async post => {
             if (post.image) {
-                // Remove any local file path and prepend the base URL
                 post.image = `${baseUrl}/uploads/posts/${post.image.split('\\').pop()}`;
             }
-        });
 
-        res.status(200).send(posts);
+            // Get likes and comments count for the post
+            const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
+
+
+            return { ...post._doc, likes: likesCount, comments: commentsCount };
+        }));
+
+        res.status(200).send(postsWithCounts);
     } catch (error) {
         res.status(500).send({ message: 'Error retrieving posts', error });
     }
@@ -145,17 +170,56 @@ const prependBaseUrlToImages = (posts, req) => {
     });
 };
 
+
+// Get a single post by ID with likes and comments count
+exports.getPost = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id).populate('authorId');
+        if (!post) {
+            return res.status(404).send({ message: 'Post not found' });
+        }
+
+        // Prepend the base URL to the image if it exists
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        if (post.image) {
+            post.image = `${baseUrl}/uploads/posts/${post.image.split('\\').pop()}`;
+        }
+
+        // Get likes and comments count
+        const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
+
+        res.status(200).send({
+            post,
+            likesCount,
+            commentsCount
+        });
+    } catch (error) {
+        if (error.kind === 'ObjectId') {
+            return res.status(400).send({ message: 'Invalid Post ID' });
+        }
+        res.status(500).send({ message: 'Error retrieving post', error });
+    }
+};
+
 // Get all posts by a specific user
 exports.getPostsByUser = async (req, res) => {
     try {
         const posts = await Post.find({ authorId: req.params.userId }).populate('authorId');
-
         if (!posts.length) {
             return res.status(404).send({ message: 'No posts found for this user' });
         }
 
         // Prepend base URL to image paths
         prependBaseUrlToImages(posts, req);
+
+        // Add likes and comments count to each post
+        // eslint-disable-next-line no-restricted-syntax
+        for (const post of posts) {
+            // eslint-disable-next-line no-await-in-loop
+            const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
+            post.likesCount = likesCount;
+            post.commentsCount = commentsCount;
+        }
 
         res.status(200).send(posts);
     } catch (error) {
@@ -181,6 +245,15 @@ exports.getPostsLikedByUser = async (req, res) => {
         // Prepend base URL to image paths
         prependBaseUrlToImages(posts, req);
 
+        // Add likes and comments count to each post
+        // eslint-disable-next-line no-restricted-syntax
+        for (const post of posts) {
+            // eslint-disable-next-line no-await-in-loop
+            const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
+            post.likesCount = likesCount;
+            post.commentsCount = commentsCount;
+        }
+
         res.status(200).send(posts);
     } catch (error) {
         if (error.kind === 'ObjectId') {
@@ -194,13 +267,21 @@ exports.getPostsLikedByUser = async (req, res) => {
 exports.searchPosts = async (req, res) => {
     try {
         const posts = await Post.find({ $text: { $search: req.query.q } }).populate('authorId');
-
         if (!posts.length) {
             return res.status(404).send({ message: 'No posts found for the search term' });
         }
 
         // Prepend base URL to image paths
         prependBaseUrlToImages(posts, req);
+
+        // Add likes and comments count to each post
+        // eslint-disable-next-line no-restricted-syntax
+        for (const post of posts) {
+            // eslint-disable-next-line no-await-in-loop
+            const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
+            post.likesCount = likesCount;
+            post.commentsCount = commentsCount;
+        }
 
         res.status(200).send(posts);
     } catch (error) {

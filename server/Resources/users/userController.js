@@ -219,36 +219,45 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
 
 
 exports.searchUser = asyncHandler(async (req, res, next) => {
-    
-   
-    
-
+    const currentUserId = req.user._id; // Assuming user is authenticated
     const page = req.query.page * 1 || 1;
     const limit = req.query.limit * 1 || 10;
     const skip = (page - 1) * limit;
 
     const { search } = req.query;
-    const query = { }; 
+    const query = {};
 
     if (search) {
-        query.userName = { $regex: search, $options: 'i' }; 
+        query.userName = { $regex: search, $options: 'i' };
     }
 
-    const user = await User.find(query)
+    const users = await User.find(query)
         .skip(skip)
         .limit(limit);
 
-        if (!user) {
-            
-            return next(new ApiError("User Not Found", 404));
-            
-        }
+    if (!users || users.length === 0) {
+        return next(new ApiError("User Not Found", 404));
+    }
+
+    // Get the list of users the current user is following
+    const userFollowing = await Follows.find({ user: currentUserId }).select("following");
+    const followingIds = userFollowing.map(f => f.following.toString());
+
+    // Add an `isFollowing` field for each user in the result
+    const usersWithFollowInfo = users.map(user => ({
+        ...user._doc,
+        isFollowing: followingIds.includes(user._id.toString()),
+    }));
 
     const totalCount = await User.countDocuments(query);
     const totalPages = Math.ceil(totalCount / limit);
-    
 
-    res.status(200).json({ results: user.length, page, totalPages, data: user });
+    res.status(200).json({
+        results: usersWithFollowInfo.length,
+        page,
+        totalPages,
+        data: usersWithFollowInfo,
+    });
 });
 
 
@@ -307,75 +316,34 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
 
 exports.getUserProfile = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
+    const currentUserId = req.user._id; // Assuming user is authenticated
 
-    // const page = req.query.page*1 || 1; 
-    // const limit = req.query.limit*1 || 10; 
-    // const skip = (page - 1) * limit; 
-
-    // Check if id is  mongoDB ObjectId
+    // Check if the provided id is a MongoDB ObjectId or a username
+    let user;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      
-        const user = await User.findOne({ userName: id })
-            // .populate({
-            //     path: 'posts',
-            //     options: {
-            //         limit: limit,  
-            //         skip: skip,    
-            //     }
-            // });
-
-        if (!user) {
-            return next(new ApiError("UserProfile Not Found", 404));
-        }
-        // const totalCount = await Post.countDocuments({ authorId: user._id });
-        // const totalPages = Math.ceil(totalCount / limit);
-    
-        const followersCount=await Follows.countDocuments({following:user._id});
-        const followingCount=await Follows.countDocuments({user:user._id});
-        return res.status(200).json({
-            // pagination: {
-
-            //     results:user.posts.length,
-            //     page: page,
-            //     totalPages,
-            // },
-            followersCount,
-            followingCount,
-            data: user,
-           
-        });
+        user = await User.findOne({ userName: id });
+    } else {
+        user = await User.findById(id);
     }
-
-    // If id is  ObjectId, find the user by _id and paginate posts
-    const user = await User.findById(id)
-        // .populate({
-        //     path: 'posts',
-        //     options: {
-        //         limit: limit,  
-        //         skip: skip,    
-        //     }
-        // });
 
     if (!user) {
         return next(new ApiError("UserProfile Not Found", 404));
     }
-    // const totalCount = await Post.countDocuments({ authorId: id });
-    // const totalPages = Math.ceil(totalCount / limit);
-    const followersCount=await Follows.countDocuments({following:id})
-    const followingCount=await Follows.countDocuments({user:id})
+
+    // Get follower and following counts
+    const followersCount = await Follows.countDocuments({ following: user._id });
+    const followingCount = await Follows.countDocuments({ user: user._id });
+
+    // Check if the current user is following the user
+    const isFollowing = await Follows.findOne({ user: currentUserId, following: user._id });
+
     res.status(200).json({
-       
-        // pagination: {
-        //     results:user.posts.length,
-        //     page: page,
-        //     totalPages,
-        // },
         followersCount,
         followingCount,
-         data: user,
+        isFollowing: !!isFollowing,
+        data: user,
     });
 });
-
 
 exports.updateUser = asyncHandler(async (req, res, next) => {
     

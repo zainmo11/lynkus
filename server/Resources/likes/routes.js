@@ -84,10 +84,40 @@ const {authenticate}= require('../auth/authController')
  *         description: Internal server error.
  */
 
+/**
+ * @swagger
+ * /likes/count/{postId}:
+ *   get:
+ *     summary: Get the count of likes for a specific post
+ *     tags: [Likes]
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         description: The ID of the post to retrieve the like count for.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: The count of likes for the post.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 likeCount:
+ *                   type: integer
+ *                   description: The number of likes for the post.
+ *       404:
+ *         description: Post not found.
+ *       500:
+ *         description: Internal server error.
+ */
 // Like routes
 router.post('/', authenticate, validateLike, likeController.likePost);
 router.get('/:postId', likeController.getLikes);
 router.delete('/', authenticate, validateLike, likeController.unlikePost);
+router.get('/count/:postId', likeController.getLikesCount);
 module.exports = router;
 
 

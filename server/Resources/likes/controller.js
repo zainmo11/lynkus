@@ -62,3 +62,20 @@ exports.unlikePost = async (req, res) => {
         res.status(500).send(error);
     }
 };
+
+exports.getLikesCount = async (req, res) => {
+    try {
+        const {postId} = req.params;
+
+        // Count the number of likes for the post
+        const likesCount = await Like.countDocuments({ postId: postId });
+
+        return res.status(200).json({
+            success: true,
+            likes: likesCount,
+        });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+

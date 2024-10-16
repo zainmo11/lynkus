@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 const {authenticate}=require('../auth/authController')
 
-const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser}=require('./controller')
+const {getRecommendedFollowers,getUserFollowers,getUserFollowing,followUser,getFollowStats}=require('./controller')
 
 
 
@@ -230,6 +230,34 @@ router.post('/:id', authenticate,followUser)
  */
 router.get('/recommended',authenticate, getRecommendedFollowers)
 
+
+/**
+ * @swagger
+ * /follows/stats:
+ *   get:
+ *     summary: Get Follow Statistics
+ *     tags: [Follows]
+ *     security:
+ *       - tokenAuth: []  # Requires authentication
+ *     responses:
+ *       200:
+ *         description: Follow statistics retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 followersCount:
+ *                   type: integer
+ *                   description: The number of followers.
+ *                 followingCount:
+ *                   type: integer
+ *                   description: The number of users the current user is following.
+ *       500:
+ *         description: Internal server error.
+ */
+
+router.get('/stats',authenticate,getFollowStats)
 
 
 

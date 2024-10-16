@@ -74,3 +74,19 @@ exports.deleteComment = async (req, res) => {
         res.status(500).send(error);
     }
 };
+
+exports.getCommentsCount = async (req, res) => {
+    try {
+        const postId = req.params.postId;
+
+        // Count the number of comments for the post
+        const commentsCount = await Comment.countDocuments({ postId: postId });
+
+        return res.status(200).json({
+            success: true,
+            comments: commentsCount,
+        });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
