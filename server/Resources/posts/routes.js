@@ -111,6 +111,9 @@ const {authenticate}= require('../auth/authController')
  *                 type: string
  *                 format: binary
  *                 description: Optional image file to update.
+ *             required:
+ *               - body
+ *               - authorId
  *     responses:
  *       200:
  *         description: Post updated successfully.
@@ -154,6 +157,8 @@ const {authenticate}= require('../auth/authController')
  *   get:
  *     summary: Get all posts
  *     tags: [Posts]
+ *     security:
+ *       - tokenAuth: []
  *     responses:
  *       200:
  *         description: List of posts retrieved successfully.
@@ -230,6 +235,7 @@ const {authenticate}= require('../auth/authController')
  *       500:
  *         description: Internal server error.
  */
+
 
 // Post routes
 // Route Definitions
