@@ -130,18 +130,18 @@ if(!token) return next(new ApiError('you are not login , login now ',401))
 
        
        
-  const refreshToken = req.cookies.refreshToken || req.headers['x-refresh-token'];
+  // const refreshToken = req.cookies.refreshToken || req.headers['x-refresh-token'];
 
-  if (!refreshToken) {
-    return next(new ApiError('Invalid or expired refresh token. ', 401));
-  }
+  // if (!refreshToken) {
+  //   return next(new ApiError('Invalid or expired refresh token. ', 401));
+  // }
 
 
-        const checkRefreshToken =RefreshToken.findOne(refreshToken)
+  //       const checkRefreshToken =RefreshToken.findOne(refreshToken)
 
-  if (!checkRefreshToken) {
-    return next(new ApiError('Invalid or expired refresh token.', 401));
-  }
+  // if (!checkRefreshToken) {
+  //   return next(new ApiError('Invalid or expired refresh token.', 401));
+  // }
    
             req.user=currUser;
             next();

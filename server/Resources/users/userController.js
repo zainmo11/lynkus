@@ -146,7 +146,6 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
 
             fs.unlinkSync(originalPath); // Remove the original file
         }
-
     }
     
 
