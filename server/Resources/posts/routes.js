@@ -61,6 +61,8 @@ const {authenticate}= require('../auth/authController')
  *   get:
  *     summary: Get a post by ID
  *     tags: [Posts]
+ *     security:
+ *       - tokenAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -172,6 +174,8 @@ const {authenticate}= require('../auth/authController')
  *   get:
  *     summary: Get all posts by a specific user
  *     tags: [Posts]
+ *     security:
+ *       - tokenAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
