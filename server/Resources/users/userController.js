@@ -318,24 +318,28 @@ exports.getUserProfile = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const currentUserId = req.user._id;
 
-    let user;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        user = await User.findOne({ userName: id });
+    // Check if the ID is a valid MongoDB ObjectId
+    let query;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+        query = { _id: id };
     } else {
-        user = await User.findById(id);
+        query = { userName: id };
     }
 
+    // Fetch user profile, followers count, following count, and following status in parallel
+    const [user, followersCount, followingCount, isFollowing] = await Promise.all([
+        User.findOne(query).lean(), // Fetch the user profile
+        Follows.countDocuments({ following: query._id }), // Count followers
+        Follows.countDocuments({ user: query._id }), // Count following
+        Follows.findOne({ user: currentUserId, following: query._id }), // Check if current user follows
+    ]);
+
+    // Handle user not found
     if (!user) {
         return next(new ApiError("UserProfile Not Found", 404));
     }
 
-    // Get follower and following counts
-    const followersCount = await Follows.countDocuments({ following: user._id });
-    const followingCount = await Follows.countDocuments({ user: user._id });
-
-    // Check if the current user is following the user
-    const isFollowing = await Follows.findOne({ user: currentUserId, following: user._id });
-
+    // Return the profile with followers, following counts, and follow status
     res.status(200).json({
         followersCount,
         followingCount,
@@ -343,6 +347,7 @@ exports.getUserProfile = asyncHandler(async (req, res, next) => {
         data: user,
     });
 });
+
 
 exports.updateUser = asyncHandler(async (req, res, next) => {
     

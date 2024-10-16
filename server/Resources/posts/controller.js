@@ -206,7 +206,7 @@ exports.getPostsByUser = async (req, res) => {
     try {
         const posts = await Post.find({ authorId: req.params.userId }).populate('authorId');
         if (!posts.length) {
-            return res.status(404).send({ message: 'No posts found for this user' });
+            return res.status(200).json({ message: 'No posts found for this user', posts: [] });
         }
 
         // Prepend base URL to image paths
@@ -237,7 +237,7 @@ exports.getPostsLikedByUser = async (req, res) => {
         const postIds = likedPosts.map(like => like.postId);
 
         if (!postIds.length) {
-            return res.status(404).send({ message: 'No liked posts found' });
+            return res.status(200).json({ message: 'No liked posts found for this user', posts: [] });
         }
 
         const posts = await Post.find({ _id: { $in: postIds } }).populate('authorId');
@@ -268,7 +268,7 @@ exports.searchPosts = async (req, res) => {
     try {
         const posts = await Post.find({ $text: { $search: req.query.q } }).populate('authorId');
         if (!posts.length) {
-            return res.status(404).send({ message: 'No posts found for the search term' });
+            return res.status(200).json({ message: 'No posts found for this search term', posts: [] });
         }
 
         // Prepend base URL to image paths
