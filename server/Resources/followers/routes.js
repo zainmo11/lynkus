@@ -101,9 +101,10 @@ router.get('/followers/:id',authenticate, getUserFollowers)
  *   get:
  *     summary: Get User Following
  *     tags: [Follows]
- *     parameters:
  *     security:
  *       - tokenAuth: []
+ *     parameters:
+
  *       - in: path
  *         name: id
  *         required: true
