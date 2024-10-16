@@ -208,6 +208,14 @@ router.post('/:id', authenticate,followUser)
  *     tags: [Follows]
  *     security:
  *       - tokenAuth: []  # Requires authentication
+ *     parameters:
+ *       - name: limit
+ *         in: query
+ *         required: false
+ *         description: The maximum number of recommended users to return (default is 10).
+ *         schema:
+ *           type: integer
+ *           example: 5
  *     responses:
  *       200:
  *         description: A list of recommended users.
@@ -221,19 +229,32 @@ router.post('/:id', authenticate,followUser)
  *                   items:
  *                     type: object
  *                     properties:
- *                           _id:
- *                             type: string
- *                           id:
- *                             type: string
- *                           userName:
- *                             type: string
- *                           name:
- *                             type: string
- *                           profileImg:
- *                             type: string
+ *                       _id:
+ *                         type: string
+ *                         description: The unique identifier of the user.
+ *                       id:
+ *                         type: string
+ *                         description: The same as `_id`, included for frontend convenience.
+ *                       userName:
+ *                         type: string
+ *                         description: The username of the user.
+ *                       name:
+ *                         type: string
+ *                         description: The full name of the user.
+ *                       profileImg:
+ *                         type: string
+ *                         description: The URL of the user's profile image or a default image.
+ *                       isFollowing:
+ *                         type: boolean
+ *                         description: Indicates if the current user is following this user (always false in the context of recommendations).
  *       404:
  *         description: No recommended users found.
+ *       401:
+ *         description: Unauthorized. Token is missing or invalid.
+ *       500:
+ *         description: Internal server error.
  */
+
 router.get('/recommended',authenticate, getRecommendedFollowers)
 
 

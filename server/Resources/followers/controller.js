@@ -217,7 +217,7 @@ exports.getRecommendedFollowers = asyncHandler(async (req, res, next) => {
 // Controller function to get follower and following count
 exports.getFollowStats = async (req, res) => {
     try {
-        const userId = req.params.userId;
+        const {userId} = req.params;
 
         // Count the number of followers (users who follow the current user)
         const followersCount = await Follows.countDocuments({ following: userId });
