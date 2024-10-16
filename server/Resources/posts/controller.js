@@ -160,8 +160,13 @@ exports.getAllPosts = async (req, res) => {
         const baseUrl = `${req.protocol}://${req.get('host')}`;
 
         const postsWithCounts = await Promise.all(posts.map(async post => {
-
+            console.log(post.authorId);
             const user = await User.findById(post.authorId);
+
+            // Check if user is found
+            const userName = user ? user.userName : "unknown UserName";
+            const name = user ? user.name : "unknown User";
+
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
 
             if (post.image) {
@@ -172,8 +177,8 @@ exports.getAllPosts = async (req, res) => {
                 ...post._doc,
                 likes: likesCount,
                 comments: commentsCount,
-                userName: user.userName || "unknown UserName",
-                name: user.name || "unknown User"
+                userName,
+                name
             };
         }));
 
