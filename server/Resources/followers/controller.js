@@ -33,7 +33,7 @@ exports.followUser = asyncHandler(async (req, res, next) => {
     if (followsExists) {
         // User is currently following, so unfollow
         await Follows.findByIdAndDelete(followsExists._id);
-
+        
         // Send a response indicating the user has been unfollowed
         return res.status(200).json({ message: "User unfollowed successfully" });
     } 
