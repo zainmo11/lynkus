@@ -295,54 +295,45 @@ exports.getPostsLikedByUser = async (req, res) => {
 
 exports.searchPosts = async (req, res) => {
     try {
-        // Perform text search on posts
-        const posts = await Post.find({ $text: { $search: req.params.q } }).populate('authorId');
+        // Use regex for partial matching, case-insensitive
+        const searchTerm = req.params.q;
+        const regex = new RegExp(searchTerm, 'i'); // 'i' makes it case-insensitive
+
+        const posts = await Post.find({ body: { $regex: regex } }).populate('authorId');
 
         if (!posts.length) {
             return res.status(200).json({ message: 'No posts found for this search term', posts: [] });
         }
 
-        console.log('Retrieved posts:', posts); // Log the retrieved posts
-        console.log('Number of posts:', posts.length);
-
         // Prepend base URL to image paths
         prependBaseUrlToImages(posts, req);
 
         // Add likes and comments count to each post
-        const postsWithCounts = await Promise.all(posts.map(async (post) => {
-            console.log('Checking post ID:', post._id); // Log the post ID being checked
-
-            // Check if post ID is valid
+        for (const post of posts) {
             if (!mongoose.Types.ObjectId.isValid(post._id)) {
-                throw new Error(`Invalid Post ID: ${post._id}`);
+                return res.status(400).json({ message: 'Invalid Post ID', post });
             }
 
-            // Get likes and comments count
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
 
-            // Check if authorId is valid before fetching user
-            if (!post.authorId || !mongoose.Types.ObjectId.isValid(post.authorId)) {
-                throw new Error(`Invalid Author ID: ${post.authorId}`);
+            if (!post.authorId) {
+                return res.status(400).json({ message: 'Invalid Author ID', post });
             }
 
             const user = await User.findById(post.authorId);
             if (!user) {
-                throw new Error(`User not found for this post: ${post._id}`);
+                return res.status(404).json({ message: 'User not found for this post', post });
             }
 
-            // Assign values to the post
-            return {
-                ...post.toObject(), // Convert Mongoose document to plain object
-                likesCount,
-                commentsCount,
-                userName: user.userName || "unknown UserName",
-                name: user.name || "unknown User"
-            };
-        }));
+            post.likesCount = likesCount;
+            post.commentsCount = commentsCount;
+            post.userName = user.userName || "unknown UserName";
+            post.name = user.name || "unknown User";
+        }
 
-        res.status(200).json(postsWithCounts);
+        res.status(200).send(posts);
     } catch (error) {
         console.error('Error details:', error);
-        res.status(500).json({ message: 'Error searching posts', error: error.message });
+        res.status(500).send({ message: 'Error searching posts', error: error.message || error });
     }
 };
