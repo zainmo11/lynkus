@@ -55,7 +55,7 @@ exports.getPost = async (req, res) => {
 
         const token = req.headers.authorization.split(" ")[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded.userId;
+        const {userId} = decoded;
 
         // Fetch user details
         const user = await User.findById(post.authorId);
@@ -116,7 +116,7 @@ exports.updatePost = async (req, res) => {
 
         await post.save();
         const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
-        const likedByUser = await userLikesPost(post._id, userId)
+        const likedByUser = await userLikesPost(post._id, authorId)
         const user = await User.findById(authorId);
         res.status(200).send({
             post,
