@@ -326,27 +326,24 @@ exports.getUserProfile = asyncHandler(async (req, res, next) => {
     if (mongoose.Types.ObjectId.isValid(id)) {
         query = { _id: id };
     } else {
-        const user = await User.findOne({userName:id})
-        if (!user) {
-            return next(new ApiError("UserProfile Not Found", 404));
-        }
-        query = { _id:user._id };
+        query = { userName:id };
     }
+    const user=await User.findOne(query);
 
+    if (!user) {
+        return next(new ApiError("UserProfile Not Found", 404));
+    }
     // Fetch user profile, followers count, following count, and following status in parallel
-    const [user, followersCount, followingCount, isFollowing] = await Promise.all([
-        User.findOne(query).lean(), // Fetch the user profile
-        Follows.countDocuments({ following: query._id }), // Count followers
-        Follows.countDocuments({ user: query._id }), // Count following
-        Follows.findOne({ user: currentUserId, following: query._id }), // Check if current user follows
+    const [ followersCount, followingCount, isFollowing] = await Promise.all([
+        Follows.countDocuments({ following: user._id }), // Count followers
+        Follows.countDocuments({ user: user._id }), // Count following
+        Follows.findOne({ user: currentUserId, following: user._id }), // Check if current user follows
     ]);
     
     
     
-    // Handle user not found
-    if (!user) {
-        return next(new ApiError("UserProfile Not Found", 404));
-    }
+    // Fetch user's posts, comments, and bookmarks count in parallel
+   
 
     // Return the profile with followers, following counts, and follow status
     res.status(200).json({
