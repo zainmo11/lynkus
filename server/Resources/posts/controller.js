@@ -64,7 +64,7 @@ exports.getPost = async (req, res) => {
         // Prepend the base URL to the image if it exists
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         if (post.image) {
-            post.image = `${baseUrl}/uploads/posts/${post.image.split('\\').pop()}`;
+            post.image = `${baseUrl}/uploads/posts/${post.image}`;
         }
 
         // Get likes and comments count
@@ -186,7 +186,7 @@ exports.getAllPosts = async (req, res) => {
 
             const likedByUser = await userLikesPost(post._id, userId);
             if (post.image) {
-                post.image = `${baseUrl}/uploads/posts/${post.image.split('\\').pop()}`;
+                post.image = `${baseUrl}/uploads/posts/${post.image}}`;
             }
 
             return {
@@ -211,7 +211,7 @@ const prependBaseUrlToImages = (posts, req) => {
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     posts.forEach(post => {
         if (post.image) {
-            post.image = `${baseUrl}/uploads/posts/${post.image.split('\\').pop()}`; // Ensure the image path is correct
+            post.image = `${baseUrl}/uploads/posts/${post.image}`;
         }
     });
 };
