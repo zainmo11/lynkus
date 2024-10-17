@@ -135,33 +135,38 @@ exports.deletePost = async (req, res) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const authorId = decoded.userId;
 
+        // Find the post by ID
         const post = await Post.findById(req.params.id);
         if (!post) {
             return res.status(404).send({ message: 'Post not found' });
         }
 
-        // Ensure the user deleting the post is the author
+        // Check if the current user is the author of the post
         if (post.authorId.toString() !== authorId) {
             return res.status(403).send({ message: 'Unauthorized to delete this post' });
         }
 
-        await post.remove();
+        // Delete the post from the database using deleteOne
+        await post.deleteOne();
 
-        // Optionally: delete the image file associated with the post
         if (post.image) {
             fs.unlink(post.image, (err) => {
                 if (err) {
-                    console.log('Error deleting image:', err);
+                    console.error('Error deleting image:', err);
                 }
             });
         }
 
         res.status(200).send({ message: 'Post deleted successfully' });
     } catch (error) {
-        if (error.kind === 'ObjectId') {
+        // Check for invalid ObjectId format
+        if (error.kind === 'ObjectId' || error.name === 'CastError') {
             return res.status(400).send({ message: 'Invalid Post ID' });
         }
-        res.status(500).send({ message: 'Error deleting post', error });
+
+        // Log and send any other errors
+        console.error('Error deleting post:', error);
+        res.status(500).send({ message: 'Error deleting post', error: error.message });
     }
 };
 
@@ -186,7 +191,8 @@ exports.getAllPosts = async (req, res) => {
 
             const likedByUser = await userLikesPost(post._id, userId);
             if (post.image) {
-                post.image = `${baseUrl}/uploads/posts/${post.image}}`;
+                const imageFilename = post.image.split('/').pop();
+                post.image = `${baseUrl}/uploads/posts/${imageFilename}`;
             }
 
             return {
