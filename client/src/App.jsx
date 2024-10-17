@@ -5,6 +5,7 @@ import ProfilePage from "./pages/ProfilePage";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { setTheme } from "./store/themeSlice";
+import PostDetailsPage from "./pages/PostDetailsPage.jsx";
 import Welcome from "./pages/Welcome";
 import Loading from "./components/Loading";
 import Error from "./pages/Error";
@@ -41,6 +42,7 @@ function App() {
       <Routes>
         {/* <Route path="/login" element={<Welcome />} /> */}
         <Route element={<Layout />}>
+          <Route path="/post/:postId" element={<PostDetailsPage />} />
           <Route
             index
             element={
