@@ -7,28 +7,30 @@ const {cleanupTempImages} =require('../../utils/cleanupTempImages')
 
 exports.updateUserValidator = [
   body('name')
+    .optional(),
+
+  check('email')
   .optional()
- ,
-    
-    check('email')
     .notEmpty().withMessage('Email Address is required')
     .isEmail().withMessage('Invalid email address')
     .custom(async (val, { req }) => {
-    
       const user = await User.findOne({ email: val });
+      // Check if email is already used by another user
       if (user && user._id.toString() !== req.user._id.toString()) {
-        cleanupTempImages(req.tempImg)
+        cleanupTempImages(req.tempImg); // Clean temp images if error
         return Promise.reject(new Error('E-mail already in use'));
       }
     }),
-    check('userName')
+
+  check('userName')
+  .optional()
     .notEmpty().withMessage('userName Required')
     .isLength({ min: 3, max: 20 })
     .customSanitizer((value) => 
       // Replace spaces with underscores in userName
-       value? value.toLowerCase().replace(/\s+/g, '_'):''
-    ) .matches(/^[a-zA-Z0-9._]+$/)
-    .withMessage('User name can only contain letters, numbers, underscores, and periods')
+      value ? value.toLowerCase().replace(/\s+/g, '_') : ''
+    )
+    .matches(/^[a-zA-Z0-9._]+$/).withMessage('User name can only contain letters, numbers, underscores, and periods')
     .custom((value) => {
       if (/^\./.test(value) || /^\_/.test(value)) {
         throw new Error('User name cannot start with a period or underscore');
@@ -41,12 +43,11 @@ exports.updateUserValidator = [
       }
       return true;
     })
-
     .custom(async (val, { req }) => {
-    
       const user = await User.findOne({ userName: val });
+      // Check if userName is already used by another user
       if (user && user._id.toString() !== req.user._id.toString()) {
-        cleanupTempImages(req.tempImg)
+        cleanupTempImages(req.tempImg); // Clean temp images if error
         return Promise.reject(new Error('userName already in use'));
       }
     }),
@@ -59,7 +60,7 @@ exports.updateUserValidator = [
 
   validatorMiddleware,
 ];
-  
+
  
 
   exports.changeUserPasswordValidator = [

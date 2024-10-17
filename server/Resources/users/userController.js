@@ -219,7 +219,9 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
 
 
 exports.searchUser = asyncHandler(async (req, res, next) => {
-    const currentUserId = req.user._id; // Assuming user is authenticated
+   
+
+    const currentUserId = req.user._id; 
     const page = req.query.page * 1 || 1;
     const limit = req.query.limit * 1 || 10;
     const skip = (page - 1) * limit;
@@ -235,14 +237,15 @@ exports.searchUser = asyncHandler(async (req, res, next) => {
         .skip(skip)
         .limit(limit);
 
-    if (!users || users.length === 0) {
+    if (!users) {
         return next(new ApiError("User Not Found", 404));
     }
 
-    // Get the list of users the current user is following
+    // Get list of users Followings
     const userFollowing = await Follows.find({ user: currentUserId }).select("following");
     const followingIds = userFollowing.map(f => f.following.toString());
 
+    console.log(followingIds)
     // Add an `isFollowing` field for each user in the result
     const usersWithFollowInfo = users.map(user => ({
         ...user._doc,
@@ -323,21 +326,24 @@ exports.getUserProfile = asyncHandler(async (req, res, next) => {
     if (mongoose.Types.ObjectId.isValid(id)) {
         query = { _id: id };
     } else {
-        query = { userName: id };
+        query = { userName:id };
     }
+    const user=await User.findOne(query);
 
-    // Fetch user profile, followers count, following count, and following status in parallel
-    const [user, followersCount, followingCount, isFollowing] = await Promise.all([
-        User.findOne(query).lean(), // Fetch the user profile
-        Follows.countDocuments({ following: query._id }), // Count followers
-        Follows.countDocuments({ user: query._id }), // Count following
-        Follows.findOne({ user: currentUserId, following: query._id }), // Check if current user follows
-    ]);
-
-    // Handle user not found
     if (!user) {
         return next(new ApiError("UserProfile Not Found", 404));
     }
+    // Fetch user profile, followers count, following count, and following status in parallel
+    const [ followersCount, followingCount, isFollowing] = await Promise.all([
+        Follows.countDocuments({ following: user._id }), // Count followers
+        Follows.countDocuments({ user: user._id }), // Count following
+        Follows.findOne({ user: currentUserId, following: user._id }), // Check if current user follows
+    ]);
+    
+    
+    
+    // Fetch user's posts, comments, and bookmarks count in parallel
+   
 
     // Return the profile with followers, following counts, and follow status
     res.status(200).json({
@@ -351,25 +357,33 @@ exports.getUserProfile = asyncHandler(async (req, res, next) => {
 
 exports.updateUser = asyncHandler(async (req, res, next) => {
     
-    
-    
-   
+    const updateData = {};  // Create an object to hold the fields that need to be updated
 
-    
-  const user = await User.findOneAndUpdate( 
-        req.user._id,
-        {
-            userName: req.body.userName,
-            name: req.body.name,
-            email: req.body.email,
-            profileImg: req.body.profileImg,
-            headerImg: req.body.headerImg,
-            bio: req.body.bio
-           
-        },
-        {new:true}
+  // add fields if they provided or send
+  if (req.body.userName) {
+    updateData.userName = req.body.userName;
+  }
+  if (req.body.name) {
+    updateData.name = req.body.name;
+  }
+  if (req.body.email) {
+    updateData.email = req.body.email;
+  }
+  if (req.body.profileImg) {
+    updateData.profileImg = req.body.profileImg;
+  }
+  if (req.body.headerImg) {
+    updateData.headerImg = req.body.headerImg;
+  }
+  if (req.body.bio) {
+    updateData.bio = req.body.bio;
+  }
 
-    );
+  const user = await User.findOneAndUpdate(
+    req.user._id,
+    updateData,  
+    { new: true }
+  );
     if (!user) {
         cleanupTempImages(req.tempImg);
         return next(new ApiError("User Not Found", 404));
