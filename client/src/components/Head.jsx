@@ -12,7 +12,7 @@ function Head({ username, name, profileImg }) {
           {name}
         </p>
         <p className="text-light-secondaryText font-medium dark:text-dark-secondaryText line-clamp-1">
-          {username}
+          @{username}
         </p>
       </div>
     </div>

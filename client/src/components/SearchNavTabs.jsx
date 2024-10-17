@@ -7,7 +7,7 @@ import FilteredPosts from "./FilteredPosts"; // Import the component to display 
 
 // Custom theme for the Tabs component, defining styling for various states (active/inactive)
 const customTheme = {
-  base: "flex flex-col gap-2",
+  base: "flex flex-col",
   tablist: {
     base: "flex text-center",
     variant: {
@@ -43,7 +43,7 @@ export default function SearchNavTabs() {
   };
 
   return (
-    <div className="min-h-full my-[20px] bg-light-background dark:bg-dark-background rounded-[10px]">
+    <div className="min-h-full mt-[20px] bg-light-background dark:bg-dark-background rounded-[10px]">
       {/* Tabs component with custom theme */}
       <Tabs
         theme={customTheme} // Apply custom styling
@@ -53,7 +53,7 @@ export default function SearchNavTabs() {
       >
         {/* Tab for Posts */}
         <Tabs.Item
-          onClick={() => changeTab("Posts")} // Switch to 'Posts' tab on click
+          onClick={() => changeTab("")} // Switch to 'Posts' tab on click
           active={activeTab === ""} // Set active when current tab is 'Posts'
           title="Posts" // Tab title
         >

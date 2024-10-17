@@ -1,21 +1,25 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import logo from "../assets/logo.png";
-import api from "../utils/axios";
+import api, { setAuthToken } from "../utils/axios";
 import Cookies from "universal-cookie";
 
 const cookies = new Cookies();
 
+const token = cookies.get("token");
+const cookieUserData = cookies.get("user");
+
 const initialState = {
   // Dummy data (replace with actual data fetching logic later)
-  userData: {
-    name: "Sam Guy",
-    userName: "samguy",
-    // bio: "Lorem ipsum odor amet, consectetuer adipiscing elit. Congue lectus fermentum nisl accumsan ut fames amet justo.",
-    bio: "",
-    profileImg:
-      "https://avatar.iran.liara.run/username?username=Lynkus&background=008080&color=F0F8FF&length=1",
-    headerImg: "https://placeholder.pics/svg/700/DEDEDE/DEDEDE/",
-  },
+  // userData: {
+  //   name: "Sam Guy",
+  //   userName: "samguy",
+  //   // bio: "Lorem ipsum odor amet, consectetuer adipiscing elit. Congue lectus fermentum nisl accumsan ut fames amet justo.",
+  //   bio: "",
+  //   profileImg:
+  //     "https://avatar.iran.liara.run/username?username=Lynkus&background=008080&color=F0F8FF&length=1",
+  //   headerImg: "https://placeholder.pics/svg/700/DEDEDE/DEDEDE/",
+  // },
+  userData: cookieUserData,
   userPosts: [],
   userLikedPosts: [],
   userFollowers: [],
@@ -36,6 +40,7 @@ export const getUserData = createAsyncThunk(
   "user/getUserData",
   async (username, { rejectWithValue }) => {
     try {
+      setAuthToken(token);
       const res = await api.get(`/users/profile/${username}`);
       // const res = await api.get(`/users/profile/3bkr`);
       return res.data.data;
@@ -47,10 +52,16 @@ export const getUserData = createAsyncThunk(
 
 export const editUserProfile = createAsyncThunk(
   "user/editUserProfile",
-  async (userData, { rejectWithValue }) => {
+  async (updatedData, { rejectWithValue }) => {
     try {
-      const res = await api.put("/users", {
-        ...userData,
+      setAuthToken(token);
+      console.log("UPDATING USER DATA: ");
+      console.log(updatedData);
+
+      const res = await api.put("/users", updatedData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
       return res.data.data;
     } catch (e) {
@@ -64,6 +75,7 @@ export const deleteUserProfile = createAsyncThunk(
   "user/deleteUserProfile",
   async (_, { rejectWithValue }) => {
     try {
+      setAuthToken(token);
       const res = await api.delete("/users");
       console.log("DELETED");
       console.log(res.data.message);
@@ -80,8 +92,9 @@ export const getUserPosts = createAsyncThunk(
   "user/getUserPosts",
   async (userId, { rejectWithValue }) => {
     try {
-      const res = await api.get(`/posts/user/${userId}`); //TODO: make it dynamic
-      return res.data.data;
+      setAuthToken(token);
+      const res = await api.get(`/posts/user/${userId}`);
+      return res.data;
     } catch (e) {
       console.log(e);
       return rejectWithValue(e.response.data.message);
@@ -93,8 +106,9 @@ export const getUserLikedPosts = createAsyncThunk(
   "user/getUserLikedPosts",
   async (userId, { rejectWithValue }) => {
     try {
+      setAuthToken(token);
       const res = await api.get(`/posts/likes/${userId}`);
-      return res.data.data;
+      return res.data;
     } catch (e) {
       console.log(e);
       return rejectWithValue(e.response.data.message);
@@ -106,6 +120,7 @@ export const getUserFollowers = createAsyncThunk(
   "user/getUserFollowers",
   async (userId, { rejectWithValue }) => {
     try {
+      setAuthToken(token);
       const res = await api.get(`/follows/followers/${userId}?page=1&limit=50`);
       return res.data.data;
     } catch (e) {
@@ -119,6 +134,7 @@ export const getUserFollowings = createAsyncThunk(
   "user/getUserFollowings",
   async (userId, { rejectWithValue }) => {
     try {
+      setAuthToken(token);
       const res = await api.get(`/follows/following/${userId}?page=1&limit=50`);
       return res.data.data;
     } catch (e) {
@@ -132,7 +148,8 @@ export const toggleFollow = createAsyncThunk(
   "user/toggleFollow",
   async (userId, { rejectWithValue }) => {
     try {
-      const res = await api.post(`/follows/${userId}`); //TODO: make it dynamic
+      setAuthToken(token);
+      const res = await api.post(`/follows/${userId}`);
       return res.data.message;
     } catch (e) {
       console.log(e);
@@ -166,7 +183,9 @@ export const userSlice = createSlice({
         state.err = action.payload;
       })
       .addCase(getUserData.fulfilled, (state, action) => {
+        state.err = null;
         console.log("Done getting user data");
+        console.log(action.payload);
         state.userData = { ...state.userData, ...action.payload };
         state.loading = false;
       })
@@ -180,6 +199,7 @@ export const userSlice = createSlice({
         state.err = action.payload;
       })
       .addCase(editUserProfile.fulfilled, (state, action) => {
+        state.err = null;
         console.log("Done updating user data");
         state.userData = { ...state.userData, ...action.payload };
         state.loading = false;
@@ -194,6 +214,7 @@ export const userSlice = createSlice({
         state.err = action.payload;
       })
       .addCase(deleteUserProfile.fulfilled, (state, action) => {
+        state.err = null;
         console.log("Done deleting user profile");
         state.message = action.payload;
         state.loading = false;
@@ -208,6 +229,7 @@ export const userSlice = createSlice({
         state.err = action.payload;
       })
       .addCase(getUserPosts.fulfilled, (state, action) => {
+        state.err = null;
         console.log("Done getting user posts");
         state.userPosts = action.payload;
         state.loading = false;
@@ -222,6 +244,7 @@ export const userSlice = createSlice({
         state.err = action.payload;
       })
       .addCase(getUserLikedPosts.fulfilled, (state, action) => {
+        state.err = null;
         console.log("Done getting user liked posts");
         state.userLikedPosts = action.payload;
         state.loading = false;
@@ -236,6 +259,7 @@ export const userSlice = createSlice({
         state.err = action.payload;
       })
       .addCase(getUserFollowers.fulfilled, (state, action) => {
+        state.err = null;
         console.log("Done getting user followers");
         state.userFollowers = action.payload;
         state.loading = false;
@@ -250,6 +274,7 @@ export const userSlice = createSlice({
         state.err = action.payload;
       })
       .addCase(getUserFollowings.fulfilled, (state, action) => {
+        state.err = null;
         console.log("Done getting user followings");
         state.userFollowings = action.payload;
         state.loading = false;
@@ -264,6 +289,7 @@ export const userSlice = createSlice({
         state.err = action.payload;
       })
       .addCase(toggleFollow.fulfilled, (state, action) => {
+        state.err = null;
         console.log("Done Toggling Follow");
         state.message = action.payload;
         state.loading = false;

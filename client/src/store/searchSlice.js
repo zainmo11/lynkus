@@ -19,7 +19,7 @@ export const fetchSearchResults = createAsyncThunk(
       const userResponse = await api.get(`/users?search=${query}`);
       data = userResponse.data;
     } else if (activeTab === "") {
-      const postsResponse = await api.get(`posts/searchPost?q=${query}`);
+      const postsResponse = await api.get(`/posts/searchPost/${query}`);
       data = postsResponse.data;
     }
 
@@ -52,10 +52,10 @@ export const searchSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchSearchResults.fulfilled, (state, action) => {
-        if (state.activeTab === "") {
-          state.users = action.payload.data;
+        if (state.activeTab === "Users") {
+          state.users = action.payload;
         } else if (state.activeTab === "") {
-          state.posts = action.payload.data;
+          state.posts = action.payload;
         }
         state.loading = false;
       })

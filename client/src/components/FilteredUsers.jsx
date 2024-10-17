@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSearchResults } from "../store/searchSlice";
-import Loading from "./Loading";
+import Loading from "../components/LoadingSpinner";
 import { useNavigate } from "react-router-dom";
 
 export default function FilteredUsers() {

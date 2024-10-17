@@ -1,14 +1,10 @@
-/* eslint-disable react/prop-types */
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import Head from "./Head";
 import { useState } from "react";
 import { likePost, togglePost, toggleLikedPosts } from "../store/postSlice";
 import { HeartIcon, ChatBubbleOvalLeftIcon } from "@heroicons/react/24/outline";
-import {
-  HeartIcon as HeartSolid,
-  ChatBubbleOvalLeftIcon as ChatBubbleOvalLeftSolid,
-  Bars3Icon,
-} from "@heroicons/react/24/solid";
+import { HeartIcon as HeartSolid, Bars3Icon } from "@heroicons/react/24/solid";
 
 function Post({
   username,
@@ -23,6 +19,11 @@ function Post({
 }) {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
+  const post = useSelector((state) => state.post.posts[index]);
+  const { likes: currentLikes, postLiked: currentPostLiked } = post || {
+    likes: 0,
+    postLiked: false,
+  };
 
   return (
     <div className="w-full">
@@ -61,35 +62,54 @@ function Post({
         {body}
       </div>
       {postImg && (
-        <div className="w-full h-96">
-          <img
-            src={postImg}
-            className="w-full h-full object-cover"
-            alt="Logo"
-          />
+        <div className="w-full h-96 flex justify-center items-center">
+          <Link to={`/post/${index}`}>
+            <img
+              src={postImg}
+              className="w-full h-auto max-w-xs object-cover"
+              alt="Post"
+              loading="lazy"
+              decoding="async"
+            />
+          </Link>
         </div>
       )}
-      <div className="w-full py-4 flex items-center justify-start gap-10">
-        <div className=" flex items-center justify-between gap-2">
+      <div className="w-full py-4 flex items-center justify-start gap-6">
+        {" "}
+        {/* Adjusted gap here */}
+        {/* Like Section */}
+        <div className="flex items-center gap-1">
+          {" "}
+          {/* Adjusted gap here */}
           <button
-            className="text-button-default  hover:text-button-hover"
+            className="text-button-default hover:text-button-hover"
             onClick={() => {
-              dispatch(likePost(index));
-              dispatch(toggleLikedPosts(index));
+              dispatch(likePost(index)); // Dispatch the likePost action
             }}
           >
-            <HeartIcon className={`size-6 ${postLiked ? "hidden" : "block"}`} />
+            <HeartIcon
+              className={`size-6 ${currentPostLiked ? "hidden" : "block"}`}
+            />
             <HeartSolid
-              className={`size-6 ${postLiked ? "block" : "hidden"}`}
+              className={`size-6 ${currentPostLiked ? "block" : "hidden"}`}
             />
           </button>
-          <p className="text-sm font-medium text-button-default">{likes}</p>
+          <p className="text-sm font-medium text-button-default">
+            {currentLikes}
+          </p>
         </div>
-        <div className=" flex items-center justify-between gap-2">
-          <button className="text-button-default hover:text-button-hover">
-            <ChatBubbleOvalLeftIcon className="size-6" />
-          </button>
-          <p className="text-sm font-medium text-button-default">{commemts}</p>
+        {/* Comments Section */}
+        <div className="flex items-center gap-1">
+          {" "}
+          {/* Adjusted gap here */}
+          <Link to={`/post/${index}`} className="flex items-center">
+            <button className="text-button-default hover:text-button-hover">
+              <ChatBubbleOvalLeftIcon className="size-6" />
+            </button>
+          </Link>
+          <p className="text-sm font-medium text-button-default items-center">
+            {commemts}
+          </p>
         </div>
       </div>
     </div>

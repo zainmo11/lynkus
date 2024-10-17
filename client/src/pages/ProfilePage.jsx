@@ -12,6 +12,9 @@ import {
   getUserLikedPosts,
   getUserPosts,
 } from "../store/userSlice";
+import LoadingPage from "./LoadingPage";
+import AlertComponent from "../components/AlertComponent";
+import { toggleAlert } from "../store/appSlice";
 function ProfilePage() {
   const dispatch = useDispatch();
   const { username } = useParams();
@@ -28,9 +31,10 @@ function ProfilePage() {
     userFollowings,
     userPosts,
   } = useSelector((state) => state.user);
+  const { showAlert } = useSelector((state) => state.app);
   const [deleteModal, setDelModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
-  const userId = userData.id; //TODO: MAKE IT DYNAMIC
+  const userId = userData.id;
   const isOwnProfile = username === userData.userName;
 
   useEffect(() => {
@@ -39,32 +43,49 @@ function ProfilePage() {
     dispatch(getUserFollowings(userId));
     dispatch(getUserPosts(userId));
     dispatch(getUserLikedPosts(userId));
-  }, [dispatch, username]);
+  }, [dispatch, userId, username]);
+
+  useEffect(() => {
+    if (showAlert) {
+      const timer = setTimeout(() => {
+        dispatch(toggleAlert());
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [dispatch, showAlert]);
 
   if (loading) {
     return (
       <div className="w-full h-full flex items-center justify-center md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText opacity-80">
-        Loading...
+        <LoadingPage />
       </div>
     );
   }
 
-  // if (err) {
-  //   return (
-  //     <div className="w-full h-full flex items-center justify-center md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText opacity-80">
-  //       Error: {err}
-  //     </div>
-  //   );
-  // }
+  if (err) {
+    return (
+      <div className="w-full h-full flex items-center justify-center md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText opacity-80">
+        Error: {err}
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-h-screen bg-light-background dark:bg-dark-background md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText">
+      {showAlert && (
+        <AlertComponent
+          type="Success!"
+          content="Your profile has been successfully updated!"
+          toggleFunction={() => {
+            dispatch(toggleAlert());
+          }}
+        />
+      )}
       {/* HEADING */}
       <ProfileHeading
         isOwnProfile={isOwnProfile}
         initiateDelModal={() => {
           setDelModal(true);
-          console.log("INITIATE DEL MODAL");
         }}
         initiateEditModal={() => {
           setEditModal(true);
