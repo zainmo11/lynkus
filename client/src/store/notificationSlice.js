@@ -1,5 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import api from "../utils/axios";
+import api, { setAuthToken } from "../utils/axios";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
 
 const initialState = {
   //   notifications: [
@@ -85,11 +88,14 @@ const initialState = {
   hasNewNotifications: false,
 };
 
+const token = cookies.get("token");
+
 //API CALLS
 export const getAllNotifications = createAsyncThunk(
   "notifications/getAllNotifications",
   async (_, { rejectWithValue }) => {
     try {
+      setAuthToken(token);
       const res = await api.get("/notifications");
       return res.data.Notifications;
     } catch (e) {

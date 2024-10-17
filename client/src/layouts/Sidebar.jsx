@@ -3,10 +3,10 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 import FollowCard from "../components/FollowCard";
 
 function Sidebar() {
-  const users = useSelector((state) => state.user.users);
+  const users = useSelector((state) => state.user.userRecommendation);
 
   return (
-    <div className="w-full max-h-screen bg-light-background dark:bg-dark-background hidden lg:grid grid-rows-6 col-span-2 border-l border-light-secondaryText dark:border-dark-secondaryText">
+    <div className="w-full max-h-screen pb-10 bg-light-background dark:bg-dark-background hidden lg:grid grid-rows-6 col-span-2 border-l border-light-secondaryText dark:border-dark-secondaryText overflow-y-auto hide-scrollbar">
       {/* Search Bar */}
       {/* <div className="h-full row-span-1 pt-6 px-4">
         <div className="relative hidden md:block">
@@ -27,16 +27,18 @@ function Sidebar() {
           Link Up With
         </h1>
         <div className="w-full flex flex-col justify-center items-center gap-8">
-          {users.map((x, i) => {
-            return (
-              <FollowCard
-                key={i}
-                username={x.username}
-                name={x.name}
-                profileImg={x.profileImg}
-              />
-            );
-          })}
+          {users &&
+            users.slice(0, 6).map((x, i) => {
+              return (
+                <FollowCard
+                  key={i}
+                  userId={x._id}
+                  username={x.username}
+                  name={x.name}
+                  profileImg={x.profileImg}
+                />
+              );
+            })}
         </div>
       </div>
       {/* Hash Tag Section */}

@@ -12,14 +12,15 @@ import { logout } from "../store/authSlice";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import api from "../utils/axios";
+import { fetchPosts } from "../store/postSlice";
 
 function CreatePost({ profileImg }) {
   const theme = useSelector((state) => state.theme.theme);
   const darkMode = theme === "dark";
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [photo, setPhoto] = useState("");
-  const [body, setBody] = useState("");
+  const [image, setImage] = useState("");
+  const [postBody, setPostBody] = useState("");
 
   const changeTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
@@ -38,13 +39,17 @@ function CreatePost({ profileImg }) {
     try {
       const postData = new FormData();
 
-      postData.append("body", body);
-      if (photo) {
-        postData.append("photo", photo);
+      postData.append("postBody", postBody);
+      if (image) {
+        postData.append("image", image);
       }
 
-      const res = await api.post("/api/posts", postData);
-      console.log(res);
+      const res = await api.post("posts", postData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      dispatch(fetchPosts());
     } catch (error) {
       console.log(error);
     }
@@ -77,12 +82,7 @@ function CreatePost({ profileImg }) {
         </div>
       </div>
       {/* Create Post Form */}
-      <form
-        className="mt-6 mx-6"
-        onSubmit={(e) => {
-          handleSubmit(e);
-        }}
-      >
+      <form className="mt-6 mx-6" onSubmit={(e) => handleSubmit(e)}>
         <div className="flex items-center justify-center gap-4">
           <img
             src={profileImg}
@@ -91,33 +91,33 @@ function CreatePost({ profileImg }) {
           />
           <input
             type="text"
-            name="body"
-            id="body"
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
+            name="postBody"
+            id="postBody"
+            value={postBody}
+            onChange={(e) => setPostBody(e.target.value)}
             className="w-full block py-2.5 text-light-primaryText bg-transparent border-0 border-b-2 border-light-secondaryText appearance-none dark:text-dark-primaryText dark:border-dark-secondaryText dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600"
             placeholder="What's Happening?"
           />
         </div>
         <div className="mb-6 flex justify-between items-end">
           <label className="mt-6 ml-3 mr-6 flex justify-center items-center gap-2">
-            {photo ? (
+            {image ? (
               <img
-                src={URL.createObjectURL(photo)}
-                alt="postPhoto"
+                src={URL.createObjectURL(image)}
+                alt="postImage"
                 className="size-7"
               />
             ) : (
               <PhotoIcon className="size-7 text-button-default hover:text-button-hover" />
             )}
             <p className="text-light-primaryText hover:text-button-hover dark:text-dark-primaryText dark:hover:text-button-hover">
-              {photo ? photo.name : "Upload Photo"}
+              {image ? image.name : "Upload Photo"}
             </p>
             <input
               type="file"
-              name="photo"
+              name="image"
               accept="image/*"
-              onChange={(e) => setPhoto(e.target.files[0])}
+              onChange={(e) => setImage(e.target.files[0])}
               hidden
             />
           </label>

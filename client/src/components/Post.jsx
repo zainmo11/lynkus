@@ -1,8 +1,9 @@
 /* eslint-disable react/prop-types */
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import Head from "./Head";
 import { useState } from "react";
-import { likePost, toggleLikedPosts } from "../store/postSlice";
+import { likeNumberChange, likePostToggle } from "../store/postSlice";
 import { HeartIcon, ChatBubbleOvalLeftIcon } from "@heroicons/react/24/outline";
 import {
   HeartIcon as HeartSolid,
@@ -11,32 +12,49 @@ import {
 } from "@heroicons/react/24/solid";
 
 function Post({
-  username,
+  userId,
   name,
+  username,
   profileImg,
+  postId,
   body,
   postImg,
   likes,
   commemts,
-  postLiked,
-  index,
+  likedByUser,
+  // index,
 }) {
   const dispatch = useDispatch();
-  const [showMenu, setShowMenu] = useState(false);
+  const posts = useSelector((state) => state.post.posts);
+
+  // const [showMenu, setShowMenu] = useState(false);
   const [showPost, setShowPost] = useState(true);
+
+  const handleLike = () => {
+    console.log(likedByUser);
+    const post = posts.find((post) => post._id === postId);
+    dispatch(likePostToggle({ postId, userId })).then(() => {
+      dispatch(likeNumberChange(posts.indexOf(post)));
+    });
+  };
 
   return (
     <div className={`w-full ${showPost ? "block" : "hidden"}`}>
-      <div className="w-full flex justify-between items-start">
-        <Head username={username} name={name} profileImg={profileImg} />
-        <div className="relative flex flex-col items-end justify-center">
+      <Link
+        to={`/post/${postId}`}
+        className="w-full flex justify-between items-start"
+      >
+        <Link to={`/user/${username}`}>
+          <Head username={username} name={name} profileImg={profileImg} />
+        </Link>
+        {/* Add Stuff to menu from here */}
+        {/* <div className="relative flex flex-col items-end justify-center">
           <button
             className="py-2 text-button-default"
             onClick={() => setShowMenu(!showMenu)}
           >
             <Bars3Icon className="size-5" />
           </button>
-          {/* Add Stuff to menu from here */}
           <div
             className={`absolute top-1/2 mt-5 z-10 ${
               showMenu ? "block" : "hidden"
@@ -56,8 +74,8 @@ function Post({
               </li>
             </ul>
           </div>
-        </div>
-      </div>
+        </div> */}
+      </Link>
       <div className="w-full pt-4 pb-2 text-light-primaryText dark:text-dark-primaryText">
         {body}
       </div>
@@ -66,32 +84,37 @@ function Post({
           <img
             src={postImg}
             className="w-full h-full object-cover"
-            alt="Logo"
+            alt="postImg"
           />
         </div>
       )}
-      <div className="w-full py-4 flex items-center justify-start gap-10">
+      <div
+        to={"/notfication"}
+        className="w-full py-4 flex items-center justify-start gap-10"
+      >
         <div className=" flex items-center justify-between gap-2">
           <button
             className="text-button-default  hover:text-button-hover"
-            onClick={() => {
-              dispatch(likePost(index));
-              dispatch(toggleLikedPosts(index));
-            }}
+            onClick={() => handleLike()}
           >
-            <HeartIcon className={`size-6 ${postLiked ? "hidden" : "block"}`} />
+            <HeartIcon
+              className={`size-6 ${likedByUser ? "hidden" : "block"}`}
+            />
             <HeartSolid
-              className={`size-6 ${postLiked ? "block" : "hidden"}`}
+              className={`size-6 ${likedByUser ? "block" : "hidden"}`}
             />
           </button>
           <p className="text-sm font-medium text-button-default">{likes}</p>
         </div>
-        <div className=" flex items-center justify-between gap-2">
+        <Link
+          to={`/post/${postId}`}
+          className=" flex items-center justify-between gap-2"
+        >
           <button className="text-button-default hover:text-button-hover">
             <ChatBubbleOvalLeftIcon className="size-6" />
           </button>
           <p className="text-sm font-medium text-button-default">{commemts}</p>
-        </div>
+        </Link>
       </div>
     </div>
   );

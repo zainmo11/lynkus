@@ -20,6 +20,7 @@ const initialState = {
   userLikedPosts: [],
   userFollowers: [],
   userFollowings: [],
+  userRecommendation: [],
   message: null,
   users: [
     { name: "User One", username: "@Hat", profileImg: logo },
@@ -32,6 +33,21 @@ const initialState = {
 };
 
 //API CALLS
+
+export const recommendedUsers = createAsyncThunk(
+  "user/recommendedUsers",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await api.get(`/follows/recommended`);
+      console.log(res.data.recommendedUsers);
+      return res.data.recommendedUsers;
+    } catch (e) {
+      console.log(e);
+      return rejectWithValue(e.response.data.message);
+    }
+  }
+);
+
 export const getUserData = createAsyncThunk(
   "user/getUserData",
   async (username, { rejectWithValue }) => {
@@ -269,6 +285,20 @@ export const userSlice = createSlice({
       .addCase(toggleFollow.fulfilled, (state, action) => {
         console.log("Done Toggling Follow");
         state.message = action.payload;
+        state.loading = false;
+      })
+      .addCase(recommendedUsers.pending, (state) => {
+        console.log("Getting recommended users...");
+        state.loading = true;
+      })
+      .addCase(recommendedUsers.rejected, (state, action) => {
+        console.log("Error getting recommended users");
+        state.loading = false;
+        state.err = action.payload;
+      })
+      .addCase(recommendedUsers.fulfilled, (state, action) => {
+        console.log("Done getting recommended users");
+        state.userRecommendation = action.payload;
         state.loading = false;
       });
   },
