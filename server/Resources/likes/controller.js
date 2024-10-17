@@ -4,7 +4,8 @@ const Notification = require('../notifications/model');
 // Like a post
 exports.likePost = async (req, res) => {
     try {
-        const { postId, userId } = req.body;
+        const { postId } = req.body;
+        const userId = req.user._id;
 
         // Check if the user has already liked the post
         const existingLike = await Like.findOne({ postId, userId });
