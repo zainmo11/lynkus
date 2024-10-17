@@ -6,7 +6,6 @@ const Post = require('../posts/model');
 exports.validateLike = [
     // Check that postId and userId are provided
     body('postId').notEmpty().withMessage('Post ID is required'),
-    body('userId').notEmpty().withMessage('User ID is required'),
 
     // Check for validation errors
     async (req, res, next) => {
