@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import logo from "../assets/logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -7,11 +8,19 @@ import {
   PhotoIcon,
 } from "@heroicons/react/24/outline";
 import { toggleTheme } from "../store/themeSlice";
+import { logout } from "../store/authSlice";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import api from "../utils/axios";
+import { fetchPosts } from "../store/postSlice";
 
-function CreatePost() {
+function CreatePost({ profileImg }) {
   const theme = useSelector((state) => state.theme.theme);
   const darkMode = theme === "dark";
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [image, setImage] = useState("");
+  const [postBody, setPostBody] = useState("");
 
   const changeTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
@@ -20,8 +29,35 @@ function CreatePost() {
     document.documentElement.classList.toggle("dark", newTheme === "dark");
   };
 
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/welcome");
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const postData = new FormData();
+
+      postData.append("postBody", postBody);
+      if (image) {
+        postData.append("image", image);
+      }
+
+      const res = await api.post("posts", postData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      dispatch(fetchPosts());
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
+      {/* Mobile Dark Toggle & Sign out */}
       <div className=" w-full bg-dark-secondaryBackground md:hidden flex justify-between items-center py-2 px-4">
         <img src={logo} className="h-14 rounded-full object-cover" alt="Logo" />
         <div className="flex justify-center items-center gap-5">
@@ -38,36 +74,59 @@ function CreatePost() {
           </button>
           <button
             type="button"
+            onClick={() => handleLogout()}
             className="mx-auto p-2 text-dark-primaryText bg-button-error hover:bg-red-800 rounded-full"
           >
             <ArrowLeftStartOnRectangleIcon className="size-6" />
           </button>
         </div>
       </div>
-
-      <form className="mt-6 mx-6">
+      {/* Create Post Form */}
+      <form className="mt-6 mx-6" onSubmit={(e) => handleSubmit(e)}>
         <div className="flex items-center justify-center gap-4">
           <img
-            src={logo}
+            src={profileImg}
             className="h-14 rounded-full object-cover"
-            alt="Logo"
+            alt="UserImg"
           />
           <input
-            type="create"
-            name="createPost"
-            id="createPost"
+            type="text"
+            name="postBody"
+            id="postBody"
+            value={postBody}
+            onChange={(e) => setPostBody(e.target.value)}
             className="w-full block py-2.5 text-light-primaryText bg-transparent border-0 border-b-2 border-light-secondaryText appearance-none dark:text-dark-primaryText dark:border-dark-secondaryText dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600"
             placeholder="What's Happening?"
           />
         </div>
+        {image && (
+          <div className="relative w-full h-96 pt-6">
+            <img
+              src={URL.createObjectURL(image)}
+              className="w-full h-full object-cover"
+              alt="postImg"
+            />
+            <button
+              type="button"
+              onClick={() => setImage(null)}
+              className="absolute top-8 right-2 bg-red-500 text-white rounded-full px-2 hover:bg-red-600"
+            >
+              &times;
+            </button>
+          </div>
+        )}
+
         <div className="mb-6 flex justify-between items-end">
-          <label className="mt-6 ml-3 mr-6">
+          <label className="mt-6 ml-3 mr-6 flex justify-center items-center gap-2">
             <PhotoIcon className="size-7 text-button-default hover:text-button-hover" />
+            <p className="text-light-primaryText hover:text-button-hover dark:text-dark-primaryText dark:hover:text-button-hover">
+              {image ? image.name : "Upload Photo"}
+            </p>
             <input
               type="file"
-              name="photo"
+              name="image"
               accept="image/*"
-              // onChange={(e) => setPhoto(e.target.files[0])}
+              onChange={(e) => setImage(e.target.files[0])}
               hidden
             />
           </label>
