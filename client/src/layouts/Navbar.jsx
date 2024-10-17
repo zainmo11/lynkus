@@ -1,12 +1,13 @@
 import logo from "../assets/logo.png";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
+import { logout } from "../store/authSlice";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   HomeIcon,
   MagnifyingGlassIcon,
   BellIcon,
   UserIcon,
-  EnvelopeIcon,
+  // EnvelopeIcon,
   SunIcon,
   MoonIcon,
   ArrowLeftStartOnRectangleIcon,
@@ -16,15 +17,21 @@ import {
   MagnifyingGlassIcon as MagnifyingGlassSolid,
   BellIcon as BellSolid,
   UserIcon as UserSolid,
-  EnvelopeIcon as EnvelopeSolid,
+  // EnvelopeIcon as EnvelopeSolid,
 } from "@heroicons/react/24/solid";
 import { DefaultButton, ErrorButton } from "../components/Buttons";
 import { toggleTheme } from "../store/themeSlice";
 
 function Navbar() {
+  const { userData } = useSelector((state) => state.user);
+  const navigate = useNavigate();
   const location = useLocation();
   const { pathname } = location;
   const theme = useSelector((state) => state.theme.theme);
+  // const hasNewNotifications = true;
+  const hasNewNotifications = useSelector(
+    (state) => state.notification.hasNewNotifications
+  );
   const darkMode = theme === "dark";
   const dispatch = useDispatch();
 
@@ -33,6 +40,11 @@ function Navbar() {
     dispatch(toggleTheme());
     localStorage.setItem("theme", newTheme);
     document.documentElement.classList.toggle("dark", newTheme === "dark");
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/welcome");
   };
 
   return (
@@ -69,17 +81,19 @@ function Navbar() {
             </li>
             <li className="w-full lg:flex items-center">
               <Link
-                to={"/profile"}
+                to={`/user/${userData.userName}`}
                 className="flex justify-center items-center gap-2"
               >
-                {pathname == "/profile" ? (
+                {pathname == `/user/${userData.userName}` ? (
                   <UserSolid className="size-7 text-button-default hover:text-button-hover" />
                 ) : (
                   <UserIcon className="size-6 text-button-default hover:text-button-hover" />
                 )}
                 <p
                   className={`hidden lg:block ${
-                    pathname == "/profile" ? "text-3xl" : "text-2xl"
+                    pathname == `/user/${userData.userName}`
+                      ? "text-3xl"
+                      : "text-2xl"
                   } font-bold text-light-primaryText hover:text-button-hover dark:text-dark-primaryText dark:hover:text-button-hover`}
                 >
                   Profile
@@ -103,22 +117,31 @@ function Navbar() {
               </Link>
             </li>
             <li className="w-full lg:flex items-center">
-              <Link to={"/"} className="flex justify-center items-center gap-2">
-                {pathname == "" ? (
+              <Link
+                to={"/notfication"}
+                className="flex justify-center items-center gap-2"
+              >
+                {pathname == "/notfication" ? (
                   <BellSolid className="size-7 text-button-default hover:text-button-hover" />
                 ) : (
-                  <BellIcon className="size-6 text-button-default hover:text-button-hover" />
+                  <div className="relative">
+                    <BellIcon className="size-6 text-button-default hover:text-button-hover" />
+                    {hasNewNotifications && (
+                      <span className="absolute -top-1 -right-0 size-3 rounded-full bg-light-secondaryText dark:bg-dark-secondaryText"></span>
+                    )}
+                  </div>
                 )}
                 <p
                   className={`hidden lg:block ${
-                    pathname == "" ? "text-3xl" : "text-2xl"
+                    pathname == "/notfication" ? "text-3xl" : "text-2xl"
                   } font-bold text-light-primaryText hover:text-button-hover dark:text-dark-primaryText dark:hover:text-button-hover`}
                 >
                   Notifications
                 </p>
               </Link>
             </li>
-            <li className="w-full lg:flex items-center">
+            {/* CHAT BONUS */}
+            {/* <li className="w-full lg:flex items-center">
               <Link to={"/"} className="flex justify-center items-center gap-2">
                 {pathname == "" ? (
                   <EnvelopeSolid className="size-7 text-button-default hover:text-button-hover" />
@@ -133,7 +156,7 @@ function Navbar() {
                   Chat
                 </p>
               </Link>
-            </li>
+            </li> */}
           </ul>
           <div className="hidden mb-4 lg:flex flex-col gap-4 order-2 w-3/4">
             {/* <DefaultButton label={"Dark Mode"} /> */}
@@ -145,7 +168,7 @@ function Navbar() {
             <ErrorButton
               label="Sign Out"
               Icon={ArrowLeftStartOnRectangleIcon}
-              onClick={() => {}}
+              onClick={() => handleLogout()}
             />
           </div>
           <div className="w-full hidden md:flex mb-8 lg:hidden flex-col gap-8 order-2">
@@ -162,6 +185,7 @@ function Navbar() {
             </button>
             <button
               type="button"
+              onClick={() => handleLogout()}
               className="mx-auto p-2 text-dark-primaryText bg-button-error hover:bg-red-800 rounded-full"
             >
               <ArrowLeftStartOnRectangleIcon className="size-6" />

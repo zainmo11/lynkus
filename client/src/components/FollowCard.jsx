@@ -4,16 +4,19 @@ import { LinkIcon } from "@heroicons/react/24/outline";
 import { DefaultButton } from "./Buttons";
 import { Link } from "react-router-dom";
 import { LinkSlashIcon } from "@heroicons/react/24/solid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function FollowCard({ name, username, profileImg, followed }) {
-  const [following, setFollowing] = useState(followed);
+  const [following, setFollowing] = useState(false);
+  useEffect(() => {
+    setFollowing(followed);
+  }, [followed]);
   const toggleFollowing = () => {
     setFollowing(!following);
   };
   return (
     <div className="w-full flex justify-between items-center">
-      <Link to={"/profile"}>
+      <Link to={`/user/${username}`}>
         <Head username={username} name={name} profileImg={profileImg} />
       </Link>
 
