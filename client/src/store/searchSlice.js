@@ -5,7 +5,7 @@ import Cookies from "universal-cookie";
 
 export const fetchSearchResults = createAsyncThunk(
   "search/fetchSearchResults",
-  async ({ query, activeTab }) => {
+  async ({ query }) => {
     const cookies = new Cookies();
 
     if (isAuthorized()) {
@@ -13,17 +13,15 @@ export const fetchSearchResults = createAsyncThunk(
       setAuthToken(token);
     }
 
-    let data = [];
+    const [userResponse, postsResponse] = await Promise.all([
+      api.get(`/users?search=${query}`),
+      api.get(`/posts/searchPost/${query}`),
+    ]);
 
-    if (activeTab === "Users") {
-      const userResponse = await api.get(`/users?search=${query}`);
-      data = userResponse.data;
-    } else if (activeTab === "") {
-      const postsResponse = await api.get(`/posts/searchPost/${query}`);
-      data = postsResponse.data;
-    }
-
-    return data;
+    return {
+      users: userResponse.data.data,
+      posts: postsResponse.data,
+    };
   }
 );
 
@@ -31,7 +29,6 @@ export const searchSlice = createSlice({
   name: "search",
   initialState: {
     searchQuery: "",
-    activeTab: "",
     users: [],
     posts: [],
     loading: false,
@@ -41,9 +38,6 @@ export const searchSlice = createSlice({
     setSearchQuery: (state, action) => {
       state.searchQuery = action.payload;
     },
-    setActiveTab: (state, action) => {
-      state.activeTab = action.payload;
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -52,11 +46,8 @@ export const searchSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchSearchResults.fulfilled, (state, action) => {
-        if (state.activeTab === "Users") {
-          state.users = action.payload;
-        } else if (state.activeTab === "") {
-          state.posts = action.payload;
-        }
+        state.users = action.payload.users;
+        state.posts = action.payload.posts;
         state.loading = false;
       })
       .addCase(fetchSearchResults.rejected, (state, action) => {
@@ -66,5 +57,5 @@ export const searchSlice = createSlice({
   },
 });
 
-export const { setSearchQuery, setActiveTab } = searchSlice.actions;
+export const { setSearchQuery } = searchSlice.actions;
 export default searchSlice.reducer;
