@@ -76,11 +76,11 @@ exports.getPost = async (req, res) => {
 
         res.status(200).send({
             post,
-            likesCount,
-            commentsCount,
+            likes: likesCount,
+            comments:commentsCount,
             userName: user.userName || "unknown UserName",
             name: user.name || "unknown User",
-            likedByUser
+            likedByUser:likedByUser
         });
     } catch (error) {
         if (error.kind === 'ObjectId') {
@@ -115,12 +115,16 @@ exports.updatePost = async (req, res) => {
         }
 
         await post.save();
-
+        const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
+        const likedByUser = await userLikesPost(post._id, userId)
         const user = await User.findById(authorId);
         res.status(200).send({
             post,
+            likes: likesCount,
+            comments: commentsCount,
             userName: user.userName,
-            name: user.name
+            name: user.name,
+            likedByUser:likedByUser
         });
     } catch (error) {
         if (error.kind === 'ObjectId') {
@@ -201,9 +205,9 @@ exports.getAllPosts = async (req, res) => {
                 ...post._doc,
                 likes: likesCount,
                 comments: commentsCount,
-                userName,
-                name,
-                likedByUser
+                userName: userName,
+                name: name,
+                likedByUser:likedByUser
             };
         }));
 
@@ -332,11 +336,13 @@ exports.searchPosts = async (req, res) => {
             if (!user) {
                 return res.status(404).json({ message: 'User not found for this post', post });
             }
+            const likedByUser = await userLikesPost(post._id, post.authorId);
 
             post.likesCount = likesCount;
             post.commentsCount = commentsCount;
             post.userName = user.userName || "unknown UserName";
             post.name = user.name || "unknown User";
+            post.likedByUser= likedByUser;
         }
 
         res.status(200).send(posts);
