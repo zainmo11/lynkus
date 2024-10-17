@@ -295,7 +295,7 @@ exports.getPostsLikedByUser = async (req, res) => {
 
 exports.searchPosts = async (req, res) => {
     try {
-        const posts = await Post.find({ $text: { $search: req.query.q } }).populate('authorId');
+        const posts = await Post.find({ $text: { $search: req.query.q } })
 
         if (!posts.length) {
             return res.status(200).json({ message: 'No posts found for this search term', posts: [] });
