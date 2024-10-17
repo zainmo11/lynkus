@@ -99,17 +99,26 @@ function CreatePost({ profileImg }) {
             placeholder="What's Happening?"
           />
         </div>
+        {image && (
+          <div className="relative w-full h-96 pt-6">
+            <img
+              src={URL.createObjectURL(image)}
+              className="w-full h-full object-cover"
+              alt="postImg"
+            />
+            <button
+              type="button"
+              onClick={() => setImage(null)}
+              className="absolute top-8 right-2 bg-red-500 text-white rounded-full px-2 hover:bg-red-600"
+            >
+              &times;
+            </button>
+          </div>
+        )}
+
         <div className="mb-6 flex justify-between items-end">
           <label className="mt-6 ml-3 mr-6 flex justify-center items-center gap-2">
-            {image ? (
-              <img
-                src={URL.createObjectURL(image)}
-                alt="postImage"
-                className="size-7"
-              />
-            ) : (
-              <PhotoIcon className="size-7 text-button-default hover:text-button-hover" />
-            )}
+            <PhotoIcon className="size-7 text-button-default hover:text-button-hover" />
             <p className="text-light-primaryText hover:text-button-hover dark:text-dark-primaryText dark:hover:text-button-hover">
               {image ? image.name : "Upload Photo"}
             </p>

@@ -24,7 +24,6 @@ function HomePage() {
           return (
             <li key={i} className="pt-6 px-6">
               <Post
-                userId={x.authorId._id}
                 name={x.authorId.name}
                 username={x.authorId.userName}
                 profileImg={x.authorId.profileImg}

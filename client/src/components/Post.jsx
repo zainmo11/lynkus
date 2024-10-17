@@ -12,7 +12,6 @@ import {
 } from "@heroicons/react/24/solid";
 
 function Post({
-  userId,
   name,
   username,
   profileImg,
@@ -33,7 +32,7 @@ function Post({
   const handleLike = () => {
     console.log(likedByUser);
     const post = posts.find((post) => post._id === postId);
-    dispatch(likePostToggle({ postId, userId })).then(() => {
+    dispatch(likePostToggle({ postId })).then(() => {
       dispatch(likeNumberChange(posts.indexOf(post)));
     });
   };
@@ -88,10 +87,7 @@ function Post({
           />
         </div>
       )}
-      <div
-        to={"/notfication"}
-        className="w-full py-4 flex items-center justify-start gap-10"
-      >
+      <div className="w-full py-4 flex items-center justify-start gap-10">
         <div className=" flex items-center justify-between gap-2">
           <button
             className="text-button-default  hover:text-button-hover"
