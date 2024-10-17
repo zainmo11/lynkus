@@ -40,7 +40,6 @@ export const getUserData = createAsyncThunk(
       // const res = await api.get(`/users/profile/3bkr`);
       return res.data.data;
     } catch (e) {
-      console.log(e);
       return rejectWithValue(e.response.data.message);
     }
   }
@@ -149,9 +148,7 @@ export const userSlice = createSlice({
     fetchUserDataFromCookies: (state) => {
       const userData = cookies.get("user");
       if (userData) {
-        console.log(userData);
         state.userData = userData;
-        console.log("FETCHED USER DATA FROM COOKIES");
       } else {
         console.log("NO USER DATA FROM COOKIES");
       }

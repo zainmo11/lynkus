@@ -13,6 +13,7 @@ import usePeriodicFetch from "./hooks/usePeriodicFetch";
 import { getAllNotifications } from "./store/notificationSlice";
 import PrivateRouter from "./components/PrivateRouter";
 import { fetchUserDataFromCookies } from "./store/userSlice";
+import SearchPage from "./pages/SearchPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -39,7 +40,6 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* <Route path="/login" element={<Welcome />} /> */}
         <Route element={<Layout />}>
           <Route
             index
@@ -54,6 +54,14 @@ function App() {
             element={
               <PrivateRouter>
                 <ProfilePage />
+              </PrivateRouter>
+            }
+          />
+          <Route
+            path="/search"
+            element={
+              <PrivateRouter>
+                <SearchPage />
               </PrivateRouter>
             }
           />
