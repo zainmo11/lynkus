@@ -6,9 +6,8 @@ import { useState } from "react";
 import { likeNumberChange, likePostToggle } from "../store/postSlice";
 import { HeartIcon, ChatBubbleOvalLeftIcon } from "@heroicons/react/24/outline";
 import {
-  HeartIcon as HeartSolid,
-  ChatBubbleOvalLeftIcon as ChatBubbleOvalLeftSolid,
-  Bars3Icon,
+    HeartIcon as HeartSolid,
+    Bars3Icon,
 } from "@heroicons/react/24/solid";
 
 function Post({

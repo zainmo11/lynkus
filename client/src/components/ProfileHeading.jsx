@@ -6,9 +6,10 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/solid";
 import { Avatar } from "flowbite-react";
-import { capitalizeName } from "../utils/helpers";
+import { capitalizeName, formatImageUrl } from "../utils/helpers";
 import { useDispatch } from "react-redux";
 import { toggleFollow } from "../store/userSlice";
+import { useEffect } from "react";
 
 function ProfileHeading({
   isOwnProfile,
@@ -18,6 +19,14 @@ function ProfileHeading({
   loading,
 }) {
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    console.log("USER HEADING DATA: ");
+    console.log(userData);
+  }, []);
+
+  const headerImg = formatImageUrl(userData.headerImg, "headerImg");
+  const profileImg = formatImageUrl(userData.profileImg, "profileImg");
 
   return (
     <div className="w-full min-h-[300px] md:min-h-[450px] pb-[30px] bg-light-secondaryBackground dark:bg-dark-secondaryBackground">
@@ -29,7 +38,7 @@ function ProfileHeading({
             alt="header-image"
             src={`${
               userData.headerImg
-                ? userData.headerImg
+                ? headerImg
                 : "https://placeholder.pics/svg/700/DEDEDE/DEDEDE/"
             }`}
             className="object-cover w-full h-full"
@@ -38,16 +47,17 @@ function ProfileHeading({
           {/* AVATAR */}
         </div>
         <div className="relative ">
-          <div className="absolute z-30 left-1/2 transform -translate-x-1/2 -bottom-12 md:-bottom-16">
+          <div className="absolute z-30 left-1/2 transform -translate-x-1/2 -bottom-12 md:-bottom-16 size-[90px] md:size-[150px] rounded-full border-4 border-light-accent dark:border-dark-accent flex items-center justify-center">
             <Avatar
               img={`${
                 userData.profileImg
-                  ? userData.profileImg
-                  : "https://avatar.iran.liara.run/username?username=Lynkus&background=008080&color=F0F8FF&length=1"
+                  ? profileImg
+                  : `https://avatar.iran.liara.run/username?username=${userData.name}&background=008080&color=F0F8FF`
               }`}
               alt="user-avatar"
               rounded
-              className="object-cover size-[90px] md:size-[150px] rounded-full border-4 border-light-accent dark:border-dark-accent"
+              size="lg"
+              className="object-cover self-center items-center"
             />
           </div>
         </div>

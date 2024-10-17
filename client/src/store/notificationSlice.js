@@ -85,6 +85,7 @@ const initialState = {
   notifications: [],
   loading: true,
   err: null,
+  message: null,
   hasNewNotifications: false,
 };
 
@@ -98,6 +99,32 @@ export const getAllNotifications = createAsyncThunk(
       setAuthToken(token);
       const res = await api.get("/notifications");
       return res.data.Notifications;
+    } catch (e) {
+      return rejectWithValue(e.response.data.message);
+    }
+  }
+);
+
+export const clearNotification = createAsyncThunk(
+  "notifications/clearNotification",
+  async (notificationId, { rejectWithValue }) => {
+    try {
+      setAuthToken(token);
+      const res = await api.delete(`/notifications/${notificationId}`);
+      return res.data.message;
+    } catch (e) {
+      return rejectWithValue(e.response.data.message);
+    }
+  }
+);
+
+export const clearAllNotifications = createAsyncThunk(
+  "notifications/clearAllNotifications",
+  async (_, { rejectWithValue }) => {
+    try {
+      setAuthToken(token);
+      const res = await api.delete("/notifications");
+      return res.data.message;
     } catch (e) {
       return rejectWithValue(e.response.data.message);
     }
@@ -126,6 +153,8 @@ export const notificationSlice = createSlice({
       })
       .addCase(getAllNotifications.fulfilled, (state, action) => {
         console.log("Done getting all notifications");
+        state.err = null;
+
         const newNotifications = action.payload.filter(
           (newNotification) =>
             !state.notifications.some(
@@ -136,6 +165,37 @@ export const notificationSlice = createSlice({
         state.hasNewNotifications =
           newNotifications.length > 0 ||
           state.notifications.some((n) => !n.read);
+        console.log(state.notifications);
+        state.loading = false;
+      })
+      .addCase(clearNotification.pending, (state) => {
+        console.log("Clearing notification...");
+        state.loading = true;
+      })
+      .addCase(clearNotification.rejected, (state, action) => {
+        console.log("Error clearing notification");
+        state.loading = false;
+        state.err = action.payload;
+      })
+      .addCase(clearNotification.fulfilled, (state, action) => {
+        console.log("Done clearing notification");
+        state.err = null;
+        state.message = action.payload;
+        state.loading = false;
+      })
+      .addCase(clearAllNotifications.pending, (state) => {
+        console.log("Clearing all notifications...");
+        state.loading = true;
+      })
+      .addCase(clearAllNotifications.rejected, (state, action) => {
+        console.log("Error clearing all notifications");
+        state.loading = false;
+        state.err = action.payload;
+      })
+      .addCase(clearAllNotifications.fulfilled, (state, action) => {
+        console.log("Done clearing all notifications");
+        state.err = null;
+        state.message = action.payload;
         state.loading = false;
       });
   },
