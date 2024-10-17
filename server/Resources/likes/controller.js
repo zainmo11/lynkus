@@ -9,33 +9,36 @@ exports.likePost = async (req, res) => {
         // Check if the user has already liked the post
         const existingLike = await Like.findOne({ postId, userId });
         if (existingLike) {
-            return res.status(400).send({ message: 'Post already liked by this user' });
+            // If like exists, remove it (unlike)
+            await Like.deleteOne({ _id: existingLike._id });
+            return res.status(200).send({ message: 'Post unliked successfully' });
         }
 
+        // If like doesn't exist, create a new like
         const like = new Like({ postId, userId });
         await like.save();
 
+        // Notify the post owner about the new liked post
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).send({ message: 'Post not found' });
+        }
 
-         // Notify the post owner about the new liked post
-         const post = await Post.findById(postId);
-         if (!post) {
-             return res.status(404).send({ message: 'Post not found' });
-         }
-         const notification = new Notification({
-             to: post.authorId,
-             from: req.user._id,
-             content: `${req.user.userName} liked your post`,
-             type: 'LIKE',
-             post: post._id
-         });
-         await notification.save();
-
+        const notification = new Notification({
+            to: post.authorId,
+            from: req.user._id,
+            content: `${req.user.userName} liked your post`,
+            type: 'LIKE',
+            post: post._id
+        });
+        await notification.save();
 
         res.status(201).send(like);
     } catch (error) {
         res.status(500).send(error);
     }
 };
+
 
 // Get all likes for a post
 exports.getLikes = async (req, res) => {
