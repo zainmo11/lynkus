@@ -252,7 +252,7 @@ router.delete('/:id', authenticate, authorizePost, postController.deletePost);
 router.get('/', authenticate, postController.getAllPosts);
 router.get('/user/:userId', authenticate, postController.getPostsByUser);
 router.get('/likes/:userId',authenticate, postController.getPostsLikedByUser);
-router.get('/searchPost',authenticate, postController.searchPosts);
+router.get('/searchPost/:q',authenticate, postController.searchPosts);
 module.exports = router;
 
 
