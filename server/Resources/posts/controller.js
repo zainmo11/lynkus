@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+const mongoose = require('mongoose');
 const Post = require('./model');
 const Like = require('../likes/model');
 const Comment = require('../comments/model');
 const User = require('../users/model');
-
 
 
 // Get likes and comments count for a post
