@@ -75,7 +75,7 @@ exports.updateComment = async (req, res) => {
 exports.deleteComment = async (req, res) => {
     try {
         const { id } = req.params;
-        const userId = req.user._id; // Assuming `req.user` contains the authenticated user's ID
+        const userId = req.user._id;
 
         const comment = await Comment.findById(id);
         if (!comment) {
