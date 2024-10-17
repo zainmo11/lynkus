@@ -32,7 +32,9 @@ exports.createPost = async (req, res) => {
             return res.status(400).send({ message: 'Post body is required' });
         }
 
-        const image = req.file ? req.file.path : null;
+        // Construct the image URL if the image exists
+        const image = req.file ? req.file.filename : null;
+
         const post = new Post({ image, body: postBody, authorId });
         await post.save();
 
