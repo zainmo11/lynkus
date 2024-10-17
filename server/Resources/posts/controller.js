@@ -295,48 +295,54 @@ exports.getPostsLikedByUser = async (req, res) => {
 
 exports.searchPosts = async (req, res) => {
     try {
-        const posts = await Post.find({ $text: { $search: req.query.q } })
+        // Perform text search on posts
+        const posts = await Post.find({ $text: { $search: req.query.q } }).populate('authorId');
 
         if (!posts.length) {
             return res.status(200).json({ message: 'No posts found for this search term', posts: [] });
         }
 
+        console.log('Retrieved posts:', posts); // Log the retrieved posts
+        console.log('Number of posts:', posts.length);
+
         // Prepend base URL to image paths
         prependBaseUrlToImages(posts, req);
 
         // Add likes and comments count to each post
-        // eslint-disable-next-line no-restricted-syntax
-        for (const post of posts) {
+        const postsWithCounts = await Promise.all(posts.map(async (post) => {
+            console.log('Checking post ID:', post._id); // Log the post ID being checked
+
             // Check if post ID is valid
             if (!mongoose.Types.ObjectId.isValid(post._id)) {
-                return res.status(400).json({ message: 'Invalid Post ID', post });
+                throw new Error(`Invalid Post ID: ${post._id}`);
             }
 
             // Get likes and comments count
-            // eslint-disable-next-line no-await-in-loop
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
 
             // Check if authorId is valid before fetching user
-            if (!post.authorId) {
-                return res.status(400).json({ message: 'Invalid Author ID', post });
+            if (!post.authorId || !mongoose.Types.ObjectId.isValid(post.authorId)) {
+                throw new Error(`Invalid Author ID: ${post.authorId}`);
             }
 
-            // eslint-disable-next-line no-await-in-loop
             const user = await User.findById(post.authorId);
             if (!user) {
-                return res.status(404).json({ message: 'User not found for this post', post });
+                throw new Error(`User not found for this post: ${post._id}`);
             }
 
-            // Assign values
-            post.likesCount = likesCount;
-            post.commentsCount = commentsCount;
-            post.userName = user.userName || "unknown UserName";
-            post.name = user.name || "unknown User";
-        }
+            // Assign values to the post
+            return {
+                ...post.toObject(), // Convert Mongoose document to plain object
+                likesCount,
+                commentsCount,
+                userName: user.userName || "unknown UserName",
+                name: user.name || "unknown User"
+            };
+        }));
 
-        res.status(200).send(posts);
+        res.status(200).json(postsWithCounts);
     } catch (error) {
         console.error('Error details:', error);
-        res.status(500).send({ message: 'Error searching posts', error: error.message || error });
+        res.status(500).json({ message: 'Error searching posts', error: error.message });
     }
 };
