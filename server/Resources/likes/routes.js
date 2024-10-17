@@ -35,9 +35,6 @@ const {authenticate}= require('../auth/authController')
  *               postId:
  *                 type: string
  *                 description: The ID of the post to like.
- *               userId:
- *                 type: string
- *                 description: The ID of the user liking the post.
  *     responses:
  *       201:
  *         description: Post liked successfully.
@@ -48,6 +45,7 @@ const {authenticate}= require('../auth/authController')
  *       500:
  *         description: Internal server error.
  */
+
 
 /**
  * @swagger
