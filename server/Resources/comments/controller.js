@@ -43,15 +43,26 @@ exports.getCommentsByPost = async (req, res) => {
 };
 
 // Update a comment
+// Update a comment
 exports.updateComment = async (req, res) => {
     try {
         const { id } = req.params;
         const { text } = req.body;
+        const userId = req.user._id;
 
-        const comment = await Comment.findByIdAndUpdate(id, { text }, { new: true });
+        const comment = await Comment.findById(id);
         if (!comment) {
             return res.status(404).send({ message: 'Comment not found' });
         }
+
+        // Check if the user is the owner of the comment
+        if (comment.userId.toString() !== userId.toString()) {
+            return res.status(403).send({ message: 'You are not authorized to update this comment' });
+        }
+
+        // Update the comment
+        comment.text = text;
+        await comment.save();
 
         res.send(comment);
     } catch (error) {
@@ -59,15 +70,25 @@ exports.updateComment = async (req, res) => {
     }
 };
 
+
 // Delete a comment
 exports.deleteComment = async (req, res) => {
     try {
         const { id } = req.params;
+        const userId = req.user._id; // Assuming `req.user` contains the authenticated user's ID
 
-        const comment = await Comment.findByIdAndDelete(id);
+        const comment = await Comment.findById(id);
         if (!comment) {
             return res.status(404).send({ message: 'Comment not found' });
         }
+
+        // Check if the user is the owner of the comment
+        if (comment.userId.toString() !== userId.toString()) {
+            return res.status(403).send({ message: 'You are not authorized to delete this comment' });
+        }
+
+        // Delete the comment
+        await comment.remove();
 
         res.send({ message: 'Comment deleted' });
     } catch (error) {
