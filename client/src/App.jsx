@@ -14,6 +14,7 @@ import { getAllNotifications } from "./store/notificationSlice";
 import PrivateRouter from "./components/PrivateRouter";
 import { fetchUserDataFromCookies } from "./store/userSlice";
 import SearchPage from "./pages/SearchPage";
+
 import LoadingPage from "./pages/LoadingPage";
 import { isAuthorized } from "./utils/checkAuth";
 
