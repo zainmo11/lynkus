@@ -13,10 +13,7 @@ import usePeriodicFetch from "./hooks/usePeriodicFetch";
 import { getAllNotifications } from "./store/notificationSlice";
 import PrivateRouter from "./components/PrivateRouter";
 import { fetchUserDataFromCookies } from "./store/userSlice";
-<<<<<<< HEAD
 import SearchPage from "./pages/SearchPage";
-=======
->>>>>>> 895dc27eea43f5047508bab4307754b799cae748
 import LoadingPage from "./pages/LoadingPage";
 import { isAuthorized } from "./utils/checkAuth";
 

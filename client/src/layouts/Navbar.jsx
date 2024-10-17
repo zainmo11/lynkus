@@ -80,7 +80,7 @@ function Navbar() {
             </li>
             <li className="w-full lg:flex items-center">
               <Link
-                to={`/user/${userData.userName}`}
+                to={`/user/${userData?.userName}`}
                 className="flex justify-center items-center gap-2"
               >
                 {pathname == `/user/${userData.userName}` ? (
