@@ -36,9 +36,32 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
 
         const profileImgDir = path.join(__dirname, '../../uploads/users/profileImg');
         const headerImgDir = path.join(__dirname, '../../uploads/users/headerImg');
+    
+     // Remove profileImg if sent  empty field
+     if (req.body.profileImg === '' && req.user.profileImg) {
+        const oldImgFileName = req.user.profileImg.split('/').pop(); 
+        const oldImgPath = path.join(profileImgDir, oldImgFileName);
+
+        if (fs.existsSync(oldImgPath)) {
+            fs.unlinkSync(oldImgPath);  // Remove the existing profile image
+        }
+
+        req.body.profileImg = null;  // Clear the profileImg in request
+        
+    }
+
+    // Remove headerImg if sent  empty field
+    if (req.body.headerImg === '' && req.user.headerImg) {
+        const oldImgFileName = req.user.headerImg.split('/').pop();
+        const oldImgPath = path.join(headerImgDir, oldImgFileName);
+
+        if (fs.existsSync(oldImgPath)) {
+            fs.unlinkSync(oldImgPath);  
+        }
+
+        req.body.headerImg = null;  // Clear the headerImg in request
+    }
    
-  
-  
      // Check if profileImg directory exists, if not create it
     if (!fs.existsSync(profileImgDir)) {
         // recursive ensures parent directories are created if necessary
@@ -369,10 +392,12 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   if (req.body.email) {
     updateData.email = req.body.email;
   }
-  if (req.body.profileImg) {
+
+    if (req.body.profileImg || req.body.profile==null ) {
     updateData.profileImg = req.body.profileImg;
   }
-  if (req.body.headerImg) {
+
+  if (req.body.headerImg || req.body.headerImg==null) {
     updateData.headerImg = req.body.headerImg;
   }
   if (req.body.bio) {
