@@ -76,7 +76,7 @@ exports.deleteComment = async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.user._id;
-
+        // Find the comment by ID
         const comment = await Comment.findById(id);
         if (!comment) {
             return res.status(404).send({ message: 'Comment not found' });
@@ -88,11 +88,15 @@ exports.deleteComment = async (req, res) => {
         }
 
         // Delete the comment
-        await comment.remove();
+        await comment.deleteOne();
 
-        res.send({ message: 'Comment deleted' });
+        res.status(200).send({ message: 'Comment deleted successfully' });
     } catch (error) {
-        res.status(500).send(error);
+        if (error.kind === 'ObjectId') {
+            return res.status(400).send({ message: 'Invalid Comment ID' });
+        }
+        console.error('Error deleting comment:', error);
+        res.status(500).send({ message: 'Error deleting comment', error: error.message || error });
     }
 };
 
