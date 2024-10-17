@@ -1,8 +1,15 @@
 import { useSelector } from "react-redux";
 import Post from "./Post";
+import { useEffect } from "react";
+import { capitalizeName } from "../utils/helpers";
 
 function UserPostsTab() {
   const { loading, err, userPosts } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    console.log("USER POSTS TAB: ");
+    console.log(userPosts[0]);
+  }, []);
   return (
     <>
       {loading && (
@@ -15,7 +22,7 @@ function UserPostsTab() {
           Error: {err}
         </div>
       )} */}
-      {userPosts.length == 0 && !loading ? (
+      {userPosts.length == 0 || userPosts.posts.length == 0 ? (
         <div className="w-full h-full flex items-center justify-center text-light-primaryText dark:text-dark-primaryText opacity-80">
           <p>You have no posts yet!</p>
         </div>
@@ -23,20 +30,17 @@ function UserPostsTab() {
         <ul className="w-full divide-y divide-light-secondaryText dark:divide-dark-secondaryText border-light-secondaryText dark:border-dark-secondaryText">
           {userPosts.map((x, i) => {
             return (
-              <li
-                key={i}
-                className={`pt-6 px-6 ${x.showPost ? "block" : "hidden"}`}
-              >
+              <li key={i} className={`pt-6 px-6 ${true ? "block" : "hidden"}`}>
                 <Post
-                  username={x.username}
-                  name={x.name}
-                  profileImg={x.profileImg}
+                  username={x.authorId.userName}
+                  name={capitalizeName(x.authorId.name)}
+                  profileImg={x.authorId.profileImg}
                   body={x.body}
-                  postImg={x.postImg}
-                  likes={x.likes}
-                  commemts={x.comments}
-                  showPost={x.showPost}
-                  postLiked={x.postLiked}
+                  postImg={x.image}
+                  likes="100"
+                  commemts="1"
+                  showPost={true}
+                  postLiked={true}
                   index={i}
                 />
               </li>

@@ -43,3 +43,17 @@ export const ErrorButton = ({ Icon, label, onClick }) => {
     </Button>
   );
 };
+
+export const SecondaryErrorButton = ({ Icon, label, onClick }) => {
+  return (
+    <Button
+      className="bg-transparent hover:border-opacity-80 text-light-primaryText dark:text-dark-primaryText hover:text-dark-primaryText border-button-error border-[2px] xl:px-2 rounded-[10px] focus:ring-0"
+      onClick={onClick}
+    >
+      <div className="flex items-center font-medium text-sm xl:text-lg">
+        {Icon && <Icon className="size-4 xl:size-5 mr-2" />}
+        {label}
+      </div>
+    </Button>
+  );
+};

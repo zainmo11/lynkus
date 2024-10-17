@@ -1,5 +1,3 @@
-import Cookies from "universal-cookie";
-
 export function capitalizeName(name) {
   return name
     .split(" ")
@@ -7,9 +5,16 @@ export function capitalizeName(name) {
     .join(" ");
 }
 
-// export function fetchUserDataFromCookies() {
-//   const cookies = new Cookies();
-//   const userData = cookies.get("user");
-//   console.log(userData);
-//   return userData;
-// }
+const BASE_URL = "https://lynkus-3.onrender.com";
+
+export const formatImageUrl = (imagePath, type = "headerImg") => {
+  if (!imagePath) return ""; // Return empty string if no image path provided
+
+  // Check if the imagePath is already a full URL
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+    return imagePath;
+  }
+
+  // If it's just a filename, construct the full URL
+  return `${BASE_URL}/users/${type}/${imagePath}`;
+};

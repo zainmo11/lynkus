@@ -55,3 +55,91 @@ export const textAreaTheme = {
     gray: "border-button-default bg-light-secondaryBackground text-light-primaryText focus:border-button-default focus:ring-light-secondaryText dark:border-button-default dark:bg-dark-secondaryBackground dark:text-dark-primaryText dark:placeholder-gray-400 dark:focus:border-button-default dark:focus:ring-dark-secondaryText",
   },
 };
+
+export const tabTheme = {
+  base: "flex flex-col gap-2",
+  tablist: {
+    base: "flex text-center",
+    variant: {
+      fullWidth:
+        "grid w-full grid-flow-col divide-x divide-light-secondaryText text-xl text-light-primaryText font-medium shadow dark:divide-dark-secondaryText dark:text-dark-primaryText ",
+    },
+    tabitem: {
+      base: " flex items-center justify-center p-4 text-sm font-medium first:ml-0 ",
+      variant: {
+        fullWidth: {
+          active: {
+            on: "active bg-light-background text-xl font-bold p-4 text-light-secondaryText dark:bg-dark-background dark:text-dark-secondaryText ",
+            off: "bg-light-secondaryBackground text-light-primaryText hover:bg-light-accent dark:bg-dark-secondaryBackground dark:hover:bg-dark-accent dark:text-dark-primaryText",
+          },
+        },
+      },
+    },
+  },
+};
+
+export const spinnerTheme = {
+  base: "inline animate-spin text-gray-200",
+  color: {
+    failure: "fill-red-600",
+    gray: "fill-gray-600",
+    info: "fill-cyan-600",
+    pink: "fill-pink-600",
+    purple: "fill-purple-600",
+    success: "fill-green-500",
+    warning: "fill-yellow-400",
+  },
+  light: {
+    off: {
+      base: "dark:text-gray-600",
+      color: {
+        failure: "",
+        gray: "dark:fill-gray-300",
+        info: "",
+        pink: "",
+        purple: "",
+        success: "",
+        warning: "",
+      },
+    },
+    on: {
+      base: "",
+      color: {
+        failure: "",
+        gray: "",
+        info: "",
+        pink: "",
+        purple: "",
+        success: "",
+        warning: "",
+      },
+    },
+  },
+  size: {
+    xs: "h-3 w-3",
+    sm: "h-4 w-4",
+    md: "h-6 w-6",
+    lg: "h-8 w-8",
+    xl: "h-10 w-10",
+  },
+};
+
+export const alertTheme = {
+  base: "flex flex-col gap-2 p-4 text-sm",
+  borderAccent: "border-t-4",
+  closeButton: {
+    base: "-m-1.5 ml-auto inline-flex h-8 w-8 rounded-lg p-1.5 focus:ring-2",
+    icon: "size-5",
+    color: {
+      success:
+        "bg-transparent text-button-default hover:bg-light-background focus:ring-0 dark:hover:bg-dark-background",
+    },
+  },
+  color: {
+    success:
+      "border-green-500 bg-green-100 text-green-700 dark:bg-green-200 dark:text-green-800",
+  },
+  icon: "mr-3 inline size-6 fill-light-secondaryText dark:fill-dark-secondaryText flex-shrink-0",
+  rounded: "rounded-lg",
+  wrapper: "flex items-center",
+};
