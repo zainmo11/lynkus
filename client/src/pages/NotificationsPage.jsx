@@ -1,10 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
 import NotificationItem from "../components/NotificationItem";
 import {
+  clearAllNotifications,
+  clearNotification,
   getAllNotifications,
   readNotification,
 } from "../store/notificationSlice";
 import { useEffect } from "react";
+import LoadingPage from "./LoadingPage";
+import { SecondaryErrorButton } from "../components/Buttons";
+import { XMarkIcon } from "@heroicons/react/24/solid";
 function NotificationsPage() {
   const dispatch = useDispatch();
 
@@ -17,13 +22,24 @@ function NotificationsPage() {
   }, [dispatch]);
 
   return (
-    <div className="w-full max-h-screen  bg-light-background dark:bg-dark-background md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText">
-      <h1 className="text-3xl font-bold mx-[30px] my-[25px] mb-[25px] text-light-primaryText dark:text-dark-primaryText">
-        Notifications
-      </h1>
+    <div className="w-full max-h-screen bg-light-background dark:bg-dark-background md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText">
+      <div className="flex justify-between items-center mx-[30px] my-[25px] mb-[25px]">
+        <h1 className="text-3xl font-bold text-light-primaryText dark:text-dark-primaryText">
+          Notifications
+        </h1>
+        <SecondaryErrorButton
+          label="Clear All"
+          Icon={XMarkIcon}
+          onClick={() => {
+            console.log("CLEARED ALL NOTIFICATIONS");
+            dispatch(clearAllNotifications());
+          }}
+        />
+      </div>
+
       {loading && (
         <div className="w-full h-full flex items-center justify-center text-light-primaryText dark:text-dark-primaryText opacity-80">
-          Loading...
+          <LoadingPage />
         </div>
       )}
       {err && (
@@ -41,11 +57,16 @@ function NotificationsPage() {
           return (
             <NotificationItem
               key={index}
-              from={notification.username}
+              from={notification.content.split(" ")[0]}
               read={notification.read}
               type={notification.type}
               toggleRead={() => {
                 dispatch(readNotification(index));
+                dispatch(getAllNotifications());
+              }}
+              delFunction={() => {
+                dispatch(clearNotification(notification._id));
+                dispatch(getAllNotifications());
               }}
             />
           );

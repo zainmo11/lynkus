@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { PencilSquareIcon, PhotoIcon } from "@heroicons/react/24/solid";
 import { Modal, Label, TextInput, Textarea } from "flowbite-react";
 import { DefaultButton, SecondaryButton } from "./Buttons";
-import { capitalizeName } from "../utils/helpers";
+import { capitalizeName, formatImageUrl } from "../utils/helpers";
 import { useDispatch, useSelector } from "react-redux";
 import { editUserProfile } from "../store/userSlice";
 import {
@@ -12,6 +12,7 @@ import {
   textAreaTheme,
   textInputTheme,
 } from "../utils/flowbiteThemes";
+import { toggleAlert } from "../store/appSlice";
 
 const EditProfileModal = ({ openModal, setOpenModal }) => {
   const [imageFiles, setImageFiles] = useState({
@@ -57,13 +58,20 @@ const EditProfileModal = ({ openModal, setOpenModal }) => {
       }
     });
 
-    console.log("FormData to be sent to API:");
+    const objData = {};
+    // console.log("FormData to be sent to API:");
     for (let [key, value] of formData.entries()) {
-      console.log(key, value);
+      // console.log(key, value);
+      objData[key] = value;
     }
+    console.log("FormData to be sent to API:");
+    console.log(objData);
 
-    dispatch(editUserProfile(formData));
-    setOpenModal(false);
+    dispatch(editUserProfile(objData));
+    if (!loading && !err) {
+      dispatch(toggleAlert());
+      setOpenModal(false);
+    }
   };
 
   const renderImageUpload = (fieldName, label) => (
@@ -79,7 +87,7 @@ const EditProfileModal = ({ openModal, setOpenModal }) => {
             imageFiles[fieldName]
               ? URL.createObjectURL(imageFiles[fieldName])
               : userData[fieldName]
-              ? userData[fieldName]
+              ? formatImageUrl(userData[fieldName], fieldName)
               : "https://placeholder.pics/svg/700/DEDEDE/DEDEDE/"
           }
           alt={`${fieldName} preview`}

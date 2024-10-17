@@ -6,13 +6,14 @@ import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { setTheme } from "./store/themeSlice";
 import Welcome from "./pages/Welcome";
-import Loading from "./components/Loading";
 import Error from "./pages/Error";
 import NotificationsPage from "./pages/NotificationsPage";
 import usePeriodicFetch from "./hooks/usePeriodicFetch";
 import { getAllNotifications } from "./store/notificationSlice";
 import PrivateRouter from "./components/PrivateRouter";
 import { fetchUserDataFromCookies } from "./store/userSlice";
+import LoadingPage from "./pages/LoadingPage";
+import { isAuthorized } from "./utils/checkAuth";
 
 function App() {
   const dispatch = useDispatch();
@@ -21,7 +22,11 @@ function App() {
   usePeriodicFetch(() => dispatch(getAllNotifications()), 300000);
 
   useEffect(() => {
-    dispatch(fetchUserDataFromCookies());
+    if (isAuthorized()) {
+      console.log("WELCOEM WE ARE GETTING UR DATA...");
+
+      dispatch(fetchUserDataFromCookies());
+    }
     const storedTheme = localStorage.getItem("theme");
 
     if (storedTheme) {
@@ -67,7 +72,7 @@ function App() {
           />
         </Route>
         <Route path="/welcome" element={<Welcome />} />
-        <Route path="/loading" element={<Loading />} />
+        <Route path="/loading" element={<LoadingPage />} />
         <Route path="/error" element={<Error />} />
       </Routes>
     </BrowserRouter>
