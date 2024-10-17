@@ -308,7 +308,7 @@ exports.searchPosts = async (req, res) => {
         // eslint-disable-next-line no-restricted-syntax
         for (const post of posts) {
             // Check if post ID is valid
-            if (!post._id) {
+            if (!mongoose.Types.ObjectId.isValid(post._id)) {
                 return res.status(400).json({ message: 'Invalid Post ID', post });
             }
 
