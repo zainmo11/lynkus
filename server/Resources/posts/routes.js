@@ -220,14 +220,14 @@ const {authenticate}= require('../auth/authController')
 
 /**
  * @swagger
- * /posts/searchPost:
+ * /posts/searchPost/{q}:
  *   get:
  *     summary: Search posts by a search term
  *     tags: [Posts]
  *     security:
  *       - tokenAuth: []
  *     parameters:
- *       - in: query
+ *       - in: path
  *         name: q
  *         required: true
  *         schema:
@@ -236,6 +236,31 @@ const {authenticate}= require('../auth/authController')
  *     responses:
  *       200:
  *         description: List of posts matching the search query.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     description: The post ID.
+ *                   image:
+ *                     type: string
+ *                     description: The URL of the post image.
+ *                   body:
+ *                     type: string
+ *                     description: The body content of the post.
+ *                   likesCount:
+ *                     type: number
+ *                     description: Number of likes on the post.
+ *                   commentsCount:
+ *                     type: number
+ *                     description: Number of comments on the post.
+ *                   userName:
+ *                     type: string
+ *                     description: The username of the post author.
  *       404:
  *         description: No posts found for the search term.
  *       500:
