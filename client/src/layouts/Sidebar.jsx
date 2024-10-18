@@ -3,26 +3,42 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 import FollowCard from "../components/FollowCard";
 
 function Sidebar() {
-  const users = useSelector((state) => state.user.users);
+  const users = useSelector((state) => state.user.userRecommendation);
 
   return (
-    <div className="w-full max-h-screen bg-light-background dark:bg-dark-background hidden lg:grid grid-rows-6 col-span-2 border-l border-light-secondaryText dark:border-dark-secondaryText">
+    <div className="w-full max-h-screen pb-10 bg-light-background dark:bg-dark-background hidden lg:grid grid-rows-6 col-span-2 border-l border-light-secondaryText dark:border-dark-secondaryText overflow-y-auto hide-scrollbar">
+      {/* Search Bar */}
+      {/* <div className="h-full row-span-1 pt-6 px-4">
+        <div className="relative hidden md:block">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <MagnifyingGlassIcon className="size-5  fill-light-secondaryText dark:fill-dark-secondaryText" />
+          </div>
+          <input
+            type="text"
+            id="search-navbar"
+            className="block w-full p-2 ps-10 text-sm text-light-primaryText border-0 border-gray-300 rounded-lg bg-light-secondaryBackground  focus:ring-light-secondaryText dark:bg-dark-secondaryBackground dark:placeholder-dark-secondaryText dark:text-dark-primaryText dark:focus:ring-dark-secondaryText"
+            placeholder="Search..."
+          />
+        </div>
+      </div> */}
       {/* Need 4 Random users unique */}
-      <div className="min-h-screen pt-6 px-4">
+      <div className="min-h-96 row-span-3 pt-10 px-4">
         <h1 className="text-3xl font-bold mb-8 text-light-primaryText dark:text-dark-primaryText">
           Link Up With
         </h1>
         <div className="w-full flex flex-col justify-center items-center gap-8">
-          {users.map((x, i) => {
-            return (
-              <FollowCard
-                key={i}
-                username={x.username}
-                name={x.name}
-                profileImg={x.profileImg}
-              />
-            );
-          })}
+          {users &&
+            users.slice(0, 6).map((x, i) => {
+              return (
+                <FollowCard
+                  key={i}
+                  userId={x._id}
+                  username={x.username}
+                  name={x.name}
+                  profileImg={x.profileImg}
+                />
+              );
+            })}
         </div>
       </div>
       {/* Hash Tag Section */}

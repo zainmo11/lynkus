@@ -99,7 +99,6 @@ function Navbar() {
                 </p>
               </Link>
             </li>
-
             <li className="w-full lg:flex items-center">
               <Link
                 to={"/search"}

@@ -2,36 +2,37 @@ import { useDispatch, useSelector } from "react-redux";
 import CreatePost from "../components/CreatePost";
 import Post from "../components/Post";
 import { useEffect } from "react";
-import { fetchUserDataFromCookies } from "../store/userSlice";
+import { fetchUserDataFromCookies, recommendedUsers } from "../store/userSlice";
+import { fetchPosts } from "../store/postSlice";
 
 function HomePage() {
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.post.posts);
+  const user = useSelector((state) => state.user.userData);
 
   useEffect(() => {
     dispatch(fetchUserDataFromCookies());
+    dispatch(fetchPosts());
+    dispatch(recommendedUsers());
   }, [dispatch]);
 
   return (
     <div className="w-full max-h-screen bg-light-background dark:bg-dark-background md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar">
-      <CreatePost />
+      <CreatePost profileImg={user.profileImg} />
       <ul className="w-full divide-y divide-light-secondaryText dark:divide-dark-secondaryText border-t border-light-secondaryText dark:border-dark-secondaryText">
         {posts.map((x, i) => {
           return (
-            <li
-              key={i}
-              className={`pt-6 px-6 ${x.showPost ? "block" : "hidden"}`}
-            >
+            <li key={i} className="pt-6 px-6">
               <Post
-                username={x.username}
-                name={x.name}
-                profileImg={x.profileImg}
+                name={x.authorId.name}
+                username={x.authorId.userName}
+                profileImg={x.authorId.profileImg}
+                postId={x._id}
                 body={x.body}
-                postImg={x.postImg}
+                postImg={x.image}
                 likes={x.likes}
                 commemts={x.comments}
-                showPost={x.showPost}
-                postLiked={x.postLiked}
+                likedByUser={x.likedByUser}
                 index={i}
               />
             </li>

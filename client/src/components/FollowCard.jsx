@@ -5,15 +5,21 @@ import { DefaultButton } from "./Buttons";
 import { Link } from "react-router-dom";
 import { LinkSlashIcon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { toggleFollow } from "../store/userSlice";
 
-function FollowCard({ name, username, profileImg, followed }) {
+function FollowCard({ userId, name, username, profileImg, followed }) {
+  const dispatch = useDispatch();
   const [following, setFollowing] = useState(false);
+
   useEffect(() => {
     setFollowing(followed);
   }, [followed]);
+
   const toggleFollowing = () => {
     setFollowing(!following);
   };
+
   return (
     <div className="w-full flex justify-between items-center">
       <Link to={`/user/${username}`}>
@@ -24,6 +30,7 @@ function FollowCard({ name, username, profileImg, followed }) {
         Icon={following ? LinkSlashIcon : LinkIcon}
         label={following ? "Unlink" : "Link"}
         onClick={() => {
+          dispatch(toggleFollow(userId));
           toggleFollowing();
         }}
       />
