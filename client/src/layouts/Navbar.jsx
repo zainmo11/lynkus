@@ -61,8 +61,7 @@ function Navbar() {
               alt="Logo"
             />
           </Link>
-
-          <ul className="w-full md:min-h-96 h-full flex md:flex-col items-center justify-between md:justify-start md:mt-20 lg:ml-24 md:gap-14 lg:gap-5 order-1 font-medium">
+          <ul className="w-full md:min-h-80 h-full flex md:flex-col items-center justify-between md:justify-start md:mt-20 lg:ml-24 md:gap-14 lg:gap-5 order-1 font-medium">
             <li className="w-full lg:flex items-center">
               <Link to={"/"} className="flex justify-center items-center gap-2">
                 {pathname == "/" ? (
@@ -81,17 +80,17 @@ function Navbar() {
             </li>
             <li className="w-full lg:flex items-center">
               <Link
-                to={`/user/${userData.userName}`}
+                to={`/user/${userData?.userName}`}
                 className="flex justify-center items-center gap-2"
               >
-                {pathname == `/user/${userData.userName}` ? (
+                {pathname == `/user/${userData?.userName}` ? (
                   <UserSolid className="size-7 text-button-default hover:text-button-hover" />
                 ) : (
                   <UserIcon className="size-6 text-button-default hover:text-button-hover" />
                 )}
                 <p
                   className={`hidden lg:block ${
-                    pathname == `/user/${userData.userName}`
+                    pathname == `/user/${userData?.userName}`
                       ? "text-3xl"
                       : "text-2xl"
                   } font-bold text-light-primaryText hover:text-button-hover dark:text-dark-primaryText dark:hover:text-button-hover`}
@@ -101,15 +100,18 @@ function Navbar() {
               </Link>
             </li>
             <li className="w-full lg:flex items-center">
-              <Link to={"/"} className="flex justify-center items-center gap-2">
-                {pathname == "" ? (
+              <Link
+                to={"/search"}
+                className="flex justify-center items-center gap-2"
+              >
+                {pathname == "/search" ? (
                   <MagnifyingGlassSolid className="size-7 text-button-default hover:text-button-hover" />
                 ) : (
                   <MagnifyingGlassIcon className="size-6 text-button-default hover:text-button-hover" />
                 )}
                 <p
                   className={`hidden lg:block ${
-                    pathname == "" ? "text-3xl" : "text-2xl"
+                    pathname == "/search" ? "text-3xl" : "text-2xl"
                   } font-bold text-light-primaryText hover:text-button-hover dark:text-dark-primaryText dark:hover:text-button-hover`}
                 >
                   Search
