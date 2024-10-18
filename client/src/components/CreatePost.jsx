@@ -13,6 +13,8 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import api from "../utils/axios";
 import { fetchPosts } from "../store/postSlice";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function CreatePost({ profileImg }) {
   const theme = useSelector((state) => state.theme.theme);
@@ -36,6 +38,8 @@ function CreatePost({ profileImg }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const toastId = toast.info("Creating post...", { autoClose: false });
+
     try {
       const postData = new FormData();
 
@@ -43,7 +47,7 @@ function CreatePost({ profileImg }) {
       if (image) {
         postData.append("image", image);
       }
-
+      // here
       const res = await api.post("posts", postData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -53,14 +57,20 @@ function CreatePost({ profileImg }) {
       setPostBody("");
       setImage(null);
 
+      toast.dismiss(toastId);
+      toast.success("Post created successfully!");
+
       dispatch(fetchPosts());
     } catch (error) {
+      toast.dismiss(toastId);
+      toast.error("Failed to create post!");
       console.log(error);
     }
   };
 
   return (
     <>
+      <ToastContainer />
       {/* Mobile Dark Toggle & Sign out */}
       <div className=" w-full bg-dark-secondaryBackground md:hidden flex justify-between items-center py-2 px-4">
         <img src={logo} className="h-14 rounded-full object-cover" alt="Logo" />
