@@ -288,16 +288,21 @@ exports.getPostsLikedByUser = async (req, res) => {
         prependBaseUrlToImages(posts, req);
 
         // Add likes and comments count to each post
-        // eslint-disable-next-line no-restricted-syntax
         const postsWithCounts = await Promise.all(posts.map(async post => {
+            // Convert the post to a plain object
+            const postObj = post.toObject();
+
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
             const user = await User.findById(post.authorId);
-            post.likesCount = likesCount;
-            post.commentsCount = commentsCount;
-            post.userName = user.userName || "unknown UserName";
-            post.name = user.name || "unknown User";
-            post.likedByUser = true;
-            return post;
+
+            // Assign new properties
+            postObj.likesCount = likesCount;
+            postObj.commentsCount = commentsCount;
+            postObj.userName = user.userName || "unknown UserName";
+            postObj.name = user.name || "unknown User";
+            postObj.likedByUser = true; // Since the user liked these posts, this is true by default.
+
+            return postObj;
         }));
 
         res.status(200).send(postsWithCounts);
