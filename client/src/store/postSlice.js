@@ -71,7 +71,7 @@ export const postSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchPosts.fulfilled, (state, action) => {
-        state.posts = action.payload;
+        state.posts = action.payload.reverse();
         state.loading = false;
       })
       .addCase(fetchPosts.pending, (state) => {

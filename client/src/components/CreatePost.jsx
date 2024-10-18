@@ -19,7 +19,7 @@ function CreatePost({ profileImg }) {
   const darkMode = theme === "dark";
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(null);
   const [postBody, setPostBody] = useState("");
 
   const changeTheme = () => {
@@ -49,6 +49,10 @@ function CreatePost({ profileImg }) {
           "Content-Type": "multipart/form-data",
         },
       });
+
+      setPostBody("");
+      setImage(null);
+
       dispatch(fetchPosts());
     } catch (error) {
       console.log(error);
