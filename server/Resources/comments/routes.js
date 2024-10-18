@@ -22,9 +22,6 @@ const { authenticate } = require('../auth/authController');
  *               text:
  *                 type: string
  *                 description: The content of the comment.
- *               userId:
- *                 type: string
- *                 description: The ID of the user making the comment.
  *               postId:
  *                 type: string
  *                 description: The ID of the post the comment is associated with.
@@ -38,7 +35,6 @@ const { authenticate } = require('../auth/authController');
  *       500:
  *         description: Internal server error.
  */
-
 /**
  * @swagger
  * /comments/{postId}:

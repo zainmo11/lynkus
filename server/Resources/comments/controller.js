@@ -5,26 +5,30 @@ const Notification = require('../notifications/model');
 // Create a new comment
 exports.createComment = async (req, res) => {
     try {
-        const { text, userId, postId } = req.body;
+        const { text, postId } = req.body;
+
+        // Retrieve userId from the token
+        const userId = req.user._id;
 
         const post = await Post.findById(postId);
         if (!post) {
             return res.status(404).send({ message: 'Post not found' });
         }
 
+        // Create a new comment with the userId from the token
         const comment = new Comment({ text, userId, postId });
         await comment.save();
+
         // Notify the post owner about the new comment
         const notification = new Notification({
             to: post.authorId,
-            from: req.user._id,
+            from: userId,
             type: 'COMMENT',
-            post:postId,
-            content:`${req.user.userName} has Commented on Your Post`, 
+            post: postId,
+            content: `${req.user.userName} has commented on your post`, // Use userName from req.user
             comment: comment._id,
         });
         await notification.save();
-    
 
         res.status(201).send(comment);
     } catch (error) {
