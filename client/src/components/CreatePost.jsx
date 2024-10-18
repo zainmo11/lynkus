@@ -47,7 +47,7 @@ function CreatePost({ profileImg }) {
       if (image) {
         postData.append("image", image);
       }
-      // here
+
       const res = await api.post("posts", postData, {
         headers: {
           "Content-Type": "multipart/form-data",
