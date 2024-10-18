@@ -6,7 +6,6 @@ const Post = require('../posts/model');
 exports.validateComment = [
     // Check that text, userId, and postId are provided
     body('text').notEmpty().withMessage('Text is required'),
-    body('userId').notEmpty().withMessage('User ID is required'),
     body('postId').notEmpty().withMessage('Post ID is required'),
 
     // Check for validation errors
