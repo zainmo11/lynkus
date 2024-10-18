@@ -231,7 +231,6 @@ const prependBaseUrlToImages = (posts, req) => {
 
 
 
-// Get all posts by a specific user with user information
 exports.getPostsByUser = async (req, res) => {
     try {
         const posts = await Post.find({ authorId: req.params.userId }).populate('authorId');
@@ -240,23 +239,28 @@ exports.getPostsByUser = async (req, res) => {
         }
         const token = req.headers.authorization.split(" ")[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const {userId} = decoded;
+        const { userId } = decoded;
 
         // Prepend base URL to image paths
         prependBaseUrlToImages(posts, req);
 
         // Add likes and comments count to each post
-        // eslint-disable-next-line no-restricted-syntax
         const postsWithCounts = await Promise.all(posts.map(async post => {
+            // Convert the post to a plain object
+            const postObj = post.toObject();
+
             const { likesCount, commentsCount } = await getLikesAndCommentsCount(post._id);
-            const user = await User.findById(post.authorId);
             const likedByUser = await userLikesPost(post._id, userId); // Check if the user likes this post
-            post.likesCount = likesCount;
-            post.commentsCount = commentsCount;
-            post.userName = user.userName || "unknown UserName";
-            post.name = user.name || "unknown User";
-            post.likedByUser = likedByUser;
-            return post;
+            const user = await User.findById(post.authorId);
+
+            // Assign new properties
+            postObj.likesCount = likesCount;
+            postObj.commentsCount = commentsCount;
+            postObj.userName = user.userName || "unknown UserName";
+            postObj.name = user.name || "unknown User";
+            postObj.likedByUser = likedByUser;
+
+            return postObj;
         }));
 
         res.status(200).send(postsWithCounts);
