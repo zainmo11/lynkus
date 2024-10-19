@@ -174,9 +174,9 @@ const EditProfileModal = ({ openModal, setOpenModal }) => {
           {renderImageUpload("headerImg", "Header Image")}
           {renderImageUpload("profileImg", "Profile Picture")}
           {renderTextInput("name", "Name", { required: "Name is required" })}
-          {renderTextInput("userName", "Username", {
+          {/* {renderTextInput("userName", "Username", {
             required: "Username is required",
-          })}
+          })} */}
           <div>
             <Label
               htmlFor="bio"

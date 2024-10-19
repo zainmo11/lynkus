@@ -164,7 +164,7 @@ export const notificationSlice = createSlice({
               (oldNotification) => oldNotification.id === newNotification.id
             )
         );
-        state.notifications = action.payload.reverse();
+        state.notifications = action.payload;
         state.hasNewNotifications = newNotifications.length > 0;
         console.log(state.notifications);
         state.loading = false;

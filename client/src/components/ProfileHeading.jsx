@@ -8,13 +8,8 @@ import {
 } from "@heroicons/react/24/solid";
 import { Avatar } from "flowbite-react";
 import { capitalizeName, formatImageUrl } from "../utils/helpers";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  clearUserData,
-  fetchUserData,
-  getUserData,
-  toggleFollow,
-} from "../store/userSlice";
+import { useDispatch } from "react-redux";
+import { fetchUserData, getUserData, toggleFollow } from "../store/userSlice";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "./LoadingSpinner";
 

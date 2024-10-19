@@ -1,9 +1,10 @@
 import { useSelector } from "react-redux";
-import FollowCard from "./FollowCard";
 import { capitalizeName } from "../utils/helpers";
+import ProfileFollowCard from "./ProfileFollowCard";
 
 function FollowingsTab() {
-  const { userFollowings } = useSelector((state) => state.user);
+  const { userFollowings, authUserData } = useSelector((state) => state.user);
+  const reversedPosts = userFollowings ? [...userFollowings].reverse() : [];
   return (
     <>
       {userFollowings.length == 0 ? (
@@ -12,13 +13,14 @@ function FollowingsTab() {
         </div>
       ) : (
         <ul className="w-full divide-y divide-light-secondaryText dark:divide-dark-secondaryText border-light-secondaryText dark:border-dark-secondaryText">
-          {userFollowings.map((x, i) => {
+          {reversedPosts.map((x, i) => {
             return (
               <li key={i} className={`p-6 `}>
-                <FollowCard
+                <ProfileFollowCard
                   key={i}
-                  username={x.userName}
                   userId={x.id}
+                  username={x.userName}
+                  userData={authUserData}
                   name={capitalizeName(x.name)}
                   profileImg={x.profileImg}
                   followed={x.isFollowed}

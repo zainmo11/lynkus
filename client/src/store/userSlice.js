@@ -328,10 +328,10 @@ export const userSlice = createSlice({
       })
       .addCase(fetchUserData.fulfilled, (state, action) => {
         state.loading = false;
-        state.userPosts = action.payload.posts.reverse();
-        state.userLikedPosts = action.payload.likedPosts.reverse();
-        state.userFollowers = action.payload.followers.reverse();
-        state.userFollowings = action.payload.followings.reverse();
+        state.userPosts = action.payload.posts;
+        state.userLikedPosts = action.payload.likedPosts;
+        state.userFollowers = action.payload.followers;
+        state.userFollowings = action.payload.followings;
       })
       .addCase(fetchUserData.rejected, (state, action) => {
         state.loading = false;
