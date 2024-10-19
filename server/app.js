@@ -30,7 +30,7 @@ const app = express();
 const corsOptions = {
     origin: '*', // Allow requests from all origins
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
-    credentials: true, // Allow credentials (if needed)
+    credentials: true,
 };
 
 // Use CORS middleware

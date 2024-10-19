@@ -106,23 +106,43 @@ const {authenticate}= require('../auth/authController')
  *               body:
  *                 type: string
  *                 description: The body content of the post.
- *               authorId:
- *                 type: string
- *                 description: The ID of the post's author.
  *               image:
  *                 type: string
  *                 format: binary
  *                 description: Optional image file to update.
  *             required:
  *               - body
- *               - authorId
  *     responses:
  *       200:
  *         description: Post updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 post:
+ *                   $ref: '#/components/schemas/Post'
+ *                 likes:
+ *                   type: integer
+ *                   description: Number of likes the post has.
+ *                 comments:
+ *                   type: integer
+ *                   description: Number of comments the post has.
+ *                 userName:
+ *                   type: string
+ *                   description: The author's username.
+ *                 name:
+ *                   type: string
+ *                   description: The author's name.
+ *                 likedByUser:
+ *                   type: boolean
+ *                   description: Whether the current user has liked the post.
  *       404:
  *         description: Post not found.
  *       400:
  *         description: Invalid Post ID.
+ *       403:
+ *         description: Unauthorized to update this post.
  *       500:
  *         description: Internal server error.
  */

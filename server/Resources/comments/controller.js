@@ -5,7 +5,7 @@ const Notification = require('../notifications/model');
 // Create a new comment
 exports.createComment = async (req, res) => {
     try {
-        const { text, postId } = req.body;
+        const { text, postId } = req.body; // Remove userId from req.body
 
         // Retrieve userId from the token
         const userId = req.user._id;
@@ -22,7 +22,7 @@ exports.createComment = async (req, res) => {
         // Notify the post owner about the new comment
         const notification = new Notification({
             to: post.authorId,
-            from: userId,
+            from: userId, // Use the userId from the token
             type: 'COMMENT',
             post: postId,
             content: `${req.user.userName} has commented on your post`, // Use userName from req.user
