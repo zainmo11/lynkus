@@ -67,10 +67,6 @@ For detailed API documentation, please refer to our [Swagger Documentation](http
 - [Ziad El-Sayed](https://github.com/ZiadElsayed01)
 - [Basil Mosalam](https://github.com/Bailts110)
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
 ## Acknowledgments
 
 - We would like to express our sincere gratitude to the Digital Egypt Pioneers Initiative (DEPI) for providing this invaluable opportunity to learn and grow as developers.
