@@ -83,7 +83,7 @@ const initialState = {
   //       read: false,
   //     },
   //   ],
-  notifications: [],
+  notifications: null,
   loading: true,
   err: null,
   message: null,
@@ -160,18 +160,18 @@ export const notificationSlice = createSlice({
 
         const newNotifications = action.payload.filter(
           (newNotification) =>
-            !state.notifications.some(
+            !state.notifications?.some(
               (oldNotification) => oldNotification.id === newNotification.id
             )
         );
-        state.notifications = action.payload;
+        state.notifications = action.payload.reverse();
         state.hasNewNotifications = newNotifications.length > 0;
         console.log(state.notifications);
         state.loading = false;
       })
       .addCase(clearNotification.pending, (state) => {
         console.log("Clearing notification...");
-        state.loading = true;
+        // state.loading = true;
       })
       .addCase(clearNotification.rejected, (state, action) => {
         console.log("Error clearing notification");
@@ -186,7 +186,7 @@ export const notificationSlice = createSlice({
       })
       .addCase(clearAllNotifications.pending, (state) => {
         console.log("Clearing all notifications...");
-        state.loading = true;
+        // state.loading = true;
       })
       .addCase(clearAllNotifications.rejected, (state, action) => {
         console.log("Error clearing all notifications");
