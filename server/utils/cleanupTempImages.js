@@ -1,14 +1,22 @@
 const fs = require('fs');
+const User= require('../Resources/users/model')
 
-const cleanupTempImages = (tempImages) => {
-  if (tempImages) {
+const cleanupTempImages = async(req) => {
+  const  tempImages=req.tempImg
+
+  if (req.tempImg) {
     // Check and delete profile image
     if (tempImages.profileImg) {
       if (fs.existsSync(tempImages.profileImg)) {
         try 
         {
           // Delete the profile image
-          fs.unlinkSync(tempImages.profileImg);  
+          fs.unlinkSync(tempImages.profileImg); 
+          await User.findByIdAndUpdate(
+            req.user._id,
+            { $set: { profileImg: null } },
+            { new: true }
+          )
           // console.log(`Deleted profile image: ${tempImages.profileImg}`);
         } catch (err) {
           console.error(`Error cleaning up profile image ${tempImages.profileImg}: ${err.message}`);
@@ -23,11 +31,17 @@ const cleanupTempImages = (tempImages) => {
         {
            // Delete the header image
           fs.unlinkSync(tempImages.headerImg); 
+          await User.findByIdAndUpdate(
+            req.user._id,
+            { $set: { headerImg: null } },
+            { new: true }
+          )
           console.log(`Deleted header image: ${tempImages.headerImg}`);
         } catch (err) {
           console.error(`Error cleaning up header image ${tempImages.headerImg}: ${err.message}`);
         }
       }
+      
     }
   }
 };
