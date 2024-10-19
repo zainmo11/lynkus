@@ -6,95 +6,109 @@ const cookies = new Cookies();
 const token = cookies.get("token");
 
 const initialState = {
-  posts: [],
-  loading: false,
-  error: null,
+    posts: [], // Array of posts
+    currentPost: null, // To hold the currently fetched post
+    loading: false,
+    error: null,
 };
 
 export const fetchPosts = createAsyncThunk(
-  "post/fetchPosts",
-  async (_, thunkapi) => {
-    try {
-      setAuthToken(token);
-      const res = await api.get("posts");
-      return res.data;
-    } catch (e) {
-      return thunkapi.rejectWithValue(
-        e.response?.data || { message: "An error occurred" }
-      );
+    "post/fetchPosts",
+    async (_, thunkapi) => {
+        try {
+            setAuthToken(token);
+            const res = await api.get("posts");
+            return res.data;
+        } catch (e) {
+            return thunkapi.rejectWithValue(
+                e.response?.data || { message: "An error occurred" }
+            );
+        }
     }
-  }
+);
+
+export const fetchPostsById = createAsyncThunk(
+    "post/fetchPostsById",
+    async (postId, thunkapi) => {
+        try {
+            setAuthToken(token); // Ensure token is set
+            const response = await api.get(`/posts/${postId}`);
+            return response.data;
+        } catch (e) {
+            return thunkapi.rejectWithValue(
+                e.response?.data || { message: "An error occurred" }
+            );
+        }
+    }
 );
 
 export const likePostToggle = createAsyncThunk(
-  "post/likePostToggle",
-  async (likeDetails, thunkapi) => {
-    try {
-      const res = await api.post("likes", likeDetails);
-      console.log(res.data);
-      return res.data;
-    } catch (e) {
-      console.log(e);
-      return thunkapi.rejectWithValue(
-        e.response?.data || { message: "An error occurred" }
-      );
+    "post/likePostToggle",
+    async (likeDetails, thunkapi) => {
+        try {
+            setAuthToken(token); // Ensure token is set
+            const res = await api.post("likes", likeDetails);
+            return res.data;
+        } catch (e) {
+            console.log(e);
+            return thunkapi.rejectWithValue(
+                e.response?.data || { message: "An error occurred" }
+            );
+        }
     }
-  }
 );
 
 export const postSlice = createSlice({
-  name: "post",
-  initialState,
-  reducers: {
-    // togglePost: (state, action) => {
-    //   state.posts[action.payload].showPost =
-    //     !state.posts[action.payload].showPost;
-    // },
-    likeNumberChange: (state, action) => {
-      if (state.posts[action.payload].likedByUser) {
-        state.posts[action.payload].likes =
-          state.posts[action.payload].likes - 1;
-        state.posts[action.payload].likedByUser =
-          !state.posts[action.payload].likedByUser;
-      } else {
-        state.posts[action.payload].likes =
-          state.posts[action.payload].likes + 1;
-        state.posts[action.payload].likedByUser =
-          !state.posts[action.payload].likedByUser;
-      }
+    name: "post",
+    initialState,
+    reducers: {
+        likeNumberChange: (state, action) => {
+            const post = state.posts[action.payload];
+            if (post.likedByUser) {
+                post.likes -= 1;
+            } else {
+                post.likes += 1;
+            }
+            post.likedByUser = !post.likedByUser;
+        },
     },
-    // toggleLikedPosts: (state, action) => {
-    //   state.likedPosts[action.payload].postLiked =
-    //     !state.likedPosts[action.payload].postLiked;
-    // },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchPosts.fulfilled, (state, action) => {
-        state.posts = action.payload;
-        state.loading = false;
-      })
-      .addCase(fetchPosts.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(fetchPosts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload.message;
-      })
-      .addCase(likePostToggle.fulfilled, (state) => {
-        state.loading = false;
-      })
-      .addCase(likePostToggle.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(likePostToggle.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload.message;
-      });
-  },
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchPosts.fulfilled, (state, action) => {
+                state.posts = action.payload;
+                state.loading = false;
+            })
+            .addCase(fetchPosts.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchPosts.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload.message;
+            })
+            .addCase(fetchPostsById.fulfilled, (state, action) => {
+                state.currentPost = action.payload; // Store the fetched post
+                state.loading = false;
+            })
+            .addCase(fetchPostsById.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchPostsById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload.message;
+            })
+            .addCase(likePostToggle.fulfilled, (state) => {
+                state.loading = false; // Reset loading state
+            })
+            .addCase(likePostToggle.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(likePostToggle.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload.message;
+            });
+    },
 });
 
-export const { togglePost, likeNumberChange, toggleLikedPosts } =
-  postSlice.actions;
+export const { likeNumberChange } = postSlice.actions;
 
 export default postSlice.reducer;

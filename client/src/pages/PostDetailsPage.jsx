@@ -1,53 +1,79 @@
 /* eslint-disable react/prop-types */
-import {useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 import Post from "../components/Post";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { DefaultButton } from "../components/Buttons.jsx";
-import { EllipsisVerticalIcon } from '@heroicons/react/24/outline'; // Updated import
+import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
+import api, { setAuthToken } from "../utils/axios";
+import Cookies from "universal-cookie";
+import LoadingPage from "./LoadingPage.jsx";
 
 function PostDetailsPage() {
     const { postId } = useParams();
-    const [comments, setComments] = useState([
-        { id: 1, text: "Great post!", user: "User1" },
-        { id: 2, text: "Really insightful, thanks!", user: "User2" },
-        { id: 3, text: "I love this post!", user: "User3" },
-    ]); // Sample comment data
-
+    const [post, setPost] = useState(null);
+    const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
-    const [optionsOpen, setOptionsOpen] = useState(null); // Track which comment's options are open
-    const posts = useSelector((state) => state.post.posts);
+    const [optionsOpen, setOptionsOpen] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const cookies = new Cookies();
+    const currentUser = cookies.get("username");
+    const token = cookies.get("token");
 
-    const postDetails = posts[postId];
+    useEffect(() => {
+        const fetchPostAndComments = async () => {
+            try {
+                setAuthToken(token);
+                const postResponse = await api.get(`/posts/${postId}`);
+                setPost(postResponse.data);
 
-    // Function to handle new comment submission
-    const handleCommentSubmit = (e) => {
+                const commentsResponse = await api.get(`/comments/${postId}`);
+                setComments(commentsResponse.data);
+            } catch (error) {
+                console.error("Error fetching post or comments:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPostAndComments();
+    }, [postId, token, setComments]);
+
+    const handleCommentSubmit = async (e) => {
         e.preventDefault();
         if (newComment.trim()) {
             const newCommentData = {
-                id: comments.length + 1,
+                postId: postId,
                 text: newComment,
-                user: "CurrentUser",
             };
-            setComments([...comments, newCommentData]);
-            setNewComment("");
+            try {
+                setAuthToken(token);
+                const response = await api.post(`/comments`, newCommentData);
+                console.log("Comment added successfully:", response.data);
+                setComments((prevComments) => [...prevComments, response.data]);
+                setNewComment("");
+            } catch (error) {
+                console.error("Error adding comment:", error);
+            }
         }
     };
 
-    // Function to delete a comment
-    const handleDeleteComment = (id) => {
-        setComments(comments.filter(comment => comment.id !== id));
-        setOptionsOpen(null); // Close the options menu after deletion
+    const handleDeleteComment = async (id) => {
+        try {
+            setAuthToken(token);
+            await api.delete(`/posts/${postId}/comments/${id}`);
+            setComments((prevComments) => prevComments.filter((comment) => comment.id !== id));
+            setOptionsOpen(null);
+        } catch (error) {
+            console.error("Error deleting comment:", error);
+        }
     };
 
-    // Function to open the options menu for a specific comment
     const toggleOptionsMenu = (id) => {
-        setOptionsOpen(optionsOpen === id ? null : id);
+        setOptionsOpen((prev) => (prev === id ? null : id));
     };
 
     const optionsMenuRef = useRef(null);
 
-    // Handle clicks outside the options menu
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (optionsMenuRef.current && !optionsMenuRef.current.contains(event.target)) {
@@ -61,26 +87,37 @@ function PostDetailsPage() {
         };
     }, []);
 
-    return (
-        <div className="w-full max-h-screen bg-light-background dark:bg-dark-background md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar pt-6 px-6">
-            {/* Post component */}
-            <Post
-                username={postDetails.username}
-                name={postDetails.name}
-                profileImg={postDetails.profileImg}
-                body={postDetails.body}
-                postImg={postDetails.postImg}
-                likes={postDetails.likes}
-                comments={postDetails.comments}
-                postLiked={postDetails.postLiked}
-                index={postId}
-                commemts={postDetails.comments}
-            />
+    if (loading) return <div
+        className="w-full max-h-screen bg-light-background dark:bg-dark-background md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText">
+        <LoadingPage/>
+    </div>;
 
-            {/* Comments Section */}
+    return (
+        <div
+            className="w-full max-h-screen bg-light-background dark:bg-dark-background md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar pt-6 px-6 flex-1">
+            {post ? (
+                <Post
+                    name={post.userName}
+                    username={post.name}
+                    profileImg={post.post.authorId.profileImg}
+                    body={post.post.body}
+                    postImg={post.post.image}
+                    likes={post.likes}
+                    postLiked={post.postLiked}
+                    index={postId}
+                    comments={post.comments}
+                    userId={post.post.authorId._id}
+                    currentUserId={currentUser}
+                />
+            ) : (
+                <div className="w-full max-h-screen bg-light-background dark:bg-dark-background md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText">
+                <LoadingPage />
+                </div>
+            )}
+
             <div className="comments-section mt-8">
                 <h2 className="text-xl mb-4 text-gray-800 dark:text-gray-200 font-bold">
-                    Comments ({Array.isArray(comments) ? comments.length : 0})
+                    Comments ({comments.length})
                 </h2>
 
                 {comments.map((comment) => (
@@ -88,18 +125,21 @@ function PostDetailsPage() {
                         key={comment.id}
                         className="comment mb-4 p-4 border border-gray-200 rounded-lg shadow-sm bg-light-primaryBackground dark:bg-dark-primaryBackground flex items-start relative"
                     >
-                        {/* User Icon */}
                         <img
-                            src="https://via.placeholder.com/40"
+                            src={post.post.authorId.profileImg}
                             alt={`${comment.user}'s avatar`}
                             className="w-10 h-10 rounded-full mr-4"
                         />
-                        <div className="flex-grow">
-                            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{comment.user}</p>
-                            <p className="text-base text-gray-700 dark:text-gray-300">{comment.text}</p>
+                        <div className="flex-grow space-y-1">
+                            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{comment.userId.name}</p>
+                            <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                                <span className="text-primary-600 dark:text-primary-400">@{comment.userId.userName}</span>
+                            </p>
+                            <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+                                {comment.text}
+                            </p>
                         </div>
 
-                        {/* Options Menu */}
                         <div className="relative" ref={optionsMenuRef}>
                             <button
                                 onClick={() => toggleOptionsMenu(comment.id)}
@@ -111,14 +151,16 @@ function PostDetailsPage() {
                             {optionsOpen === comment.id && (
                                 <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-10">
                                     <ul className="py-1">
-                                        {/* Options based on user */}
-                                        {comment.user === "CurrentUser" ? (
+                                        {comment.user === currentUser ? (
                                             <>
-                                                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => handleDeleteComment(comment.id)}>Delete</li>
+                                                <li
+                                                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                                    onClick={() => handleDeleteComment(comment.id)}>Delete
+                                                </li>
                                                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Modify</li>
                                             </>
                                         ) : (
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => handleDeleteComment(comment.id)}>Delete</li>
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Report & Delete</li>
                                         )}
                                     </ul>
                                 </div>
@@ -127,8 +169,7 @@ function PostDetailsPage() {
                     </div>
                 ))}
 
-                {/* Add Comment Form */}
-                <form onSubmit={handleCommentSubmit} className="add-comment-form mt-6 flex flex-col gap-4">
+                <form onSubmit={handleCommentSubmit} className="add-comment-form mt-6 flex flex-col gap-4 mb-20">
                     <textarea
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
@@ -137,7 +178,7 @@ function PostDetailsPage() {
                         required
                     ></textarea>
                     <div className="flex justify-end">
-                        <DefaultButton type="submit" label="Post Comment"/>
+                        <DefaultButton type="submit" label="Post Comment" />
                     </div>
                 </form>
             </div>
