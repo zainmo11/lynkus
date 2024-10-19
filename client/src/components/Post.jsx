@@ -26,7 +26,7 @@ function Post({
               }) {
     const dispatch = useDispatch();
     const posts = useSelector((state) => state.post.posts);
-    const [showPost, setShowPost] = useState(true);
+    const [showPost] = useState(true);
     const [openModal, setOpenModal] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
 

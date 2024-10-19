@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+ 
 import { useEffect, useRef, useState } from "react";
 import Post from "../components/Post";
 import { useParams } from "react-router-dom";

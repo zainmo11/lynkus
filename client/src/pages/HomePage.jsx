@@ -29,7 +29,7 @@ function HomePage() {
 
     // Render LoadingPage while loading is true
     if (loading) {
-        return <div className="w-full max-h-screen bg-light-background dark:bg-dark-background md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText"><LoadingPage /></div>;;
+        return <div className="w-full max-h-screen bg-light-background dark:bg-dark-background md:col-span-7 lg:col-span-4 overflow-y-auto hide-scrollbar text-light-primaryText dark:text-dark-primaryText"><LoadingPage /></div>;
     }
 
     return (
@@ -38,7 +38,6 @@ function HomePage() {
             <ul className="w-full divide-y divide-light-secondaryText dark:divide-dark-secondaryText border-t border-light-secondaryText dark:border-dark-secondaryText">
                 {posts.map((x, i) => {
                     return (
-                        console.log("posts", x),
                         <li key={i} className="pt-6 px-6">
                             <Post
                                 name={x.authorId?.name}
