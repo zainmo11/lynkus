@@ -1,9 +1,7 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Post from "../components/Post";
 import { fetchSearchResults } from "../store/searchSlice";
-import { useNavigate } from "react-router-dom";
-import PostDetailsPage from "../pages/PostDetailsPage";
+import SearchPost from "./SearchPost";
 
 export default function FilteredPosts() {
   const dispatch = useDispatch();
@@ -18,7 +16,6 @@ export default function FilteredPosts() {
     }
   }, [dispatch, query, activeTab]);
 
-
   return (
     <div className="filtered-posts px-3">
       {loading ? (
@@ -29,19 +26,14 @@ export default function FilteredPosts() {
         </p>
       ) : posts.length > 0 ? (
         posts.map((post, index) => (
-          <div
-            key={post._id}
-            className="border-b-gray-300 border-b mt-5"
-          >
-            <Post
+          <div key={post._id} className="border-b-gray-300 border-b mt-5">
+            <SearchPost
               username={post.authorId.userName}
               name={post.authorId.name}
               profileImg={post.authorId.profileImg}
+              postId={post._id}
               body={post.body}
               postImg={post.image}
-              likes={post.likes || 0}
-              comments={post.comments || 0}
-              postLiked={post.postLiked || false}
               index={index}
             />
           </div>

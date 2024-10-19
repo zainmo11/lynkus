@@ -10,7 +10,7 @@ import {
 import { toggleTheme } from "../store/themeSlice";
 import { logout } from "../store/authSlice";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../utils/axios";
 import { fetchPosts } from "../store/postSlice";
 import { toast, ToastContainer } from "react-toastify";
@@ -25,6 +25,10 @@ function CreatePost({ profileImg }) {
   const [image, setImage] = useState(null);
   const [postBody, setPostBody] = useState("");
   const [postCreation, setPostCreation] = useState("false");
+
+  useEffect(() => {
+    setPostCreation(false);
+  }, []);
 
   const changeTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
