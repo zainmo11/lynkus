@@ -393,7 +393,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
     updateData.email = req.body.email;
   }
 
-    if (req.body.profileImg || req.body.profile===null ) {
+    if (req.body.profileImg || req.body.profileImg===null ) {
     updateData.profileImg = req.body.profileImg;
   }
 
