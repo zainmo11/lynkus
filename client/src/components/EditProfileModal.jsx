@@ -6,13 +6,18 @@ import { Modal, Label, TextInput, Textarea } from "flowbite-react";
 import { DefaultButton, SecondaryButton } from "./Buttons";
 import { capitalizeName, formatImageUrl } from "../utils/helpers";
 import { useDispatch, useSelector } from "react-redux";
-import { editUserProfile } from "../store/userSlice";
+import {
+  editUserProfile,
+  fetchUserData,
+  getUserData,
+} from "../store/userSlice";
 import {
   modalTheme,
   textAreaTheme,
   textInputTheme,
 } from "../utils/flowbiteThemes";
 import { toggleAlert } from "../store/appSlice";
+import { useNavigate } from "react-router-dom";
 
 const EditProfileModal = ({ openModal, setOpenModal }) => {
   const [imageFiles, setImageFiles] = useState({
@@ -20,8 +25,9 @@ const EditProfileModal = ({ openModal, setOpenModal }) => {
     headerImg: null,
   });
   const dispatch = useDispatch();
-  const { userData, loading, err } = useSelector((state) => state.user);
-  console.log(userData);
+  const { authUserData, loading, err } = useSelector((state) => state.user);
+  console.log(authUserData.data);
+  const nav = useNavigate();
 
   const {
     register,
@@ -29,8 +35,8 @@ const EditProfileModal = ({ openModal, setOpenModal }) => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      ...userData,
-      name: capitalizeName(userData.name),
+      ...authUserData.data,
+      name: capitalizeName(authUserData.data.name),
     },
   });
 
@@ -41,7 +47,8 @@ const EditProfileModal = ({ openModal, setOpenModal }) => {
     }
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
+    setOpenModal(false);
     const formData = new FormData();
 
     // Append text fields
@@ -67,10 +74,16 @@ const EditProfileModal = ({ openModal, setOpenModal }) => {
     console.log("FormData to be sent to API:");
     console.log(objData);
 
-    dispatch(editUserProfile(objData));
+    await dispatch(editUserProfile(objData)).unwrap();
+    // Dispatch editUserProfile and wait for it to complete
+    // await dispatch(editUserProfile(formData)).unwrap();
+
+    // After editUserProfile is fulfilled, dispatch getUserData
+    await dispatch(fetchUserData(authUserData.data?.id)).unwrap();
+
+    await dispatch(getUserData(authUserData.data?.userName)).unwrap();
     if (!loading && !err) {
       dispatch(toggleAlert());
-      setOpenModal(false);
     }
   };
 
@@ -86,8 +99,8 @@ const EditProfileModal = ({ openModal, setOpenModal }) => {
           src={
             imageFiles[fieldName]
               ? URL.createObjectURL(imageFiles[fieldName])
-              : userData[fieldName]
-              ? formatImageUrl(userData[fieldName], fieldName)
+              : authUserData.data[fieldName]
+              ? formatImageUrl(authUserData.data[fieldName], fieldName)
               : "https://placeholder.pics/svg/700/DEDEDE/DEDEDE/"
           }
           alt={`${fieldName} preview`}

@@ -48,8 +48,8 @@ function DeleteProfileModal({ openModal, setOpenModal }) {
           <div className="flex justify-center items-center gap-4">
             <ErrorButton
               label="Yes, I'm sure"
-              onClick={() => {
-                dispatch(deleteUserProfile());
+              onClick={async () => {
+                await dispatch(deleteUserProfile()).unwrap();
                 dispatch(logout());
                 nav("/welcome");
                 setOpenModal(false);

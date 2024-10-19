@@ -31,7 +31,6 @@ export default function SearchNavTabs() {
   const dispatch = useDispatch(); // Initialize dispatch to trigger actions
   const activeTab = useSelector((state) => state.search.activeTab); // Select the current active tab from the Redux store
 
-
   return (
     <div className="min-h-full mt-[20px] bg-light-background dark:bg-dark-background rounded-[10px]">
       {/* Tabs component with custom theme */}

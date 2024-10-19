@@ -7,7 +7,7 @@ function FollowingsTab() {
   return (
     <>
       {userFollowings.length == 0 ? (
-        <div className="w-full h-full flex items-center justify-center text-light-primaryText dark:text-dark-primaryText opacity-80">
+        <div className="w-full h-20 flex items-center justify-center text-light-primaryText dark:text-dark-primaryText opacity-80">
           <p>You have no followings yet!</p>
         </div>
       ) : (
@@ -18,9 +18,10 @@ function FollowingsTab() {
                 <FollowCard
                   key={i}
                   username={x.userName}
+                  userId={x.id}
                   name={capitalizeName(x.name)}
                   profileImg={x.profileImg}
-                  followed={true}
+                  followed={x.isFollowed}
                 />
               </li>
             );
