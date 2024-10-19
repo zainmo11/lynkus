@@ -13,13 +13,15 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import api from "../utils/axios";
 import { fetchPosts } from "../store/postSlice";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function CreatePost({ profileImg }) {
   const theme = useSelector((state) => state.theme.theme);
   const darkMode = theme === "dark";
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(null);
   const [postBody, setPostBody] = useState("");
 
   const changeTheme = () => {
@@ -36,6 +38,8 @@ function CreatePost({ profileImg }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const toastId = toast.info("Creating post...", { autoClose: false });
+
     try {
       const postData = new FormData();
 
@@ -49,14 +53,24 @@ function CreatePost({ profileImg }) {
           "Content-Type": "multipart/form-data",
         },
       });
+
+      setPostBody("");
+      setImage(null);
+
+      toast.dismiss(toastId);
+      toast.success("Post created successfully!");
+
       dispatch(fetchPosts());
     } catch (error) {
+      toast.dismiss(toastId);
+      toast.error("Failed to create post!");
       console.log(error);
     }
   };
 
   return (
     <>
+      <ToastContainer />
       {/* Mobile Dark Toggle & Sign out */}
       <div className=" w-full bg-dark-secondaryBackground md:hidden flex justify-between items-center py-2 px-4">
         <img src={logo} className="h-14 rounded-full object-cover" alt="Logo" />

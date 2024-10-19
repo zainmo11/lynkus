@@ -107,6 +107,35 @@ export const postSlice = createSlice({
                 state.error = action.payload.message;
             });
     },
+    // toggleLikedPosts: (state, action) => {
+    //   state.likedPosts[action.payload].postLiked =
+    //     !state.likedPosts[action.payload].postLiked;
+    // },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchPosts.fulfilled, (state, action) => {
+        state.posts = action.payload.reverse();
+        state.loading = false;
+      })
+      .addCase(fetchPosts.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchPosts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.message;
+      })
+      .addCase(likePostToggle.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(likePostToggle.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(likePostToggle.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.message;
+      });
+  },
 });
 
 export const { likeNumberChange } = postSlice.actions;

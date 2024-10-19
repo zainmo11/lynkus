@@ -47,9 +47,11 @@ export default function Welcome() {
 
   // Signup
   const onSubmitSignup = (data) => {
-    dispatch(signup(data));
-    dispatch(toggleAlert());
-    setFormStatus(true);
+    dispatch(signup(data)).then(() => {
+      dispatch(toggleAlert());
+      setFormStatus(true);
+      reset();
+    });
   };
 
   const toggleForm = (status) => {
@@ -58,7 +60,7 @@ export default function Welcome() {
   };
 
   return (
-    <div className="flex flex-col w-screen max-h-screen">
+    <div className="flex flex-col max-w-screen max-h-screen">
       {showAlert && (
         <AlertComponent
           type="Success!"
@@ -68,7 +70,7 @@ export default function Welcome() {
           }}
         />
       )}
-      <div className="welcome flex dark:bg-dark-background ">
+      <div className="welcome flex dark:bg-dark-background">
         <div className="image w-[55%] relative hidden lg:block">
           <img
             className="w-full h-screen object-cover"

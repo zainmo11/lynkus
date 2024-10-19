@@ -1,4 +1,3 @@
- 
 import { useEffect, useRef, useState } from "react";
 import Post from "../components/Post";
 import { useParams } from "react-router-dom";
@@ -72,8 +71,7 @@ function PostDetailsPage() {
         setOptionsOpen((prev) => (prev === id ? null : id));
     };
 
-    const optionsMenuRef = useRef(null);
-
+  const optionsMenuRef = useRef(null);
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (optionsMenuRef.current && !optionsMenuRef.current.contains(event.target)) {
@@ -182,8 +180,28 @@ function PostDetailsPage() {
                     </div>
                 </form>
             </div>
-        </div>
-    );
+          </div>
+        ))}
+
+        {/* Add Comment Form */}
+        <form
+          onSubmit={handleCommentSubmit}
+          className="add-comment-form mt-6 flex flex-col gap-4"
+        >
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            className="p-3 border border-gray-300 rounded-lg resize-none h-24 focus:outline-none focus:border-blue-500 transition-colors"
+            placeholder="Add a comment..."
+            required
+          ></textarea>
+          <div className="flex justify-end">
+            <DefaultButton type="submit" label="Post Comment" />
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
 
 export default PostDetailsPage;
