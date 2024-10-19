@@ -45,22 +45,23 @@ const sendEmail=require('../../utils/sendEmail')
 
     
     const AccessToken = createAccessToken(user._id);
-    const refreshToken =  createRefreshToken(user._id);
+    
+    // const refreshToken =  createRefreshToken(user._id);
 
     
-    await RefreshToken.create({ token: refreshToken,
-        user: user._id,
-          expiresAt: new Date(
-            Date.now() + 7 * 24 * 60 * 60 * 1000 //7 days in milliseconds
-        ) });
+    // await RefreshToken.create({ token: refreshToken,
+    //     user: user._id,
+    //       expiresAt: new Date(
+    //         Date.now() + 7 * 24 * 60 * 60 * 1000 //7 days in milliseconds
+    //     ) });
         
-    // Set the refreshToken as a cookie
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true, // prevent xss attacks and cookies is sent over HTTP
-      secure: false, // make sure the token is only sent over encrypted HTTPS connections.
-      sameSite: 'Strict', // sent from same site prevent CSRF attacks
-      path: '/', // make sure cookie accessible to all routes
-    });
+    // // Set the refreshToken as a cookie
+    // res.cookie('refreshToken', refreshToken, {
+    //   httpOnly: true, // prevent xss attacks and cookies is sent over HTTP
+    //   secure: false, // make sure the token is only sent over encrypted HTTPS connections.
+    //   sameSite: 'Strict', // sent from same site prevent CSRF attacks
+    //   path: '/', // make sure cookie accessible to all routes
+    // });
 
 
   const Suer=user.toObject();
