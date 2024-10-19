@@ -1,35 +1,94 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Layout from "./layouts/MainLayout";
+import HomePage from "./pages/HomePage";
+import ProfilePage from "./pages/ProfilePage";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { setTheme } from "./store/themeSlice";
+import PostDetailsPage from "./pages/PostDetailsPage.jsx";
+import Welcome from "./pages/Welcome";
+import Error from "./pages/Error";
+import NotificationsPage from "./pages/NotificationsPage";
+import usePeriodicFetch from "./hooks/usePeriodicFetch";
+import { getAllNotifications } from "./store/notificationSlice";
+import PrivateRouter from "./components/PrivateRouter";
+import { fetchUserDataFromCookies, recommendedUsers } from "./store/userSlice";
+import SearchPage from "./pages/SearchPage";
+
+import LoadingPage from "./pages/LoadingPage";
+import { isAuthorized } from "./utils/checkAuth";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const dispatch = useDispatch();
+
+  //Fetch notifications globally
+  usePeriodicFetch(() => dispatch(getAllNotifications()), 300000);
+
+  useEffect(() => {
+    if (isAuthorized()) {
+      console.log("WELCOEM WE ARE GETTING UR DATA...");
+
+      dispatch(fetchUserDataFromCookies());
+      dispatch(recommendedUsers());
+    }
+    const storedTheme = localStorage.getItem("theme");
+
+    if (storedTheme) {
+      dispatch(setTheme(storedTheme));
+      document.documentElement.classList.toggle("dark", storedTheme === "dark");
+    } else {
+      const systemTheme = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      dispatch(setTheme(systemTheme ? "dark" : "light"));
+      document.documentElement.classList.toggle("dark", systemTheme);
+    }
+  }, [dispatch]);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/post/:postId" element={<PostDetailsPage />} />
+          <Route
+            index
+            element={
+              <PrivateRouter>
+                <HomePage />
+              </PrivateRouter>
+            }
+          />
+          <Route
+            path="/user/:username"
+            element={
+              <PrivateRouter>
+                <ProfilePage />
+              </PrivateRouter>
+            }
+          />
+          <Route
+            path="/search"
+            element={
+              <PrivateRouter>
+                <SearchPage />
+              </PrivateRouter>
+            }
+          />
+          <Route
+            path="/notfication"
+            element={
+              <PrivateRouter>
+                <NotificationsPage />
+              </PrivateRouter>
+            }
+          />
+        </Route>
+        <Route path="/welcome" element={<Welcome />} />
+        <Route path="/loading" element={<LoadingPage />} />
+        <Route path="/error" element={<Error />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
