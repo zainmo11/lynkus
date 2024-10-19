@@ -393,11 +393,11 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
     updateData.email = req.body.email;
   }
 
-    if (req.body.profileImg || req.body.profile==null ) {
+    if (req.body.profileImg || req.body.profileImg===null ) {
     updateData.profileImg = req.body.profileImg;
   }
 
-  if (req.body.headerImg || req.body.headerImg==null) {
+  if (req.body.headerImg || req.body.headerImg===null) {
     updateData.headerImg = req.body.headerImg;
   }
   if (req.body.bio) {
@@ -410,7 +410,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
     { new: true }
   );
     if (!user) {
-        cleanupTempImages(req.tempImg);
+        cleanupTempImages(req);
         return next(new ApiError("User Not Found", 404));
     }
     

@@ -17,7 +17,7 @@ exports.updateUserValidator = [
       const user = await User.findOne({ email: val });
       // Check if email is already used by another user
       if (user && user._id.toString() !== req.user._id.toString()) {
-        cleanupTempImages(req.tempImg); // Clean temp images if error
+        cleanupTempImages(req); // Clean temp images if error
         return Promise.reject(new Error('E-mail already in use'));
       }
     }),
@@ -47,7 +47,7 @@ exports.updateUserValidator = [
       const user = await User.findOne({ userName: val });
       // Check if userName is already used by another user
       if (user && user._id.toString() !== req.user._id.toString()) {
-        cleanupTempImages(req.tempImg); // Clean temp images if error
+        cleanupTempImages(req); // Clean temp images if error
         return Promise.reject(new Error('userName already in use'));
       }
     }),

@@ -13,7 +13,7 @@ const globalError = (err, req, res, next) => {
 
   //for cleanup
   if (req.tempImg) {
-    cleanupTempImages(req.tempImg)
+    cleanupTempImages(req)
 }
 
   // Development Mode Error Handling
