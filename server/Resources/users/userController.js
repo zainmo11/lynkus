@@ -37,6 +37,18 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
         const profileImgDir = path.join(__dirname, '../../uploads/users/profileImg');
         const headerImgDir = path.join(__dirname, '../../uploads/users/headerImg');
     
+         // Check if profileImg directory exists, if not create it
+        if (!fs.existsSync(profileImgDir)) {
+            // recursive ensures parent directories are created if necessary
+            fs.mkdirSync(profileImgDir, { recursive: true }); 
+            
+        }
+    
+        // Check if headerImg directory exists, if not create it
+        if (!fs.existsSync(headerImgDir)) {
+            fs.mkdirSync(headerImgDir, { recursive: true });
+           
+        }  
      // Remove profileImg if sent  empty field
      if (req.body.profileImg === '' && req.user.profileImg) {
         const oldImgFileName = req.user.profileImg.split('/').pop(); 
@@ -62,18 +74,8 @@ exports.resizeImg = asyncHandler(async (req, res, next) => {
         req.body.headerImg = null;  // Clear the headerImg in request
     }
    
-     // Check if profileImg directory exists, if not create it
-    if (!fs.existsSync(profileImgDir)) {
-        // recursive ensures parent directories are created if necessary
-        fs.mkdirSync(profileImgDir, { recursive: true }); 
-        
-    }
-
-    // Check if headerImg directory exists, if not create it
-    if (!fs.existsSync(headerImgDir)) {
-        fs.mkdirSync(headerImgDir, { recursive: true });
-       
-    }  
+   
+    
         // Handle Profile Image
         if (req.files && req.files.profileImg && req.files.profileImg.length > 0) 
             {
