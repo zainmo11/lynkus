@@ -1,25 +1,25 @@
 const multer = require('multer');
 const path = require('path');
-
+const {v4: uuid4}=require("uuid")
+const fs = require('fs');
 // Create a storage engine for user images
+
 const userStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, '../uploads/users/'); // Set the destination to '../uploads/users'
+        const uploadPath = path.join(__dirname, '../uploads/users'); 
+        if (!fs.existsSync(uploadPath)) {
+            
+            fs.mkdirSync(uploadPath, { recursive: true }); 
+            
+        }
+        cb(null, uploadPath);
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname); // Unique filename
+        cb(null, `user-${uuid4()}-${Date.now()}-${file.originalname}`);
     },
 });
 
-// Create a storage engine for post images
-const postStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, '../uploads/posts/'); // Set the destination to '../uploads/posts'
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname); // Unique filename
-    },
-});
+
 
 // Initialize upload middleware for user images
 const userUpload = multer({
@@ -37,6 +37,23 @@ const userUpload = multer({
     },
 });
 
+// Ensure the uploads directory exists
+const uploadsDir = path.join(__dirname, '../uploads/posts'); // Adjust path as needed
+
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true }); // Create directory if it doesn't exist
+}
+
+// Create a storage engine for post images
+const postStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadsDir); // Set the destination to the uploads/posts directory
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`); // Unique filename
+    },
+});
+
 // Initialize upload middleware for post images
 const postUpload = multer({
     storage: postStorage,
@@ -46,12 +63,15 @@ const postUpload = multer({
         const mimetype = filetypes.test(file.mimetype);
         const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
 
+        console.log("MIME", mimetype);
+        console.log("EXT", extname);
+
         if (mimetype && extname) {
             return cb(null, true);
         }
         cb(new Error('File type not allowed'), false);
     },
-});
+}).single('image');
 
 module.exports = {
     userUpload,

@@ -1,4 +1,5 @@
 const express = require('express');
+
 const router = express.Router();
 
 const users = require('./Resources/users/routes');
@@ -9,7 +10,10 @@ const likes = require('./Resources/likes/routes');
 const follows = require('./Resources/followers/routes');
 const hashtags = require('./Resources/hashtags/routes');
 const bookmarks = require('./Resources/bookmarks/routes');
+const auth = require('./Resources/auth/routes');
 
+
+router.use('/auth', auth);
 router.use('/users', users);
 router.use('/posts', posts);
 router.use('/notifications', notifications);
