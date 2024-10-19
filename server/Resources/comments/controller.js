@@ -2,7 +2,6 @@
 const Comment = require('./model');
 const Post = require('../posts/model');
 const Notification = require('../notifications/model');
-const User = require('../users/model');
 
 // Create a new comment
 exports.createComment = async (req, res) => {

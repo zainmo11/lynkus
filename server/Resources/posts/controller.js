@@ -66,7 +66,8 @@ exports.getPost = async (req, res) => {
         // Prepend the base URL to the image if it exists
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         if (post.image) {
-            post.image = `${baseUrl}/uploads/posts/${post.image}`;
+            const imageFilename = post.image.split('/').pop();
+            post.image = `${baseUrl}/uploads/posts/${imageFilename}`;
         }
 
         // Get likes and comments count
