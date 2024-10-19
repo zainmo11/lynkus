@@ -2,17 +2,20 @@
 const Comment = require('./model');
 const Post = require('../posts/model');
 const Notification = require('../notifications/model');
+const User = require('../users/model');
+
 // Create a new comment
 exports.createComment = async (req, res) => {
     try {
-        const { text, postId } = req.body; // Remove userId from req.body
+        const { text, postId } = req.body;
 
         // Retrieve userId from the token
         const userId = req.user._id;
 
+        // Check if the post exists
         const post = await Post.findById(postId);
         if (!post) {
-            return res.status(404).send({ message: 'Post not found' });
+            return res.status(404).json({ message: 'Post not found' });
         }
 
         // Create a new comment with the userId from the token
@@ -21,7 +24,7 @@ exports.createComment = async (req, res) => {
 
         // Notify the post owner about the new comment
         const notification = new Notification({
-            to: post.authorId,
+            to: post.authorId, // Notify the post author
             from: userId, // Use the userId from the token
             type: 'COMMENT',
             post: postId,
@@ -30,9 +33,13 @@ exports.createComment = async (req, res) => {
         });
         await notification.save();
 
-        res.status(201).send(comment);
+        // Populate the comment with user data before sending the response
+        const populatedComment = await Comment.findById(comment._id).populate('userId', 'name userName profileImg'); // Populate the userId field
+
+        res.status(201).json(populatedComment);
     } catch (error) {
-        res.status(500).send(error);
+        console.error('Error creating comment:', error);
+        res.status(500).json({ message: 'Server error', error });
     }
 };
 
