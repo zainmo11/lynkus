@@ -27,7 +27,7 @@ function Sidebar() {
           Link Up With
         </h1>
         <div className="w-full flex flex-col justify-center items-center gap-8">
-          {users &&
+          {users.length > 0 ? (
             users.slice(0, 6).map((x, i) => {
               return (
                 <FollowCard
@@ -38,7 +38,12 @@ function Sidebar() {
                   profileImg={x.profileImg}
                 />
               );
-            })}
+            })
+          ) : (
+            <p className="text-lg text-light-primaryText dark:text-dark-primaryText">
+              Currently Linked With All Users
+            </p>
+          )}
         </div>
       </div>
       {/* Hash Tag Section */}
