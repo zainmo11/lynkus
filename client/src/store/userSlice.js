@@ -212,6 +212,22 @@ export const toggleFollow = createAsyncThunk(
   }
 );
 
+export const toggleLikeUserPost = createAsyncThunk(
+  "user/toggleLikeUserPost",
+  async (postId, { rejectWithValue }) => {
+    try {
+      setAuthToken(token);
+      const res = await api.post(`/likes`, {
+        postId: postId,
+      });
+      return res.data.message;
+    } catch (e) {
+      console.log(e);
+      return rejectWithValue(e.response.data.message);
+    }
+  }
+);
+
 export const userSlice = createSlice({
   name: "user",
   initialState,
@@ -312,10 +328,10 @@ export const userSlice = createSlice({
       })
       .addCase(fetchUserData.fulfilled, (state, action) => {
         state.loading = false;
-        state.userPosts = action.payload.posts;
-        state.userLikedPosts = action.payload.likedPosts;
-        state.userFollowers = action.payload.followers;
-        state.userFollowings = action.payload.followings;
+        state.userPosts = action.payload.posts.reverse();
+        state.userLikedPosts = action.payload.likedPosts.reverse();
+        state.userFollowers = action.payload.followers.reverse();
+        state.userFollowings = action.payload.followings.reverse();
       })
       .addCase(fetchUserData.rejected, (state, action) => {
         state.loading = false;
@@ -447,6 +463,18 @@ export const userSlice = createSlice({
         console.log("Done getting recommended users");
         state.userRecommendation = action.payload;
         state.loading = false;
+      })
+      .addCase(toggleLikeUserPost.fulfilled, (state) => {
+        state.err = null;
+        state.loading = false;
+      })
+      // .addCase(toggleLikeUserPost.pending, (state) => {
+      //   state.err = null;
+      //   state.loading = true;
+      // })
+      .addCase(toggleLikeUserPost.rejected, (state, action) => {
+        state.loading = false;
+        state.err = action.payload.message;
       });
   },
 });

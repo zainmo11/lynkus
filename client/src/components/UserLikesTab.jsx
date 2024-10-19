@@ -2,6 +2,7 @@ import { useSelector } from "react-redux";
 import Post from "./Post";
 import { capitalizeName } from "../utils/helpers";
 import { useEffect } from "react";
+import ProfilePost from "./ProfilePost";
 
 function UserLikesTab() {
   const { loading, err, userLikedPosts } = useSelector((state) => state.user);
@@ -21,16 +22,17 @@ function UserLikesTab() {
           {userLikedPosts.map((x, i) => {
             return (
               <li key={i} className={`pt-6 px-6`}>
-                <Post
-                  username={x.authorId.userName}
-                  name={capitalizeName(x.authorId.name)}
-                  profileImg={x.authorId.profileImg}
-                  body={x.body}
-                  postImg={x.image}
-                  likes={x.likesCount || "0"}
-                  commemts={x.commentsCount || "0"}
-                  likedByUser={x.likedByUser}
-                  postId={x._id}
+                <ProfilePost
+                  username={x?.authorId?.userName}
+                  name={capitalizeName(x?.authorId?.name)}
+                  profileImg={x?.authorId?.profileImg}
+                  body={x?.body}
+                  postImg={x?.image}
+                  likes={x?.likesCount || "0"}
+                  commemts={x?.commentsCount || "0"}
+                  likedByUser={x?.likedByUser}
+                  postId={x?._id}
+                  userId={x?.authorId?.id}
                 />
               </li>
             );
