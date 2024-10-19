@@ -15,6 +15,7 @@ import api from "../utils/axios";
 import { fetchPosts } from "../store/postSlice";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import LoadingSpinner from "./LoadingSpinner";
 
 function CreatePost({ profileImg }) {
   const theme = useSelector((state) => state.theme.theme);
@@ -23,6 +24,7 @@ function CreatePost({ profileImg }) {
   const navigate = useNavigate();
   const [image, setImage] = useState(null);
   const [postBody, setPostBody] = useState("");
+  const [postCreation, setPostCreation] = useState("false");
 
   const changeTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
@@ -38,7 +40,7 @@ function CreatePost({ profileImg }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const toastId = toast.info("Creating post...", { autoClose: false });
+    setPostCreation(true);
 
     try {
       const postData = new FormData();
@@ -56,15 +58,12 @@ function CreatePost({ profileImg }) {
 
       setPostBody("");
       setImage(null);
-
-      toast.dismiss(toastId);
-      toast.success("Post created successfully!");
-
       dispatch(fetchPosts());
     } catch (error) {
-      toast.dismiss(toastId);
       toast.error("Failed to create post!");
       console.log(error);
+    } finally {
+      setPostCreation(false);
     }
   };
 
@@ -148,7 +147,7 @@ function CreatePost({ profileImg }) {
             type="submit"
             className="font-semibold rounded-3xl text-sm px-6 py-2 text-center text-dark-primaryText bg-button-default hover:bg-button-hover"
           >
-            Post
+            {postCreation ? <LoadingSpinner size="sm" /> : "Post"}
           </button>
         </div>
       </form>
