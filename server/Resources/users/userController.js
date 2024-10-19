@@ -9,11 +9,12 @@ const User = require("./model");
 const Post = require("../posts/model")
 const Comment = require("../comments/model")
 const BookMark = require("../bookmarks/model")
+const Like = require('../likes/model');
 const {userUpload} = require("../../utils/upload")
 const refreshToken=require("../auth/RefreshTokenModel")
 const Follows=require("../followers/model")
 const {cleanupTempImages} =require('../../utils/cleanupTempImages')
-
+const Notification=require('../notifications/model')
 
 exports.UploadUserImgs=userUpload.fields([
     {
@@ -296,11 +297,15 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
         return next(new ApiError("Invalid User ID", 404));
     }
     // Delete related posts, comments, bookmarks, and refresh tokens for the user
-    await Post.deleteMany({ user: id });
-    await Comment.deleteMany({ user: id });
+    await Post.deleteMany({ authorId: id });
+    await Comment.deleteMany({ userId: id });
     await BookMark.deleteMany({ user: id });
     await refreshToken.deleteMany({ user: id });
-
+    await Follows.deleteMany({following:id})
+    await Follows.deleteMany({user:id})
+    await Like.deleteMany({userId:id});
+    await Notification.deleteMany({to:id});
+    await Notification.deleteMany({from:id});
     //delete profileImg and headerImg
     if (req.user && req.user.profileImg) {
         const oldImgFileName = req.user.profileImg.split('/').pop(); // Extract the file name from URL
