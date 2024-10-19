@@ -33,7 +33,7 @@ function Sidebar() {
                 <FollowCard
                   key={i}
                   userId={x._id}
-                  username={x.username}
+                  username={x.userName}
                   name={x.name}
                   profileImg={x.profileImg}
                 />

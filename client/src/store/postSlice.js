@@ -15,6 +15,8 @@ export const fetchPosts = createAsyncThunk(
   "post/fetchPosts",
   async (_, thunkapi) => {
     try {
+      console.log(token);
+
       setAuthToken(token);
       const res = await api.get("posts");
       return res.data;

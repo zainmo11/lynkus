@@ -23,7 +23,7 @@ import { DefaultButton, ErrorButton } from "../components/Buttons";
 import { toggleTheme } from "../store/themeSlice";
 
 function Navbar() {
-  const { userData } = useSelector((state) => state.user);
+  const { authUserData } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const location = useLocation();
   const { pathname } = location;
@@ -80,17 +80,31 @@ function Navbar() {
             </li>
             <li className="w-full lg:flex items-center">
               <Link
-                to={`/user/${userData?.userName}`}
+                to={`/user/${
+                  authUserData?.userName
+                    ? authUserData?.userName
+                    : authUserData.data?.userName
+                }`}
                 className="flex justify-center items-center gap-2"
               >
-                {pathname == `/user/${userData?.userName}` ? (
+                {pathname ==
+                `/user/${
+                  authUserData?.userName
+                    ? authUserData?.userName
+                    : authUserData.data?.userName
+                }` ? (
                   <UserSolid className="size-7 text-button-default hover:text-button-hover" />
                 ) : (
                   <UserIcon className="size-6 text-button-default hover:text-button-hover" />
                 )}
                 <p
                   className={`hidden lg:block ${
-                    pathname == `/user/${userData?.userName}`
+                    pathname ==
+                    `/user/${
+                      authUserData?.userName
+                        ? authUserData?.userName
+                        : authUserData.data?.userName
+                    }`
                       ? "text-3xl"
                       : "text-2xl"
                   } font-bold text-light-primaryText hover:text-button-hover dark:text-dark-primaryText dark:hover:text-button-hover`}

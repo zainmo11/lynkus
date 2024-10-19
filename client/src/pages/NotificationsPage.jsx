@@ -57,7 +57,7 @@ function NotificationsPage() {
           return (
             <NotificationItem
               key={index}
-              from={notification.content.split(" ")[0]}
+              from={notification.from.userName}
               read={notification.read}
               type={notification.type}
               toggleRead={() => {

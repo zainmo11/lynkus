@@ -12,7 +12,7 @@ import NotificationsPage from "./pages/NotificationsPage";
 import usePeriodicFetch from "./hooks/usePeriodicFetch";
 import { getAllNotifications } from "./store/notificationSlice";
 import PrivateRouter from "./components/PrivateRouter";
-import { fetchUserDataFromCookies } from "./store/userSlice";
+import { fetchUserDataFromCookies, recommendedUsers } from "./store/userSlice";
 import SearchPage from "./pages/SearchPage";
 
 import LoadingPage from "./pages/LoadingPage";
@@ -29,6 +29,7 @@ function App() {
       console.log("WELCOEM WE ARE GETTING UR DATA...");
 
       dispatch(fetchUserDataFromCookies());
+      dispatch(recommendedUsers());
     }
     const storedTheme = localStorage.getItem("theme");
 

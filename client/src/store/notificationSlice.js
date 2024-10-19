@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api, { setAuthToken } from "../utils/axios";
 import Cookies from "universal-cookie";
+import { isAuthorized } from "../utils/checkAuth";
 
 const cookies = new Cookies();
 
@@ -96,9 +97,11 @@ export const getAllNotifications = createAsyncThunk(
   "notifications/getAllNotifications",
   async (_, { rejectWithValue }) => {
     try {
-      setAuthToken(token);
-      const res = await api.get("/notifications");
-      return res.data.Notifications;
+      if (isAuthorized()) {
+        setAuthToken(token);
+        const res = await api.get("/notifications");
+        return res.data.Notifications;
+      }
     } catch (e) {
       return rejectWithValue(e.response.data.message);
     }
@@ -162,9 +165,7 @@ export const notificationSlice = createSlice({
             )
         );
         state.notifications = action.payload;
-        state.hasNewNotifications =
-          newNotifications.length > 0 ||
-          state.notifications.some((n) => !n.read);
+        state.hasNewNotifications = newNotifications.length > 0;
         console.log(state.notifications);
         state.loading = false;
       })
